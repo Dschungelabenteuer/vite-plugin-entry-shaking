@@ -1,0 +1,4 @@
+{
+  "extends": ["@yungezeit/base"],
+  "ignorePatterns": ["README.md"]
+}

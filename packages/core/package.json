@@ -1,0 +1,65 @@
+{
+  "name": "vite-plugin-entry-shaking",
+  "version": "0.0.0",
+  "description": "Mimic tree-shaking behaviour when importing code from an entry file in development mode.",
+  "author": "Charles Gruenais",
+  "license": "MIT",
+  "homepage": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
+  },
+  "keywords": [
+    "vite",
+    "vite-plugin",
+    "entry",
+    "tree shaking"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "main": "dist/index.cjs",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts"
+  },
+  "scripts": {
+    "dev": "pnpm unbuild --stub",
+    "build": "pnpm unbuild",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "peerDependencies": {
+    "vite": ">=2.0.0"
+  },
+  "dependencies": {
+    "es-module-lexer": "^1.0.3",
+    "magic-string": "^0.26.3"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.18",
+    "@vitest/coverage-istanbul": "^0.23.4",
+    "@yungezeit/eslint-config-typescript": "^0.0.8",
+    "eslint": "^8.23.1",
+    "ts-dedent": "^2.2.0",
+    "typescript": "^4.8.3",
+    "unbuild": "^0.8.11",
+    "vite": "^3.1.1",
+    "vitest": "^0.23.2"
+  }
+}

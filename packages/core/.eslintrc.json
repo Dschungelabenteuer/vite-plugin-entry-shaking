@@ -1,0 +1,10 @@
+{
+  "extends": ["@yungezeit/typescript"],
+  "overrides": [{
+    "files": ["tests/**/*.test.ts"],
+    "rules": {
+      "max-len": "off",
+      "prefer-regex-literals": "off"
+    }
+  }]
+}

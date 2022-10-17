@@ -1,0 +1,25 @@
+{
+  "name": "vite-plugin-entry-shaking-root",
+  "version": "0.0.0",
+  "private": true,
+  "author": "Charles Gruenais",
+  "license": "MIT",
+  "homepage": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking"
+  },
+  "bugs": {
+    "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
+  },
+  "scripts": {
+    "changeset": "changeset",
+    "build": "pnpm --filter \"./packages/core\" build",
+    "release": "pnpm build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.4.7",
+    "@changesets/cli": "^2.25.0",
+    "@yungezeit/eslint-config-base": "^0.0.8"
+  }
+}
