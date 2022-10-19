@@ -1,5 +1,11 @@
 # vite-plugin-entry-shaking
 
+## 0.0.2
+
+### Patch Changes
+
+- a7e8fe2: Prepare release (v0.0.2)
+
 ## 0.0.1
 
 ### Patch Changes
