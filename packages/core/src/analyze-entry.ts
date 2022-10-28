@@ -31,7 +31,7 @@ const parseImportStatement = (statement: string): ParsedImportStatement => {
       });
     }
 
-    const defaultImport = importContent.replaceAll(',', '').trim();
+    const defaultImport = importContent.replace(/,/g, '').trim();
     output.defaultImport = defaultImport.length
       ? defaultImport
       : output.defaultImport;
