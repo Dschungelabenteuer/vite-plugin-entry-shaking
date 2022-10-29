@@ -1,5 +1,14 @@
 # vite-plugin-entry-shaking-example-simple
 
+## 0.0.3
+
+### Patch Changes
+
+- c0641df:
+  - Fixed the plugin not correctly rewriting imports of aliases
+  - Fixed the plugin being used in build mode (#1)
+  - Added Node minimal requirements
+
 ## 0.0.2
 
 ### Patch Changes
