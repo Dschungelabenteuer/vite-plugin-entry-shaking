@@ -20,24 +20,22 @@ describe('analyzeEntries', () => {
 describe('transformRequired', () => {
   it('should return false if served file is not located within the configured root', () => {
     const id = '/path/to/another-project/file.ext';
-    const config = { root: '/path/to/project' } as ResolvedConfig;
     const options = { extensions: ['ext'] } as FinalPluginOptions;
-    expect(transformRequired(id, config, options)).toStrictEqual(false);
+
+    expect(transformRequired(id, [], options)).toStrictEqual(false);
   });
 
   it('should return false if served file extension is not within config extension list', () => {
     const id = '/path/to/project/file.anotherext';
-    const config = { root: '/path/to/project' } as ResolvedConfig;
     const options = { extensions: ['ext'] } as FinalPluginOptions;
 
-    expect(transformRequired(id, config, options)).toStrictEqual(false);
+    expect(transformRequired(id, [id], options)).toStrictEqual(false);
   });
 
   it('should return true if served file must be transformed by the plugin', () => {
     const id = '/path/to/project/file.ext';
-    const config = { root: '/path/to/project' } as ResolvedConfig;
     const options = { extensions: ['ext'] } as FinalPluginOptions;
 
-    expect(transformRequired(id, config, options)).toStrictEqual(true);
+    expect(transformRequired(id, [id], options)).toStrictEqual(true);
   });
 });

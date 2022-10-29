@@ -2,6 +2,9 @@
 export type PluginOptions = {
   targets: PluginTargets;
   extensions?: string[];
+  include?: string[];
+  root?: string;
+  debug?: boolean;
 };
 
 /** Final plugin options. */
@@ -23,9 +26,15 @@ export type ImportName = string;
 export type ImportPath = string;
 
 /** Import parameters. */
-export type ImportParams<T> = {
+export type ImportParams<T = string> = {
   path: T;
   importDefault: boolean;
+  aliasStatement?: string;
+};
+
+/** Import inputs. */
+export type ImportInput = Omit<ImportParams, 'path'> & {
+  name: string;
 };
 
 /** Entry imports map. */

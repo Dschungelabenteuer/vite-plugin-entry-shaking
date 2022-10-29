@@ -195,6 +195,26 @@ describe('analyzeEntryExport', () => {
     expect(entryMap.get(importedName)).toMatchObject(importedParams);
   });
 
+  it('should correctly feed the `entryMap` when the export relies on a named import statement', () => {
+    const path = `@any/path`;
+    const importedAlias = 'UserId';
+    const importedSourceName = 'UID';
+    const aliasStatement = `${importedSourceName} as ${importedAlias}`;
+    const importedParams = { path, importDefault: false, aliasStatement };
+
+    const entryMap: EntryExports = new Map([]);
+    const analyzedImports = new Map([[aliasStatement, importedParams]]);
+
+    EntryAnalyzer.analyzeEntryExport(
+      entryMap,
+      analyzedImports,
+      importedAlias,
+    );
+
+    expect(entryMap.size).toStrictEqual(1);
+    expect(entryMap.get(importedAlias)).toMatchObject(importedParams);
+  });
+
   it('should correctly feed the `entryMap` when the export relies on a default import statement', () => {
     const path = `@any/path`;
     const importedName = `UserId`;

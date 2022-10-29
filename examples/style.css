@@ -26,7 +26,7 @@ h1 {
   background: -webkit-linear-gradient(var(--base-color-lighter), var(--base-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: pluginTitle 10s infinite ease-in-out;
+  animation: pluginTitle 16s infinite ease-in-out;
 }
 
 h2 {
@@ -47,7 +47,7 @@ h2 {
   padding: 0.8255rem;
   margin: 1.5rem;
   box-shadow: 0 0 1rem var(--shade-color-glow);
-  animation: exampleTitle 16s infinite ease-in-out;
+  animation: exampleTitle 21s infinite ease-in-out;
 }
 
 p {

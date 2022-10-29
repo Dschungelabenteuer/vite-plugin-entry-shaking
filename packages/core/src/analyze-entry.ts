@@ -95,12 +95,12 @@ const analyzeEntryExport = (
     return;
   }
 
-  const namedImport = Array.from(analyzedImports.keys())
+  const aliasStatement = Array.from(analyzedImports.keys())
     .find((key) => key.match(new RegExp(`as ${namedExport}`)));
 
-  if (namedImport && analyzedImports.has(namedImport)) {
-    const { path, importDefault } = analyzedImports.get(namedImport)!;
-    entryMap.set(namedExport, { path, importDefault });
+  if (aliasStatement && analyzedImports.has(aliasStatement)) {
+    const { path, importDefault } = analyzedImports.get(aliasStatement)!;
+    entryMap.set(namedExport, { path, importDefault, aliasStatement });
   }
 };
 

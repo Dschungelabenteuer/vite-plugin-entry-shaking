@@ -2,7 +2,7 @@ import type MagicString from 'magic-string';
 import { resolve } from 'path';
 import { normalizePath } from 'vite';
 
-import type { EntryExports, TargetAbsolutePath, TargetPath } from './types';
+import type { EntryExports, ImportInput, TargetAbsolutePath, TargetPath } from './types';
 
 /** Returns array of imported target's named exports. */
 const getImportedNamedExports = (
@@ -30,7 +30,7 @@ export const analyzeImport = (
   statementEndPosition: number,
 ) => {
   const replacement: `import ${string}`[] = [];
-  const imported: Map<string, ([string, boolean])[]> = new Map([]);
+  const imported: Map<string, ImportInput[]> = new Map([]);
   const namedImports = getImportedNamedExports(
     code,
     statementStartPosition,
@@ -38,28 +38,29 @@ export const analyzeImport = (
   );
 
   namedImports.forEach((importedItem) => {
-    const item = importedItem.trim();
-    const namedImport = entry.get(item);
+    const name = importedItem.trim();
+    const namedImport = entry.get(name);
     if (namedImport) {
       const resolvedPath = normalizePath(resolve(targetAbsolutePath, namedImport.path));
+      const { importDefault, aliasStatement } = namedImport;
       imported.set(resolvedPath, [
         ...(imported.get(resolvedPath) ?? []),
-        [importedItem.trim(), namedImport.importDefault],
+        { name, importDefault, aliasStatement },
       ]);
     } else {
       imported.set(targetPath, [
         ...(imported.get(targetPath) ?? []),
-        [importedItem.trim(), false],
+        { name, importDefault: false },
       ]);
     }
   });
 
   imported.forEach((importedItems, importedPath) => {
     const path = normalizePath(importedPath);
-    if (importedItems.length === 1 && importedItems[0][1] === true) {
-      replacement.push(`import ${importedItems[0][0]} from '${path}'`);
+    if (importedItems.length === 1 && importedItems[0].importDefault === true) {
+      replacement.push(`import ${importedItems[0].name} from '${path}'`);
     } else {
-      const imports = importedItems.map(([name]) => name);
+      const imports = importedItems.map(({ name, aliasStatement }) => aliasStatement ?? name);
       replacement.push(`import { ${imports.join(', ')} } from '${path}'`);
     }
   });

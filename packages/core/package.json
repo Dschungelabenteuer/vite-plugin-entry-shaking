@@ -31,6 +31,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
+  },
   "publishConfig": {
     "main": "dist/index.cjs",
     "module": "dist/index.mjs",
@@ -49,6 +52,7 @@
   },
   "dependencies": {
     "es-module-lexer": "^1.0.3",
+    "globby": "^13.1.2",
     "magic-string": "^0.26.3"
   },
   "devDependencies": {

@@ -41,7 +41,7 @@ describe('analyzeImport', () => {
   const input = `${importStart}} from "${path}";`;
   const entry = new Map([
     ['UserName', { importDefault: false, path: '@models/User' }],
-    ['User', { importDefault: false, path: '@models/User' }],
+    ['User', { importDefault: false, path: '@models/User', aliasStatement: 'UserId as User' }],
     ['Test', { importDefault: false, path: '@models/Test' }],
     ['Groups', { importDefault: true, path: '@models/Groups' }],
   ]);
@@ -61,7 +61,7 @@ describe('analyzeImport', () => {
 
     expect(src.toString()).toStrictEqual(dedent(`
       import { UserId } from '@entry/path';
-      import { UserName, User } from '${normalizePath(resolve(absolutePath, '@models/User'))}';
+      import { UserName, UserId as User } from '${normalizePath(resolve(absolutePath, '@models/User'))}';
       import { Test } from '${normalizePath(resolve(absolutePath, '@models/Test'))}';
       import Groups from '${normalizePath(resolve(absolutePath, '@models/Groups'))}';
     `));

@@ -52,7 +52,29 @@ You need to list all of the entry points you want this plugin to process.
 
 This specifies which file extensions you want this plugin to process.
 
-Default value: `['js', 'jsx', 'mjs', 'ts', 'tsx', 'mts']`.
+Default value: `['js', 'jsx', 'mjs', 'ts', 'tsx', 'mts']`
+
+> #### **(optional) root:** `string` - _Project's root directory._
+
+Specifies the path to the project's root. Especially useful when using the plugin inside a monorepository which consumes workspace packages and when using package managers which do not hoist modules. The root path is relative to Vite config's `root` parameter.
+
+Default value: `'.'`
+
+> #### **(optional) include:** `string[]` - _Array of glob patterns._
+
+This specifies glob patterns whose matched paths can be transformed by the plugin.
+* These patterns are resolved based on the above `root` option.
+* Hidden `.dot` files and folders (e.g. `.vscode`) are excluded by default.
+* All of the `node_modules` folders are excluded by default.
+* Everything else within the `root` directory is included by default.
+
+Default value: `[]`
+
+> #### **(optional) debug:** `boolean` - _Enable debug logs._
+
+Turns on debug mode. This will print debug logs if Vite's `logLevel` is set to any other value than `'silent'`
+
+Default value: `false`
 
 ## Motivation
 
@@ -94,7 +116,7 @@ This way, the `shared/index.ts` file is not loaded by the browser anymore and no
 
 First of all, the plugin reads all of the target entry files listed in the plugin's `targets` option. For each entry file :
 * It uses [`es-module-lexer`](https://github.com/guybedford/es-module-lexer) to get a list of imports and exports.
-* It stores named exports that are re-exports of code imported from another module and the path they resolve to. It also stores whether this re-exported code is the default or a named export of its origin. This let us correctly rewrite the import using the adequate statement.
+* It stores named exports that are re-exports of code imported from another module and the path they resolve to. It also stores whether this re-exported code is the default or a named export of its origin. This lets us correctly rewrite the import using the adequate statement.
 * It also tracks a mutated version of the entry file where these stored named exports are removed. This is required because we might still import code which is actually defined within the entry file, rather than exported from another module. To make these work, we'll still need to serve this mutated version of the entry file so that this kind of code can be reached.
 
 Whenever Vite serves a file which includes an import which resolved to one of the `targets`, this file is transformed to rewrite the relevant import statements. It extracts the list of entities imported from that entry file, and for each imported entity :

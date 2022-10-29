@@ -31,7 +31,9 @@ export default defineConfig(async () => ({
   },
   plugins: [
     await EntryShakingPlugin({
+      root: '../..',
       targets: [pathToEntry],
+      debug: true,
     }),
     countRequestPlugin(),
   ],
