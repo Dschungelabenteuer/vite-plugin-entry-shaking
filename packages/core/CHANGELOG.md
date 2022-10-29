@@ -4,7 +4,8 @@
 
 ### Patch Changes
 
-- c0641df: - Fixed the plugin not correctly rewriting imports of aliases
+- c0641df: 
+  - Fixed the plugin not correctly rewriting imports of aliases
   - Fixed the plugin being used in build mode (#1)
   - Added Node minimal requirements
 
