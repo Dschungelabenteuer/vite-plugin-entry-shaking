@@ -81,9 +81,6 @@ export default defineConfig(async () => ({
   </tbody>
 </table>
 
-> **Warning**
->  Use the `include` option with caution as you could rapidly end up processing a huge amount of files (e.g. node_modules), which could result in the memory limit being exceeded.
-
 ## Motivation
 
 The problem this plugin tries to address is well described by this [Vite's github issue](https://github.com/vitejs/vite/issues/8237), so we'll stick to its author's example. Suppose your codebase contains an index file which is basically used as an entry point to dispatch code imported from other files. This is a rather common pattern which may be handy and avoid writing a lot of individual import statements:
