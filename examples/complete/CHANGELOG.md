@@ -1,5 +1,12 @@
 # vite-plugin-entry-shaking-example-complete
 
+## 0.1.0
+
+### Minor Changes
+
+- 8fee575: - Replaced the "include" option with a simpler "exclude" option. This should help avoid performance issues that could be caused by globby matching huge amounts of paths.
+  - Removed the `root` option which is not used anymore after the above change
+
 ## 0.0.3
 
 ### Patch Changes
