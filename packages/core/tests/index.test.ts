@@ -1,5 +1,4 @@
 import { resolve } from 'path';
-import type { ResolvedConfig } from 'vite';
 import { describe, it, expect } from 'vitest';
 
 import type { FinalPluginOptions } from '../src/types';
@@ -18,24 +17,30 @@ describe('analyzeEntries', () => {
 });
 
 describe('transformRequired', () => {
-  it('should return false if served file is not located within the configured root', () => {
+  const defaultOptions: FinalPluginOptions = {
+    extensions: ['ext'],
+    ignorePatterns: [/node_modules/],
+    debug: false,
+    targets: [],
+  };
+  it('should return false if served file is ignored', () => {
     const id = '/path/to/another-project/file.ext';
-    const options = { extensions: ['ext'] } as FinalPluginOptions;
+    const options = { ...defaultOptions, ignorePatterns: [/another-project/] } as FinalPluginOptions;
 
-    expect(transformRequired(id, [], options)).toStrictEqual(false);
+    expect(transformRequired(id, options)).toStrictEqual(false);
   });
 
   it('should return false if served file extension is not within config extension list', () => {
     const id = '/path/to/project/file.anotherext';
-    const options = { extensions: ['ext'] } as FinalPluginOptions;
+    const options = defaultOptions;
 
-    expect(transformRequired(id, [id], options)).toStrictEqual(false);
+    expect(transformRequired(id, options)).toStrictEqual(false);
   });
 
   it('should return true if served file must be transformed by the plugin', () => {
     const id = '/path/to/project/file.ext';
-    const options = { extensions: ['ext'] } as FinalPluginOptions;
+    const options = defaultOptions;
 
-    expect(transformRequired(id, [id], options)).toStrictEqual(true);
+    expect(transformRequired(id, options)).toStrictEqual(true);
   });
 });

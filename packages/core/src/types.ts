@@ -2,8 +2,7 @@
 export type PluginOptions = {
   targets: PluginTargets;
   extensions?: string[];
-  include?: string[];
-  root?: string;
+  ignorePatterns?: any[];
   debug?: boolean;
 };
 

@@ -1,7 +1,6 @@
 import type { PluginOption, ResolvedConfig, Logger } from 'vite';
 import { normalizePath } from 'vite';
-import { globby } from 'globby';
-import { join, parse, resolve } from 'path';
+import { parse } from 'path';
 
 import type { FinalPluginOptions, PluginEntries, PluginOptions, PluginTargets } from './types';
 import { paint } from './logger';
@@ -30,12 +29,11 @@ export const analyzeEntries = async (
 /** Determines whether a given file should be transformed. */
 export const transformRequired = (
   id: string,
-  includedPaths: string[],
   options: FinalPluginOptions,
 ) => {
   const extension = id.split('.').pop()!;
-  return includedPaths.includes(id)
-    && options.extensions.includes(extension);
+  const isIgnored = options.ignorePatterns.some((pattern) => id.match(pattern));
+  return !isIgnored && options.extensions.includes(extension);
 };
 
 /** Merges user options with the default ones. */
@@ -43,23 +41,11 @@ export const mergeOptions = (
   userOptions: PluginOptions,
 ): FinalPluginOptions => ({
   extensions: ['js', 'jsx', 'mjs', 'ts', 'tsx', 'mts'],
-  include: [],
+  ignorePatterns: [/node_modules/, ...userOptions.ignorePatterns ?? []],
   debug: false,
-  root: '.',
   ...userOptions,
   targets: userOptions.targets.map(normalizePath),
 });
-
-/** Lists all of the paths matching the `include` option. */
-export const listIncluded = async (
-  finalOptions: FinalPluginOptions,
-): Promise<string[]> => {
-  const filter = (pattern: any) => normalizePath(join(finalOptions.root, pattern));
-  const include = ['!node_modules', './**/*', ...finalOptions.include];
-  const includedPaths = await globby(include.map(filter));
-  const resolvedPaths = includedPaths.map((path) => normalizePath(resolve(process.cwd(), path)));
-  return resolvedPaths;
-};
 
 export default async function createEntryShakingPlugin(
   userOptions: PluginOptions,
@@ -68,7 +54,6 @@ export default async function createEntryShakingPlugin(
   let config: ResolvedConfig;
   const options = mergeOptions(userOptions);
   const entries = await analyzeEntries(options.targets);
-  const includedPaths = await listIncluded(options);
 
   return {
     name: 'vite-plugin-entry-shaking',
@@ -82,7 +67,6 @@ export default async function createEntryShakingPlugin(
       if (options.debug) {
         logger.info(`${logPrefix} List of merged options: ${JSON.stringify(options)}`);
         logger.info(`${logPrefix} List of parsed entries: Map(${JSON.stringify(Array.from(entries))})`);
-        logger.info(`${logPrefix} Included ${includedPaths.length} files within the plugin scope.`);
       }
     },
 
@@ -94,7 +78,7 @@ export default async function createEntryShakingPlugin(
     },
 
     async transform(code, id) {
-      const requiresTransform = transformRequired(id, includedPaths, options);
+      const requiresTransform = transformRequired(id, options);
       if (options.debug) {
         logger.info(`${logPrefix} ${requiresTransform
           ? `[MATCHED] ${id}`

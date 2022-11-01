@@ -44,37 +44,45 @@ export default defineConfig(async () => ({
 
 ### Plugin options
 
-> #### **targets:** `string[]` - _Array of absolute paths to target entry points._
+<table>
+  <thead>
+    <tr>
+      <th>Option name</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>targets <em>(required)</em></td>
+      <td><code>string[]`</code></td>
+      <td>N/A</td>
+      <td>You need to list all of the entry points you want this plugin to process.</td>
+    </tr>
+    <tr>
+      <td>extensions</td>
+      <td><code>string[]</code></td>
+      <td><code>['js', 'jsx', 'mjs', 'ts', 'tsx', 'mts']</code></td>
+      <td>This specifies which file extensions you want this plugin to process.</td>
+    </tr>
+    <tr>
+      <td>ignorePatterns</td>
+      <td><code>(string | RegExp)[]</code></td>
+      <td><code>[/node_modules/]</code></td>
+      <td>This specifies RegExp/string whose matched paths must be ignored by the plugin.</td>
+    </tr>
+    <tr>
+      <td>debug</td>
+      <td><code>boolean</code></td>
+      <td><code>false</code></td>
+      <td>Turns on debug mode. This will print debug logs if Vite's <code>logLevel</code> is set to any other value than <code>'silent'</code></td>
+    </tr>
+  </tbody>
+</table>
 
-You need to list all of the entry points you want this plugin to process.
-
-> #### **(optional) extensions:** `string[]` - _Array of extensions that require transformations._
-
-This specifies which file extensions you want this plugin to process.
-
-Default value: `['js', 'jsx', 'mjs', 'ts', 'tsx', 'mts']`
-
-> #### **(optional) root:** `string` - _Project's root directory._
-
-Specifies the path to the project's root. Especially useful when using the plugin inside a monorepository which consumes workspace packages and when using package managers which do not hoist modules. The root path is relative to Vite config's `root` parameter.
-
-Default value: `'.'`
-
-> #### **(optional) include:** `string[]` - _Array of glob patterns._
-
-This specifies glob patterns whose matched paths can be transformed by the plugin.
-* These patterns are resolved based on the above `root` option.
-* Hidden `.dot` files and folders (e.g. `.vscode`) are excluded by default.
-* All of the `node_modules` folders are excluded by default.
-* Everything else within the `root` directory is included by default.
-
-Default value: `[]`
-
-> #### **(optional) debug:** `boolean` - _Enable debug logs._
-
-Turns on debug mode. This will print debug logs if Vite's `logLevel` is set to any other value than `'silent'`
-
-Default value: `false`
+> **Warning**
+>  Use the `include` option with caution as you could rapidly end up processing a huge amount of files (e.g. node_modules), which could result in the memory limit being exceeded.
 
 ## Motivation
 

@@ -52,7 +52,6 @@
   },
   "dependencies": {
     "es-module-lexer": "^1.0.3",
-    "globby": "^13.1.2",
     "magic-string": "^0.26.3"
   },
   "devDependencies": {
