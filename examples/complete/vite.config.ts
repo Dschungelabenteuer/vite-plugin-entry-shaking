@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 import EntryShakingPlugin from 'vite-plugin-entry-shaking';
 
 const pathToEntry = resolve(__dirname, 'src/entry-a');
+const pathToComponents = resolve(__dirname, 'src/components');
 let requestCount = 0;
 let disabled = false;
 
@@ -27,11 +28,11 @@ export default defineConfig(async () => ({
   resolve: {
     alias: {
       '@entry-a': pathToEntry,
+      components: pathToComponents,
     },
   },
   plugins: [
     await EntryShakingPlugin({
-      root: '../..',
       targets: [pathToEntry],
       debug: true,
     }),
