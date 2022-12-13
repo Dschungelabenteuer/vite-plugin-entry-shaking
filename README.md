@@ -83,7 +83,7 @@ export default defineConfig(async () => ({
 
 ## Examples
 
-Examples
+Examples illustrating usage and benefits can be found [here](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/examples). Feel free to fork and play around. For instance, you can toggle the plugin on and off their respective vite config file while serving in development mode and see how it affects the amount of requests made by your browser.
 
 ## Motivation
 
