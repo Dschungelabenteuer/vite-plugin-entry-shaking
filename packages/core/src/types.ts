@@ -16,7 +16,7 @@ export type EntryData = {
 };
 
 /** Target entry map. */
-export type PluginEntries = Map<TargetAbsolutePath, EntryData>;
+export type PluginEntries = Map<EntryPath, EntryData>;
 
 /** Named import. */
 export type ImportName = string;
@@ -28,7 +28,10 @@ export type ImportPath = string;
 export type ImportParams<T = string> = {
   path: T;
   importDefault: boolean;
-  aliasStatement?: string;
+  /** Original name of the entity (as exported by its source file). */
+  originalName?: string;
+  /** Alias of the entity (as imported from the entry by consomming code). */
+  alias?: string;
 };
 
 /** Import inputs. */
@@ -48,14 +51,17 @@ export type ExportOriginPath = string;
 /** Entry exports map. */
 export type EntryExports = Map<ExportName, ImportParams<ExportOriginPath>>;
 
+/** Target imports map */
+export type TargetImports = Map<string, ImportInput[]>;
+
 /** Target's path/alias as used in imports. */
 export type TargetPath = string;
 
 /** Resolved absolute path of target. */
-export type TargetAbsolutePath = string;
+export type EntryPath = string;
 
 /** List of targets being processed by the plugin. */
-export type PluginTargets = TargetAbsolutePath[];
+export type PluginTargets = EntryPath[];
 
 /** Parsed import statement output. */
 export type ParsedImportStatement = {

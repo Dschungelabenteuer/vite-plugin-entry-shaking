@@ -2,8 +2,10 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { init, parse } from 'es-module-lexer';
 
-import type { EntryExports, EntryImports, ParsedImportStatement, PluginEntries, TargetAbsolutePath } from './types';
+import type { ResolveFn } from 'vite';
+import type { EntryExports, EntryImports, ParsedImportStatement, PluginEntries, PluginTargets, EntryPath } from './types';
 import EntryCleaner from './cleanup-entry';
+import ImportAnalyzer from './analyze-import';
 
 /**
  * Parses an import statement to extract default and named exports.
@@ -41,25 +43,25 @@ const parseImportStatement = (statement: string): ParsedImportStatement => {
 };
 
 /**
- * Analyzes the imports of an entry point.
+ * Analyzes an import of an entry point.
  * This is required because we need to store their paths to
  * later remap named exports that rely on import statements.
  * @param rawEntry Source code of the entry file.
  * @param analyzedImports _reference_ - Map of analyzed imports.
  * @param path Path of the imported resource.
- * @param statementStartPosition Import statement start position (based on rawEntry).
- * @param statementEndPosition Import statement end position (based on rawEntry).
+ * @param startPosition Import statement start position (based on rawEntry).
+ * @param endPosition Import statement end position (based on rawEntry).
  */
 const analyzeEntryImport = (
   rawEntry: string,
   analyzedImports: EntryImports,
   path: string,
-  statementStartPosition: number,
-  statementEndPosition: number,
+  startPosition: number,
+  endPosition: number,
 ): void => {
   const statement = rawEntry.slice(
-    statementStartPosition,
-    statementEndPosition,
+    startPosition,
+    endPosition,
   );
 
   const { namedImports, defaultImport } = methods.parseImportStatement(statement);
@@ -70,13 +72,18 @@ const analyzeEntryImport = (
 
   if (namedImports.length) {
     namedImports.forEach((namedImport) => {
-      analyzedImports.set(namedImport, { path, importDefault: false });
+      const { name, alias } = ImportAnalyzer.getImportParams(namedImport);
+      analyzedImports.set(alias ?? name, {
+        path,
+        importDefault: false,
+        originalName: name,
+      });
     });
   }
 };
 
 /**
- * Analyzes the exports of an entry point.
+ * Analyzes an export of an entry point.
  * This maps named exports to their origin paths so that we
  * can later rewrite any import statement of the entry file
  * with individual import statements to mimic tree-shaking behaviour.
@@ -90,50 +97,43 @@ const analyzeEntryExport = (
   namedExport: string,
 ): void => {
   if (namedExport && analyzedImports.has(namedExport)) {
-    const { path, importDefault } = analyzedImports.get(namedExport)!;
-    entryMap.set(namedExport, { path, importDefault });
-    return;
-  }
-
-  const aliasStatement = Array.from(analyzedImports.keys())
-    .find((key) => key.match(new RegExp(`as ${namedExport}`)));
-
-  if (aliasStatement && analyzedImports.has(aliasStatement)) {
-    const { path, importDefault } = analyzedImports.get(aliasStatement)!;
-    entryMap.set(namedExport, { path, importDefault, aliasStatement });
+    const { path, importDefault, originalName } = analyzedImports.get(namedExport)!;
+    entryMap.set(namedExport, { path, importDefault, originalName });
   }
 };
 
 /**
  * Analyzes an entry file to feed a list of exports.
  * @param entries _reference_ - Map of parsed entry files.
- * @param targetAbsolutePath Absolute path of the entry point.
+ * @param entryPath Absolute path of the entry point.
  */
 const doAnalyzeEntry = async (
   entries: PluginEntries,
-  targetAbsolutePath: TargetAbsolutePath,
+  entryPath: EntryPath,
 ): Promise<void> => {
   await init;
 
   const entryMap: EntryExports = new Map([]);
   const analyzedImports: EntryImports = new Map([]);
-  const rawEntry = readFileSync(resolve(targetAbsolutePath, 'index.ts'), 'utf-8');
+  const rawEntry = readFileSync(resolve(entryPath), 'utf-8');
   const [imports, exports] = parse(rawEntry);
 
+  // First analyze the imported entities of the entry.
   imports.forEach(({
     n: path,
-    ss: statementStartPosition,
-    se: statementEndPosition,
+    ss: startPosition,
+    se: endPosition,
   }) => {
     methods.analyzeEntryImport(
       rawEntry,
       analyzedImports,
       path as string,
-      statementStartPosition,
-      statementEndPosition,
+      startPosition,
+      endPosition,
     );
   });
 
+  // Then analyze the exports with the gathered data.
   exports.forEach(({ n: namedExport }) => {
     methods.analyzeEntryExport(
       entryMap,
@@ -142,7 +142,8 @@ const doAnalyzeEntry = async (
     );
   });
 
-  entries.set(targetAbsolutePath, {
+  // Finally export entry's analyzis output.
+  entries.set(entryPath, {
     exports: entryMap,
     updatedSource: EntryCleaner.cleanupEntry(
       rawEntry,
@@ -155,18 +156,38 @@ const doAnalyzeEntry = async (
 /**
  * Analyzes an entry file to feed a list of exports, if it was not analyzed before.
  * @param entries _reference_ - Map of parsed entry files.
- * @param targetAbsolutePath Absolute path of the entry point.
+ * @param entryPath Absolute path of the entry point.
  */
 const analyzeEntry = async (
   entries: PluginEntries,
-  targetAbsolutePath: TargetAbsolutePath,
+  entryPath: EntryPath,
 ): Promise<void> => {
-  if (entries.has(targetAbsolutePath)) return;
+  if (entries.has(entryPath)) return;
 
   await methods.doAnalyzeEntry(
     entries,
-    targetAbsolutePath,
+    entryPath,
   );
+};
+
+/**
+ * Analyzes target entry files.
+ * @param targets List of targets being processed by the plugin.
+ * @param resolver Vite's resolve function.
+ */
+const analyzeEntries = async (
+  targets: PluginTargets,
+  resolver: ResolveFn,
+): Promise<PluginEntries> => {
+  const entries: PluginEntries = new Map([]);
+  await Promise.all(
+    targets.map(async (path) => {
+      const absolutePath = await resolver(path) ?? path;
+      await methods.analyzeEntry(entries, absolutePath);
+    }),
+  );
+
+  return entries;
 };
 
 const methods = {
@@ -175,6 +196,7 @@ const methods = {
   analyzeEntryExport,
   doAnalyzeEntry,
   analyzeEntry,
+  analyzeEntries,
 };
 
 export default methods;

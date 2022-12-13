@@ -5,7 +5,7 @@ export default defineConfig({
     includeSource: ['tests/**/*.test.ts'],
     coverage: {
       provider: 'istanbul',
-      exclude: ['src/index.ts'],
+      exclude: ['src/index.ts', 'src/logger.ts'],
     },
   },
 });

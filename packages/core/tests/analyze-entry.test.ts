@@ -1,12 +1,21 @@
 import type { MockedFunction } from 'vitest';
+import type { ResolveFn } from 'vite';
+import { beforeAll, describe, it, expect, vi, beforeEach } from 'vitest';
 import fs from 'fs';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import dedent from 'ts-dedent';
+import { resolve } from 'path';
 
 import type { EntryExports, EntryImports, PluginEntries } from '../src/types';
 import EntryAnalyzer from '../src/analyze-entry';
+import { getTestResolver, MOCKS_FOLDER } from './utils';
 
 vi.mock('fs');
+
+let resolver: ResolveFn;
+
+beforeAll(async () => {
+  resolver = await getTestResolver();
+});
 
 describe('parseImportStatement', () => {
   describe('aggregated export statements', () => {
@@ -99,20 +108,20 @@ describe('analyzeEntryImport', () => {
 
   const run = (input: string) => {
     const analyzedImports: EntryImports = new Map([]);
-    const statementStartPosition = 0;
-    const statementEndPosition: number = input.length;
+    const startPosition = 0;
+    const endPosition: number = input.length;
     EntryAnalyzer.analyzeEntryImport(
       input,
       analyzedImports,
       path,
-      statementStartPosition,
-      statementEndPosition,
+      startPosition,
+      endPosition,
     );
 
     return {
       analyzedImports,
-      statementStartPosition,
-      statementEndPosition,
+      startPosition,
+      endPosition,
     };
   };
 
@@ -121,7 +130,7 @@ describe('analyzeEntryImport', () => {
       const output = run(`export { UserId } from '${path}'`);
 
       expect(output.analyzedImports.size).toStrictEqual(1);
-      expect(output.analyzedImports.get('UserId')).toStrictEqual({ path, importDefault: false });
+      expect(output.analyzedImports.get('UserId')).toStrictEqual({ path, importDefault: false, originalName: 'UserId' });
     });
 
     it('should feed the `analyzedImports` map if this is an aggregated default export with alias', () => {
@@ -135,7 +144,7 @@ describe('analyzeEntryImport', () => {
       const output = run(`export { UserId as UserIdentifier } from '${path}'`);
 
       expect(output.analyzedImports.size).toStrictEqual(1);
-      expect(output.analyzedImports.get('UserId as UserIdentifier')).toStrictEqual({ path, importDefault: false });
+      expect(output.analyzedImports.get('UserIdentifier')).toStrictEqual({ path, importDefault: false, originalName: 'UserId' });
     });
   });
 
@@ -145,7 +154,7 @@ describe('analyzeEntryImport', () => {
       const output = run(`import { ${namedImport} } from "${path}"`);
 
       expect(output.analyzedImports.size).toStrictEqual(1);
-      expect(output.analyzedImports.get(namedImport)).toStrictEqual({ path, importDefault: false });
+      expect(output.analyzedImports.get(namedImport)).toStrictEqual({ path, importDefault: false, originalName: namedImport });
     });
 
     it('should feed the `analyzedImports` map if it imports a module', () => {
@@ -163,7 +172,7 @@ describe('analyzeEntryImport', () => {
       const output = run(`import { ${importString} } from "${path}"`);
 
       expect(output.analyzedImports.size).toStrictEqual(1);
-      expect(output.analyzedImports.get(importString)).toStrictEqual({ path, importDefault: false });
+      expect(output.analyzedImports.get(importAlias)).toStrictEqual({ path, importDefault: false, originalName: moduleImport });
     });
 
     it('should feed the `analyzedImports` map if it imports a default export with an alias', () => {
@@ -198,12 +207,11 @@ describe('analyzeEntryExport', () => {
   it('should correctly feed the `entryMap` when the export relies on a named import statement', () => {
     const path = `@any/path`;
     const importedAlias = 'UserId';
-    const importedSourceName = 'UID';
-    const aliasStatement = `${importedSourceName} as ${importedAlias}`;
-    const importedParams = { path, importDefault: false, aliasStatement };
+    const originalName = 'UID';
+    const importedParams = { path, importDefault: false, originalName };
 
     const entryMap: EntryExports = new Map([]);
-    const analyzedImports = new Map([[aliasStatement, importedParams]]);
+    const analyzedImports = new Map([[importedAlias, importedParams]]);
 
     EntryAnalyzer.analyzeEntryExport(
       entryMap,
@@ -238,12 +246,12 @@ describe('doAnalyzeEntry', () => {
   const run = async (entrySource: string) => {
     const entries: PluginEntries = new Map([]);
     const targetPath = '@entry/path';
-    const targetAbsolutePath = '/path/to/entry';
+    const entryPath = '/path/to/entry';
     (fs.readFileSync as MockedFunction<any>).mockReturnValueOnce(entrySource);
 
     await EntryAnalyzer.doAnalyzeEntry(entries, targetPath);
 
-    return { entries, targetPath, targetAbsolutePath };
+    return { entries, targetPath, entryPath };
   };
 
   it('should feed the `entries` map even though it does not export anything', async () => {
@@ -330,5 +338,21 @@ describe('analyzeEntry', () => {
       expect.anything(),
       path,
     );
+  });
+});
+
+describe('analyzeEntries', () => {
+  beforeAll(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('should correctly analyze entries', async () => {
+    const aPath = await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a')) as string;
+    const bPath = await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-b')) as string;
+    const entries = await EntryAnalyzer.analyzeEntries([aPath, bPath], resolver);
+
+    expect(entries.size).toStrictEqual(2);
+    expect(entries.has(aPath)).toStrictEqual(true);
+    expect(entries.has(bPath)).toStrictEqual(true);
   });
 });
