@@ -26,6 +26,12 @@ export default async function createEntryShakingPlugin(
       logger.info(`List of parsed entries: ${JSON.stringify([...entries.keys()])}`);
     },
 
+    async handleHotUpdate({ file }) {
+      if (entries.has(file)) {
+        await EntryAnalyzer.doAnalyzeEntry(entries, file);
+      }
+    },
+
     async transform(code, id) {
       return await transformIfNeeded(
         id,
