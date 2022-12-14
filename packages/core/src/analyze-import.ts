@@ -1,80 +1,154 @@
 import type MagicString from 'magic-string';
-import { resolve } from 'path';
+import type { ResolveFn } from 'vite';
 import { normalizePath } from 'vite';
 
-import type { EntryExports, ImportInput, TargetAbsolutePath, TargetPath } from './types';
+import type { EntryExports, EntryPath, ImportInput, TargetImports } from './types';
 
-/** Returns array of imported target's named exports. */
+/**
+ * Returns the import params of a single imported entity.
+ * @param importString Import statement string.
+ */
+const getImportParams = (importString: string) => {
+  const [name, alias] = importString.trim().split(' as ');
+  return { name, alias };
+};
+
+/**
+ * Returns the names of the entities imported from the target entry.
+ * @param code Import statement string.
+ * @param startPosition Start position of the import statement.
+ * @param endPosition End position of the import statement.
+ */
 const getImportedNamedExports = (
   code: string,
-  statementStartPosition: number,
-  statementEndPosition: number,
+  startPosition: number,
+  endPosition: number,
 ): string[] => {
   const [, importContentString] = code.slice(
-    statementStartPosition,
-    statementEndPosition,
+    startPosition,
+    endPosition,
   ).match(/{(.*[^,])}/) ?? [];
 
   return (importContentString?.split(',') ?? [])
     .map((namedExport) => namedExport.trim());
 };
 
-/** Analyzes a single target import. */
-export const analyzeImport = (
-  src: MagicString,
-  code: string,
-  entry: EntryExports,
-  targetPath: TargetPath,
-  targetAbsolutePath: TargetAbsolutePath,
-  statementStartPosition: number,
-  statementEndPosition: number,
-) => {
-  const replacement: `import ${string}`[] = [];
-  const imported: Map<string, ImportInput[]> = new Map([]);
-  const namedImports = getImportedNamedExports(
-    code,
-    statementStartPosition,
-    statementEndPosition,
+/**
+ * Returns a structured information map about entities imported from target entry.
+ * @param entryExports List of analyzed exports of the target entry.
+ * @param entryPath Absolute path to the target entry.
+ * @param imports List of named imports.
+ * @param resolver Vite's resolve function.
+ */
+const getImportsMap = async (
+  entryExports: EntryExports,
+  entryPath: EntryPath,
+  imports: string[],
+  resolver: ResolveFn,
+): Promise<TargetImports> => {
+  const map: TargetImports = new Map([]);
+
+  await Promise.all(
+    imports.map(async (importString) => {
+      const { name, alias } = methods.getImportParams(importString);
+      const namedImport = entryExports.get(name);
+      if (namedImport) {
+        const resolvedPath = await resolver(namedImport.path, entryPath);
+        if (resolvedPath) {
+          const { importDefault, originalName } = namedImport;
+          map.set(resolvedPath, [
+            ...(map.get(resolvedPath) ?? []),
+            { name, importDefault, originalName, alias },
+          ]);
+        }
+      } else {
+        map.set(entryPath, [
+          ...(map.get(entryPath) ?? []),
+          { name, importDefault: false },
+        ]);
+      }
+    }),
   );
 
-  namedImports.forEach((importedItem) => {
-    const name = importedItem.trim();
-    const namedImport = entry.get(name);
-    if (namedImport) {
-      const resolvedPath = normalizePath(resolve(targetAbsolutePath, namedImport.path));
-      const { importDefault, aliasStatement } = namedImport;
-      imported.set(resolvedPath, [
-        ...(imported.get(resolvedPath) ?? []),
-        { name, importDefault, aliasStatement },
-      ]);
-    } else {
-      imported.set(targetPath, [
-        ...(imported.get(targetPath) ?? []),
-        { name, importDefault: false },
-      ]);
-    }
-  });
+  return map;
+};
 
+/**
+ * Formats a single entity import replacement.
+ * @param analyzedImport Analyzed import.
+ */
+const formatImportReplacement = ({
+  name,
+  alias,
+  originalName,
+  importDefault,
+}: ImportInput) => {
+  if (importDefault) {
+    return `default as ${alias ?? originalName ?? name}`;
+  }
+
+  if (originalName) {
+    return `${originalName}${alias ? ` as ${alias}` : ` as ${name}`}`;
+  }
+
+  return `${name}${alias ? ` as ${alias}` : ''}`;
+};
+
+/**
+ * Returns a single target import's replacement lines.
+ * @param imported Analyzed imported entities from target entry.
+ */
+const getImportReplacement = (
+  imported: TargetImports,
+): `import ${string}`[] => {
+  const replacement: `import ${string}`[] = [];
   imported.forEach((importedItems, importedPath) => {
     const path = normalizePath(importedPath);
-    if (importedItems.length === 1 && importedItems[0].importDefault === true) {
-      replacement.push(`import ${importedItems[0].name} from '${path}'`);
-    } else {
-      const imports = importedItems.map(({ name, aliasStatement }) => aliasStatement ?? name);
-      replacement.push(`import { ${imports.join(', ')} } from '${path}'`);
-    }
+    const imports = importedItems
+      .map((importedItem) => methods.formatImportReplacement(importedItem));
+    replacement.push(`import { ${imports.join(', ')} } from '${path}'`);
   });
 
+  return replacement;
+};
+
+/**
+ * Analyzes a single target import.
+ * @param src MagicString instance to prepare transforms.
+ * @param code Source code of the file.
+ * @param entryExports List of analyzed exports of the target entry.
+ * @param entryPath Absolute path to the target entry.
+ * @param startPosition Start position of the import statement.
+ * @param endPosition End position of the import statement.
+ * @param resolver Vite's resolve function.
+ */
+const analyzeImportStatement = async (
+  src: MagicString,
+  code: string,
+  entryExports: EntryExports,
+  entryPath: EntryPath,
+  startPosition: number,
+  endPosition: number,
+  resolver: ResolveFn,
+) => {
+  const namedImports = methods.getImportedNamedExports(code, startPosition, endPosition);
+  const imported = await methods.getImportsMap(entryExports, entryPath, namedImports, resolver);
+  const replacement = methods.getImportReplacement(imported);
+
   src.overwrite(
-    statementStartPosition,
-    statementEndPosition + 1,
+    startPosition,
+    endPosition + 1,
     `${replacement.join(';\n')};`,
   );
 };
 
 const methods = {
+  getImportParams,
   getImportedNamedExports,
-  analyzeImport,
+  getImportsMap,
+  getImportReplacement,
+  formatImportReplacement,
+  analyzeImportStatement,
 };
 
 export default methods;
