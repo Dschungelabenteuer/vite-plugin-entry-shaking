@@ -27,7 +27,7 @@ const getImportedNamedExports = (
   const [, importContentString] = code.slice(
     startPosition,
     endPosition,
-  ).match(/{(.*[^,])}/) ?? [];
+  ).match(/{([\s\S]*?)}/) ?? [];
 
   return (importContentString?.split(',') ?? [])
     .map((namedExport) => namedExport.trim());
