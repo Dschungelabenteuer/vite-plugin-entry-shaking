@@ -1,5 +1,11 @@
 # vite-plugin-entry-shaking
 
+## 0.2.1
+
+### Patch Changes
+
+- 15a67f9: Fixed regex to support multiline imports
+
 ## 0.2.0
 
 ### Minor Changes
