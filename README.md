@@ -33,13 +33,13 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import EntryShakingPlugin from 'vite-plugin-entry-shaking';
 
-export default defineConfig(async () => ({
+export default defineConfig({
   plugins: [
-    await EntryShakingPlugin({
+    EntryShakingPlugin({
       targets: [resolve(__dirname, 'src/entry-a')],
     }),
   ],
-}));
+});
 ```
 
 ### Plugin options
