@@ -30,7 +30,10 @@ describe('requiresTransform', () => {
 
   it('should return false if served file is ignored', () => {
     const id = '/path/to/another-project/file.ext';
-    const options = { ...defaultOptions, ignorePatterns: [/another-project/] } as FinalPluginOptions;
+    const options = {
+      ...defaultOptions,
+      ignorePatterns: [/another-project/],
+    } as FinalPluginOptions;
 
     expect(requiresTransform(id, options)).toStrictEqual(false);
   });
@@ -51,10 +54,7 @@ describe('requiresTransform', () => {
 });
 
 describe('importsTargetEntry', () => {
-  const imports = [
-    { n: '@mocks/entry-a' },
-    { n: undefined },
-  ] as ImportSpecifier[];
+  const imports = [{ n: '@mocks/entry-a' }, { n: undefined }] as ImportSpecifier[];
 
   it('should return true if any import targets one of the entries using aliases', async () => {
     // should also work with relative paths and bare imports.
@@ -74,13 +74,16 @@ describe('transformImports', () => {
   it('should not transform if it does not import any target entry', async () => {
     const id = '';
     const code = `import { B_MODULE_B, test } from '@mocks/entry-b';`;
-    const entryPath = await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a')) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
     const imports = [{ n: '@mocks/entry-b', ss: 0, se: code.length - 1 }] as any;
     const entries: PluginEntries = new Map([
-      [entryPath, {
-        exports: new Map([['A_MODULE_A', { path: '', importDefault: true }]]),
-        updatedSource: '',
-      }],
+      [
+        entryPath,
+        {
+          exports: new Map([['A_MODULE_A', { path: '', importDefault: true }]]),
+          updatedSource: '',
+        },
+      ],
     ]);
 
     const transformed = await transformImports(id, code, entries, imports, resolver, logger);
@@ -90,19 +93,24 @@ describe('transformImports', () => {
   it('should transform if it does import at least one target entry', async () => {
     const id = __dirname;
     const code = dedent(`import { A_MODULE_A, test } from '@mocks/entry-a';`);
-    const entryPath = await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a')) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
     const imports = [{ n: '@mocks/entry-a', ss: 0, se: code.length - 1 }] as any;
     const entries: PluginEntries = new Map([
-      [entryPath, {
-        exports: new Map([['A_MODULE_A', { path: './modules/A', importDefault: true }]]),
-        updatedSource: '',
-      }],
+      [
+        entryPath,
+        {
+          exports: new Map([['A_MODULE_A', { path: './modules/A', importDefault: true }]]),
+          updatedSource: '',
+        },
+      ],
     ]);
 
     const transformed = await transformImports(id, code, entries, imports, resolver, logger);
-    expect(transformed).toStrictEqual(dedent(`
+    expect(transformed).toStrictEqual(
+      dedent(`
       import { test } from '${entryPath}';
       import { default as A_MODULE_A } from '${entryAModuleA}';
-    `));
+    `),
+    );
   });
 });

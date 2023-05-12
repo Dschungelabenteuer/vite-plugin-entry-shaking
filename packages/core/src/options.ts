@@ -11,11 +11,9 @@ const ignorePatterns = [/node_modules/];
  * Merges user options with the default ones.
  * @param userOptions Options passed to the plugin by the user.
  */
-export const mergeOptions = (
-  userOptions: PluginOptions,
-): FinalPluginOptions => ({
+export const mergeOptions = (userOptions: PluginOptions): FinalPluginOptions => ({
   extensions,
-  ignorePatterns: [...ignorePatterns, ...userOptions.ignorePatterns ?? []],
+  ignorePatterns: [...ignorePatterns, ...(userOptions.ignorePatterns ?? [])],
   debug: false,
   ...userOptions,
   targets: userOptions.targets.map(normalizePath),

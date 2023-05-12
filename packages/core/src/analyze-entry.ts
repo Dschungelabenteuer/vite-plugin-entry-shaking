@@ -3,7 +3,14 @@ import { resolve } from 'path';
 import { init, parse } from 'es-module-lexer';
 
 import type { ResolveFn } from 'vite';
-import type { EntryExports, EntryImports, ParsedImportStatement, PluginEntries, PluginTargets, EntryPath } from './types';
+import type {
+  EntryExports,
+  EntryImports,
+  ParsedImportStatement,
+  PluginEntries,
+  PluginTargets,
+  EntryPath,
+} from './types';
 import EntryCleaner from './cleanup-entry';
 import ImportAnalyzer from './analyze-import';
 
@@ -12,10 +19,16 @@ import ImportAnalyzer from './analyze-import';
  * @param statement Import statement to parse.
  */
 const parseImportStatement = (statement: string): ParsedImportStatement => {
-  const output: ParsedImportStatement = { namedImports: [], defaultImport: null };
-  let [,, importContent] = statement.match(/(im|ex)port (.*) from/) ?? [,, undefined];
+  const output: ParsedImportStatement = {
+    namedImports: [],
+    defaultImport: null,
+  };
+  let [, , importContent] = statement.match(/(im|ex)port (.*) from/) ?? [, , undefined];
   if (importContent) {
-    const [namedImportsStatement, namedImportsContent] = importContent.match(/{(.*)}/) ?? [, undefined];
+    const [namedImportsStatement, namedImportsContent] = importContent.match(/{(.*)}/) ?? [
+      ,
+      undefined,
+    ];
     if (namedImportsStatement && namedImportsContent) {
       importContent = importContent.replace(namedImportsStatement, '');
       namedImportsContent.split(',').forEach((namedImport) => {
@@ -34,9 +47,7 @@ const parseImportStatement = (statement: string): ParsedImportStatement => {
     }
 
     const defaultImport = importContent.replace(/,/g, '').trim();
-    output.defaultImport = defaultImport.length
-      ? defaultImport
-      : output.defaultImport;
+    output.defaultImport = defaultImport.length ? defaultImport : output.defaultImport;
   }
 
   return output;
@@ -59,10 +70,7 @@ const analyzeEntryImport = (
   startPosition: number,
   endPosition: number,
 ): void => {
-  const statement = rawEntry.slice(
-    startPosition,
-    endPosition,
-  );
+  const statement = rawEntry.slice(startPosition, endPosition);
 
   const { namedImports, defaultImport } = methods.parseImportStatement(statement);
 
@@ -107,10 +115,7 @@ const analyzeEntryExport = (
  * @param entries _reference_ - Map of parsed entry files.
  * @param entryPath Absolute path of the entry point.
  */
-const doAnalyzeEntry = async (
-  entries: PluginEntries,
-  entryPath: EntryPath,
-): Promise<void> => {
+const doAnalyzeEntry = async (entries: PluginEntries, entryPath: EntryPath): Promise<void> => {
   await init;
 
   const entryMap: EntryExports = new Map([]);
@@ -119,11 +124,7 @@ const doAnalyzeEntry = async (
   const [imports, exports] = parse(rawEntry);
 
   // First analyze the imported entities of the entry.
-  imports.forEach(({
-    n: path,
-    ss: startPosition,
-    se: endPosition,
-  }) => {
+  imports.forEach(({ n: path, ss: startPosition, se: endPosition }) => {
     methods.analyzeEntryImport(
       rawEntry,
       analyzedImports,
@@ -135,21 +136,13 @@ const doAnalyzeEntry = async (
 
   // Then analyze the exports with the gathered data.
   exports.forEach(({ n: namedExport }) => {
-    methods.analyzeEntryExport(
-      entryMap,
-      analyzedImports,
-      namedExport,
-    );
+    methods.analyzeEntryExport(entryMap, analyzedImports, namedExport);
   });
 
   // Finally export entry's analyzis output.
   entries.set(entryPath, {
     exports: entryMap,
-    updatedSource: EntryCleaner.cleanupEntry(
-      rawEntry,
-      entryMap,
-      exports,
-    ),
+    updatedSource: EntryCleaner.cleanupEntry(rawEntry, entryMap, exports),
   });
 };
 
@@ -158,16 +151,12 @@ const doAnalyzeEntry = async (
  * @param entries _reference_ - Map of parsed entry files.
  * @param entryPath Absolute path of the entry point.
  */
-const analyzeEntry = async (
-  entries: PluginEntries,
-  entryPath: EntryPath,
-): Promise<void> => {
+const analyzeEntry = async (entries: PluginEntries, entryPath: EntryPath): Promise<void> => {
   if (entries.has(entryPath)) return;
 
-  await methods.doAnalyzeEntry(
-    entries,
-    entryPath,
-  );
+  await methods.doAnalyzeEntry(entries, entryPath).catch(() => {
+    throw new Error(`Could not analyze entry file "${entryPath}"`);
+  });
 };
 
 /**
@@ -182,7 +171,7 @@ const analyzeEntries = async (
   const entries: PluginEntries = new Map([]);
   await Promise.all(
     targets.map(async (path) => {
-      const absolutePath = await resolver(path) ?? path;
+      const absolutePath = (await resolver(path)) ?? path;
       await methods.analyzeEntry(entries, absolutePath);
     }),
   );

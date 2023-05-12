@@ -135,7 +135,9 @@ const mockedEntryMap: EntryExports = new Map([
 
 let mockedExports: any = [];
 
-beforeAll(async () => { mockedExports = await getMockedExports(); });
+beforeAll(async () => {
+  mockedExports = await getMockedExports();
+});
 
 describe('reformatRemainingExports', () => {
   it('should correctly reformat remaining exports (integration)', () => {
@@ -155,7 +157,11 @@ describe('removeEmptyExports', () => {
 
 describe('removeResolvedExports', () => {
   it('should correctly remove resolved exports (integration)', () => {
-    const output = EntryCleaner.removeResolvedExports(mockedRawEntry, mockedEntryMap, mockedExports);
+    const output = EntryCleaner.removeResolvedExports(
+      mockedRawEntry,
+      mockedEntryMap,
+      mockedExports,
+    );
 
     expect(output).toStrictEqual(mockedRemovedResolvedEntry);
   });

@@ -1,13 +1,15 @@
 {
-  "extends": ["@yungezeit/typescript"],
+  "extends": ["@yungezeit/typescript", "prettier"],
   "rules": {
     "no-await-in-loop": "off"
   },
-  "overrides": [{
-    "files": ["tests/**/*.test.ts"],
-    "rules": {
-      "max-len": "off",
-      "prefer-regex-literals": "off"
+  "overrides": [
+    {
+      "files": ["tests/**/*.test.ts"],
+      "rules": {
+        "max-len": "off",
+        "prefer-regex-literals": "off"
+      }
     }
-  }]
+  ]
 }

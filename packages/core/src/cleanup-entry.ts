@@ -7,30 +7,22 @@ import type { EntryExports } from './types';
  * Reformats remaining changed exports from updated entry file.
  * @param content Updated entry file content.
  */
-const reformatRemainingExports = (
-  content: string,
-) => content.replace(
-  /export {([^}]*)}/mg,
-  (_, exports: string) => {
-    const reformattedExport = exports.split(',')
+const reformatRemainingExports = (content: string) =>
+  content.replace(/export {([^}]*)}/gm, (_, exports: string) => {
+    const reformattedExport = exports
+      .split(',')
       .map((item) => item.trim())
       .filter((item) => item !== '')
       .join(',');
 
     return `export { ${reformattedExport} }`;
-  },
-);
+  });
 
 /**
  * Removes empty exports from updated entry file.
  * @param content Updated entry file content.
  */
-const removeEmptyExports = (
-  content: string,
-) => content.replace(
-  /(export {[^\w}]*}.*;?)/mg,
-  '',
-);
+const removeEmptyExports = (content: string) => content.replace(/(export {[^\w}]*}.*;?)/gm, '');
 
 /**
  * Removes resolved exports from entry file.
@@ -45,11 +37,7 @@ const removeResolvedExports = (
 ): string => {
   const output = new MagicString(rawEntry);
   const replace = new Set<[number, number, string]>([]);
-  exports.forEach(({
-    n: exportedName,
-    s: lineStart,
-    e: lineEnd,
-  }) => {
+  exports.forEach(({ n: exportedName, s: lineStart, e: lineEnd }) => {
     if (entryMap.has(exportedName)) {
       replace.add([lineStart, lineEnd, '']);
     }
@@ -59,10 +47,7 @@ const removeResolvedExports = (
     output.overwrite(start, end, replacement);
   });
 
-  return output.toString().replace(
-    /(\w*\s*as\s*)([,}])/mg,
-    '$2',
-  );
+  return output.toString().replace(/(\w*\s*as\s*)([,}])/gm, '$2');
 };
 
 /**
@@ -78,17 +63,10 @@ const cleanupEntry = (
   rawEntry: string,
   entryMap: EntryExports,
   exports: readonly ExportSpecifier[],
-) => (
+) =>
   methods.reformatRemainingExports(
-    methods.removeEmptyExports(
-      methods.removeResolvedExports(
-        rawEntry,
-        entryMap,
-        exports,
-      ),
-    ),
-  )
-);
+    methods.removeEmptyExports(methods.removeResolvedExports(rawEntry, entryMap, exports)),
+  );
 
 export const methods = {
   removeResolvedExports,

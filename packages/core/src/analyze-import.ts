@@ -24,13 +24,10 @@ const getImportedNamedExports = (
   startPosition: number,
   endPosition: number,
 ): string[] => {
-  const [, importContentString] = code.slice(
-    startPosition,
-    endPosition,
-  ).match(/{([\s\S]*?)}/) ?? [];
+  const [, importContentString] =
+    code.slice(startPosition, endPosition).match(/{([\s\S]*?)}/) ?? [];
 
-  return (importContentString?.split(',') ?? [])
-    .map((namedExport) => namedExport.trim());
+  return (importContentString?.split(',') ?? []).map((namedExport) => namedExport.trim());
 };
 
 /**
@@ -62,10 +59,7 @@ const getImportsMap = async (
           ]);
         }
       } else {
-        map.set(entryPath, [
-          ...(map.get(entryPath) ?? []),
-          { name, importDefault: false },
-        ]);
+        map.set(entryPath, [...(map.get(entryPath) ?? []), { name, importDefault: false }]);
       }
     }),
   );
@@ -77,12 +71,7 @@ const getImportsMap = async (
  * Formats a single entity import replacement.
  * @param analyzedImport Analyzed import.
  */
-const formatImportReplacement = ({
-  name,
-  alias,
-  originalName,
-  importDefault,
-}: ImportInput) => {
+const formatImportReplacement = ({ name, alias, originalName, importDefault }: ImportInput) => {
   if (importDefault) {
     return `default as ${alias ?? originalName ?? name}`;
   }
@@ -98,14 +87,13 @@ const formatImportReplacement = ({
  * Returns a single target import's replacement lines.
  * @param imported Analyzed imported entities from target entry.
  */
-const getImportReplacement = (
-  imported: TargetImports,
-): `import ${string}`[] => {
+const getImportReplacement = (imported: TargetImports): `import ${string}`[] => {
   const replacement: `import ${string}`[] = [];
   imported.forEach((importedItems, importedPath) => {
     const path = normalizePath(importedPath);
-    const imports = importedItems
-      .map((importedItem) => methods.formatImportReplacement(importedItem));
+    const imports = importedItems.map((importedItem) =>
+      methods.formatImportReplacement(importedItem),
+    );
     replacement.push(`import { ${imports.join(', ')} } from '${path}'`);
   });
 
@@ -135,11 +123,7 @@ const analyzeImportStatement = async (
   const imported = await methods.getImportsMap(entryExports, entryPath, namedImports, resolver);
   const replacement = methods.getImportReplacement(imported);
 
-  src.overwrite(
-    startPosition,
-    endPosition + 1,
-    `${replacement.join(';\n')};`,
-  );
+  src.overwrite(startPosition, endPosition + 1, `${replacement.join(';\n')};`);
 };
 
 const methods = {

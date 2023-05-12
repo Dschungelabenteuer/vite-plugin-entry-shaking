@@ -11,6 +11,5 @@ export const VITE_CONFIG = {
   },
 };
 
-export const getTestResolver = async () => (
-  await resolveConfig(VITE_CONFIG, 'serve')
-).createResolver();
+export const getTestResolver = async () =>
+  (await resolveConfig(VITE_CONFIG, 'serve')).createResolver();

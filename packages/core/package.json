@@ -41,10 +41,12 @@
   },
   "scripts": {
     "dev": "pnpm unbuild --stub",
+    "postinstall": "pnpm build",
     "build": "pnpm unbuild",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
   "peerDependencies": {
@@ -57,8 +59,9 @@
   "devDependencies": {
     "@types/node": "^18.7.18",
     "@vitest/coverage-istanbul": "^0.23.4",
-    "@yungezeit/eslint-config-typescript": "^0.0.8",
+    "@yungezeit/eslint-config-typescript": "^0.0.11",
     "eslint": "^8.23.1",
+    "eslint-config-prettier": "^8.8.0",
     "ts-dedent": "^2.2.0",
     "typescript": "^4.8.3",
     "unbuild": "^0.8.11",

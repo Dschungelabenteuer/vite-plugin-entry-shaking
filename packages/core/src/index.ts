@@ -33,14 +33,7 @@ export default async function createEntryShakingPlugin(
     },
 
     async transform(code, id) {
-      return await transformIfNeeded(
-        id,
-        code,
-        entries,
-        options,
-        resolver,
-        logger,
-      );
+      return await transformIfNeeded(id, code, entries, options, resolver, logger);
     },
 
     load(id) {

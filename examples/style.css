@@ -7,8 +7,8 @@
   --accent-color: #e1d287;
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   color: rgba(180, 244, 255, 0.87);
-  background: rgb(17,15,29);
-  background: linear-gradient(133deg, rgba(17,15,29,1) 0%, #0f1a1d);
+  background: rgb(17, 15, 29);
+  background: linear-gradient(133deg, rgba(17, 15, 29, 1) 0%, #0f1a1d);
 }
 
 body {
@@ -39,8 +39,8 @@ h2 {
 
   letter-spacing: 7px;
   background: -webkit-linear-gradient(var(--base-color), var(--shade-color-lighter));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   border-width: 3px;
   border-style: solid;
   border-image-source: linear-gradient(to right, var(--shade-color-lighter), var(--shade-color));
@@ -71,19 +71,31 @@ p {
   text-align: center;
 }
 
-
 @keyframes pluginTitle {
-  0% { transform: translate(0,0) scale(1); }
-  50% { transform: translate(0.4rem,1rem) scale(1.07); }
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(0.4rem, 1rem) scale(1.07);
+  }
 }
 
-
 @keyframes exampleTitle {
-  0% { transform: translate(0,0) scale(1); opacity: 1; }
-  50% { transform: translate(-0.4rem,1rem) scale(1.04); opacity: 0.7 ;}
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-0.4rem, 1rem) scale(1.04);
+    opacity: 0.7;
+  }
 }
 
 @keyframes requests {
-  0% { transform: translate(0,0) scale(1); }
-  50% { transform: translate(0.9rem,0.9rem) scale(1.09); }
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(0.9rem, 0.9rem) scale(1.09);
+  }
 }

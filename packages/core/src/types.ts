@@ -65,6 +65,6 @@ export type PluginTargets = EntryPath[];
 
 /** Parsed import statement output. */
 export type ParsedImportStatement = {
-  namedImports: string[],
-  defaultImport: string | null,
+  namedImports: string[];
+  defaultImport: string | null;
 };

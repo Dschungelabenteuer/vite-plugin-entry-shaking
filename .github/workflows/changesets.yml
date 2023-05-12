@@ -1,0 +1,27 @@
+name: Changesets
+on:
+  workflow_call:
+
+jobs:
+  changesets:
+    name: Changesets
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install node & pnpm dependencies
+        uses: ./.github/actions/install
+
+      - name: Create Release Pull Request or Publish to npm
+        uses: changesets/action@v1
+        with:
+          title: 'chore: version packages'
+          commit: 'chore: version packages'
+          publish: pnpm changeset:release
+          version: pnpm changeset:version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

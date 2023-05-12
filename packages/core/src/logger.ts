@@ -10,10 +10,10 @@ export const paint = (color: keyof typeof COLORS, text: string) => `${COLORS[col
 
 export const logPrefix = paint('cyan', `[vite:entry-shaking]`);
 
-export const configureLogger = (logger: Logger, debug: boolean) => ({
-  ...logger,
-  info(
-    message: Parameters<Logger['info']>[0],
-    options: Parameters<Logger['info']>[1],
-  ) { if (debug) logger.info(`${logPrefix} ${message}`, options); },
-}) as Logger;
+export const configureLogger = (logger: Logger, debug: boolean) =>
+  ({
+    ...logger,
+    info(message: Parameters<Logger['info']>[0], options: Parameters<Logger['info']>[1]) {
+      if (debug) logger.info(`${logPrefix} ${message}`, options);
+    },
+  } as Logger);

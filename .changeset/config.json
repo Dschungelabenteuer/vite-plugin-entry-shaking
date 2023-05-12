@@ -3,13 +3,12 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [],
-  "linked": [
-    [
-      "vite-plugin-entry-shaking"
-    ]
-  ],
+  "linked": [["vite-plugin-entry-shaking"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": []
+  "ignore": [
+    "vite-plugin-entry-shaking-example-complete",
+    "vite-plugin-entry-shaking-example-simple"
+  ]
 }

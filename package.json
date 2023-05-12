@@ -13,13 +13,20 @@
     "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
   },
   "scripts": {
-    "changeset": "changeset",
     "build": "pnpm --filter \"./packages/core\" build",
-    "release": "pnpm build && changeset publish"
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "format": "prettier . --write",
+    "check": "pnpm format && pnpm lint && pnpm test",
+    "changeset:release": "pnpm build && changeset publish",
+    "changeset:version": "changeset version && pnpm install --lockfile-only"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.4.7",
     "@changesets/cli": "^2.25.0",
-    "@yungezeit/eslint-config-base": "^0.0.8"
+    "@yungezeit/eslint-config-base": "^0.0.11",
+    "eslint": "^8.23.1",
+    "eslint-config-prettier": "^8.8.0",
+    "prettier": "^2.8.8"
   }
 }

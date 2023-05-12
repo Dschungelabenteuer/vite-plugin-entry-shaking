@@ -1,0 +1,49 @@
+name: Verify
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install node & pnpm dependencies
+        uses: ./.github/actions/install
+
+      - name: Lint code
+        run: pnpm lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install node & pnpm dependencies
+        uses: ./.github/actions/install
+
+      - name: Test
+        run: pnpm test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install node & pnpm dependencies
+        uses: ./.github/actions/install
+
+      - name: Build
+        run: pnpm build

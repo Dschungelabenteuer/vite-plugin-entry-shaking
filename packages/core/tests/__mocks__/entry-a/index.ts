@@ -11,15 +11,10 @@ export { default as A_MODULE_I, J as A_MODULE_J } from './modules/IJ';
 export { A_MODULE_A };
 export { A_MODULE_B };
 export { A_MODULE_C, A_MODULE_D };
-export {
-  A_MODULE_E,
-  A_MODULE_F,
-};
+export { A_MODULE_E, A_MODULE_F };
 
 export { A_MODULE_G };
 
 export const test = 'test';
 
-export default () => {
-
-};
+export default () => {};

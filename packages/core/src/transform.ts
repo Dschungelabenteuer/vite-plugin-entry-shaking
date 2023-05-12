@@ -12,10 +12,7 @@ import { paint } from './logger';
  * @param id Resolved id of the file.
  * @param options Final plugin options.
  */
-export const requiresTransform = (
-  id: string,
-  options: FinalPluginOptions,
-) => {
+export const requiresTransform = (id: string, options: FinalPluginOptions) => {
   const extension = id.split('.').pop()!;
   const isIgnored = options.ignorePatterns.some((pattern) => id.match(pattern));
   return !isIgnored && options.extensions.includes(extension);
@@ -38,7 +35,7 @@ export const importsTargetEntry = async (
     return await Promise.any(
       imports.map(async (importParams) => {
         const { n: importPath } = importParams;
-        const resolvedPath = importPath && await resolver(importPath, id);
+        const resolvedPath = importPath && (await resolver(importPath, id));
         if (!resolvedPath || !entries.has(resolvedPath)) throw new Error();
         return true;
       }),
@@ -69,14 +66,8 @@ export async function transformImports(
   await init;
   const src = new MagicString(code);
 
-  for (
-    const {
-      n: targetPath,
-      ss: startPosition,
-      se: endPosition,
-    } of imports
-  ) {
-    const resolvedImport = targetPath && await resolver(targetPath, id);
+  for (const { n: targetPath, ss: startPosition, se: endPosition } of imports) {
+    const resolvedImport = targetPath && (await resolver(targetPath, id));
     const entry = resolvedImport && entries.get(resolvedImport);
     // If the active import is one of the targets, let's analyze it.
     if (entry) {
@@ -118,14 +109,7 @@ export async function transformImportsIfNeeded(
   if (!importsTarget) {
     logger.info(paint('gray', `[IGNORED BY ANALYZIS] ${id}`));
   } else {
-    return await transformImports(
-      id,
-      code,
-      entries,
-      imports,
-      resolver,
-      logger,
-    );
+    return await transformImports(id, code, entries, imports, resolver, logger);
   }
 }
 
@@ -152,12 +136,6 @@ export async function transformIfNeeded(
   if (!isCandidate) {
     logger.info(paint('gray', `[IGNORED BY OPTIONS] ${id}`));
   } else {
-    return await transformImportsIfNeeded(
-      id,
-      code,
-      entries,
-      resolver,
-      logger,
-    );
+    return await transformImportsIfNeeded(id, code, entries, resolver, logger);
   }
 }
