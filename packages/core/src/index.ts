@@ -5,7 +5,7 @@ import { transformIfNeeded } from './transform';
 import { mergeOptions } from './options';
 import EntryAnalyzer from './analyze-entry';
 
-export default async function createEntryShakingPlugin(
+export async function createEntryShakingPlugin(
   userOptions: PluginOptions,
 ): Promise<PluginOption> {
   const options = mergeOptions(userOptions);
@@ -44,3 +44,5 @@ export default async function createEntryShakingPlugin(
     },
   };
 }
+
+export default createEntryShakingPlugin;
