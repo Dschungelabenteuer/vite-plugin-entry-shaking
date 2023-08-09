@@ -1,5 +1,16 @@
 # vite-plugin-entry-shaking
 
+## 0.3.0
+
+### Minor Changes
+
+- 963b45a: Added support for circular imports/exports accross target entries
+
+### Patch Changes
+
+- d2147c0: Added a message to clarify which entry file throws an error when being analyzed
+- 977b17c: Export plugin as named export
+
 ## 0.2.1
 
 ### Patch Changes
