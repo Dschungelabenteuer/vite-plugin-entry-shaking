@@ -1,8 +1,8 @@
+import { resolve } from 'path';
 import type { ImportSpecifier } from 'es-module-lexer';
 import type { ResolveFn } from 'vite';
 import { normalizePath, createLogger } from 'vite';
 import { describe, it, expect, beforeAll, vi, beforeEach, afterEach } from 'vitest';
-import { resolve } from 'path';
 import dedent from 'ts-dedent';
 
 import type { EntryData, FinalPluginOptions, PluginEntries, PluginOptions } from '../src/types';

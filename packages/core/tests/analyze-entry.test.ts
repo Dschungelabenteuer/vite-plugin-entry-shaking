@@ -1,9 +1,9 @@
+import fs from 'fs';
+import { resolve } from 'path';
 import type { MockedFunction } from 'vitest';
 import type { ResolveFn } from 'vite';
 import { beforeAll, describe, it, expect, vi, beforeEach } from 'vitest';
-import fs from 'fs';
 import dedent from 'ts-dedent';
-import { resolve } from 'path';
 
 import type { EntryExports, EntryImports, PluginEntries } from '../src/types';
 import EntryAnalyzer from '../src/analyze-entry';
