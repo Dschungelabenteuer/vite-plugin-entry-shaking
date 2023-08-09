@@ -24,8 +24,8 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.4.7",
     "@changesets/cli": "^2.25.0",
-    "@yungezeit/eslint-config-base": "^0.0.11",
-    "eslint": "^8.23.1",
+    "@yungezeit/eslint-config-base": "^0.0.12",
+    "eslint": "^8.46.0",
     "eslint-config-prettier": "^8.8.0",
     "prettier": "^2.8.8"
   }

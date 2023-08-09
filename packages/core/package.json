@@ -59,13 +59,13 @@
   "devDependencies": {
     "@types/node": "^18.7.18",
     "@vitest/coverage-istanbul": "^0.23.4",
-    "@yungezeit/eslint-config-typescript": "^0.0.11",
-    "eslint": "^8.23.1",
+    "@yungezeit/eslint-config-typescript": "^0.0.12",
+    "eslint": "^8.46.0",
     "eslint-config-prettier": "^8.8.0",
     "ts-dedent": "^2.2.0",
     "typescript": "^4.8.3",
     "unbuild": "^0.8.11",
-    "vite": "^4.0.1",
+    "vite": "^4.0.5",
     "vitest": "^0.23.2"
   }
 }
