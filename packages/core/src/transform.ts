@@ -74,6 +74,7 @@ export async function transformImports(
       await ImportAnalyzer.analyzeImportStatement(
         src,
         code,
+        entries,
         entry.exports,
         resolvedImport,
         startPosition,
@@ -103,13 +104,14 @@ export async function transformImportsIfNeeded(
   resolver: ResolveFn,
   logger: Logger,
 ): Promise<string | undefined> {
-  const [imports] = parse(code);
-  const importsTarget = await importsTargetEntry(id, imports, entries, resolver);
+  const sourceCode = entries.has(id) ? entries.get(id)!.source : code;
+  const [imports] = parse(sourceCode);
 
+  const importsTarget = await methods.importsTargetEntry(id, imports, entries, resolver);
   if (!importsTarget) {
     logger.info(paint('gray', `[IGNORED BY ANALYZIS] ${id}`));
   } else {
-    return await transformImports(id, code, entries, imports, resolver, logger);
+    return await methods.transformImports(id, code, entries, imports, resolver, logger);
   }
 }
 
@@ -131,11 +133,21 @@ export async function transformIfNeeded(
   resolver: ResolveFn,
   logger: Logger,
 ): Promise<string | undefined> {
-  const isCandidate = requiresTransform(id, options);
+  const isCandidate = methods.requiresTransform(id, options);
 
   if (!isCandidate) {
     logger.info(paint('gray', `[IGNORED BY OPTIONS] ${id}`));
   } else {
-    return await transformImportsIfNeeded(id, code, entries, resolver, logger);
+    return await methods.transformImportsIfNeeded(id, code, entries, resolver, logger);
   }
 }
+
+const methods = {
+  requiresTransform,
+  importsTargetEntry,
+  transformImports,
+  transformImportsIfNeeded,
+  transformIfNeeded,
+};
+
+export default methods;

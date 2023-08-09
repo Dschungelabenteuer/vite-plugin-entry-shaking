@@ -12,6 +12,7 @@ export type FinalPluginOptions = Required<PluginOptions>;
 /** Target entry data. */
 export type EntryData = {
   exports: EntryExports;
+  source: string;
   updatedSource: string;
 };
 
@@ -26,7 +27,9 @@ export type ImportPath = string;
 
 /** Import parameters. */
 export type ImportParams<T = string> = {
+  /** Imported path. */
   path: T;
+  /** Is it a default import? */
   importDefault: boolean;
   /** Original name of the entity (as exported by its source file). */
   originalName?: string;
@@ -68,3 +71,6 @@ export type ParsedImportStatement = {
   namedImports: string[];
   defaultImport: string | null;
 };
+
+/** Import statement string. */
+export type ImportStatement = `import ${string}`;
