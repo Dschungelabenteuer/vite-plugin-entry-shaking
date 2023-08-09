@@ -142,6 +142,7 @@ const doAnalyzeEntry = async (entries: PluginEntries, entryPath: EntryPath): Pro
   // Finally export entry's analyzis output.
   entries.set(entryPath, {
     exports: entryMap,
+    source: rawEntry,
     updatedSource: EntryCleaner.cleanupEntry(rawEntry, entryMap, exports),
   });
 };

@@ -393,6 +393,13 @@ describe('analyzeEntry', () => {
 
     expect(EntryAnalyzer.doAnalyzeEntry).toHaveBeenCalledWith(expect.anything(), path);
   });
+
+  it('should throw error if anything went wrong while analyzing entry file', async () => {
+    vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementationOnce(() => Promise.reject());
+    expect(async () => {
+      await EntryAnalyzer.analyzeEntry(new Map([]), path);
+    }).rejects.toThrowError();
+  });
 });
 
 describe('analyzeEntries', () => {

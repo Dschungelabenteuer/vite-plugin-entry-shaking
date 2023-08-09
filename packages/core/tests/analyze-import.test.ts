@@ -4,14 +4,27 @@ import fs from 'fs';
 import MagicString from 'magic-string';
 import { resolve } from 'path';
 import dedent from 'ts-dedent';
-import { beforeAll, describe, it, expect, vi } from 'vitest';
+import { beforeAll, describe, it, expect, vi, beforeEach } from 'vitest';
 
 import ImportAnalyzer from '../src/analyze-import';
-import { getTestResolver, MOCKS_FOLDER } from './utils';
+import { getTestResolver, MOCK_IMPORT_INPUT, MOCKS_FOLDER, STUB_PATH, STUB_SOURCE } from './utils';
+import type { EntryData, ImportInput, PluginEntries, TargetImports } from '../src/types';
 
 vi.mock('fs');
 
 let resolver: ResolveFn;
+
+const getEntries = (entryPath: string): PluginEntries =>
+  new Map([
+    [
+      entryPath,
+      {
+        exports: new Map([['A_MODULE_A', { path: './modules/A', importDefault: true }]]),
+        source: '',
+        updatedSource: '',
+      },
+    ],
+  ]);
 
 beforeAll(async () => {
   resolver = await getTestResolver();
@@ -56,7 +69,7 @@ describe('getImportedNamedExports', () => {
   });
 });
 
-describe('getImportsMap', async () => {
+describe('getImportsMap', () => {
   const entryExports = new Map([
     ['A_MODULE_H', { path: './modules/H', importDefault: false, originalName: 'A_MODULE_H' }],
     ['A_MODULE_I', { path: './modules/IJ', importDefault: true, originalName: undefined }],
@@ -263,6 +276,80 @@ describe('formatImportReplacement', () => {
   });
 });
 
+describe('getImportReplacements', () => {
+  it('should call resolveImportedEntities for each import', async () => {
+    vi.spyOn(ImportAnalyzer, 'resolveImportedEntities');
+    const entries = new Map([['entry', {} as EntryData]]);
+    const imports: TargetImports = new Map([
+      ['first', [MOCK_IMPORT_INPUT]],
+      ['second', [MOCK_IMPORT_INPUT, MOCK_IMPORT_INPUT]],
+    ]);
+
+    const output = await ImportAnalyzer.getImportReplacements(
+      imports,
+      STUB_PATH,
+      entries,
+      resolver,
+    );
+
+    expect(ImportAnalyzer.resolveImportedEntities).toHaveBeenCalledTimes(2);
+    expect(Array.isArray(output)).toStrictEqual(true);
+  });
+});
+
+describe('resolveImportedEntities', () => {
+  const expectedFn = 'resolveImportedCircularEntities';
+  const when = 'from different target entries';
+  const imported: ImportInput[] = [MOCK_IMPORT_INPUT];
+  const entries: PluginEntries = new Map([['entryB', { exports: new Map() } as EntryData]]);
+
+  beforeEach(() => {
+    vi.spyOn(ImportAnalyzer, 'resolveImportedCircularEntities');
+    vi.spyOn(ImportAnalyzer, 'formatImportReplacement');
+  });
+
+  it(`should call "${expectedFn}" if there is circular imports ${when}`, async () => {
+    const entryPath = 'entryA';
+    const path = 'entryB';
+    await ImportAnalyzer.resolveImportedEntities(imported, entryPath, entries, resolver, path);
+    expect(ImportAnalyzer.resolveImportedCircularEntities).toHaveBeenCalledWith(
+      imported,
+      entries,
+      resolver,
+      path,
+    );
+  });
+
+  it(`should not call "${expectedFn}" if there is no circular imports ${when}`, async () => {
+    const entryPath = 'entryA';
+    const path = 'entryA';
+    await ImportAnalyzer.resolveImportedEntities(imported, entryPath, entries, resolver, path);
+    expect(ImportAnalyzer.resolveImportedCircularEntities).not.toHaveBeenCalled();
+    expect(ImportAnalyzer.formatImportReplacement).toHaveBeenCalledTimes(imported.length);
+  });
+});
+
+describe('resolveImportedCircularEntities', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const entryPath = 'entryB';
+  const entryData: EntryData = {
+    exports: new Map([[MOCK_IMPORT_INPUT.name, MOCK_IMPORT_INPUT]]),
+    source: STUB_SOURCE,
+    updatedSource: STUB_SOURCE,
+  };
+
+  const imported: ImportInput[] = [MOCK_IMPORT_INPUT];
+  const entries: PluginEntries = new Map([[entryPath, entryData]]);
+
+  it('should call "formatImportReplacement" with resolved entry data', async () => {
+    await ImportAnalyzer.resolveImportedCircularEntities(imported, entries, resolver, entryPath);
+    expect(ImportAnalyzer.formatImportReplacement).toHaveBeenCalledTimes(imported.length);
+  });
+});
+
 describe('analyzeImportStatement', () => {
   it('should correctly return mutated entry file', async () => {
     vi.restoreAllMocks();
@@ -325,6 +412,7 @@ describe('analyzeImportStatement', () => {
     await ImportAnalyzer.analyzeImportStatement(
       src,
       input,
+      getEntries(entryPath),
       entryExports,
       entryPath,
       0,
