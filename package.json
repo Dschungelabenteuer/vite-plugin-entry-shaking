@@ -13,6 +13,7 @@
     "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
   },
   "scripts": {
+    "postinstall": "pnpm build",
     "build": "pnpm --filter \"./packages/core\" build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",

@@ -41,7 +41,6 @@
   },
   "scripts": {
     "dev": "pnpm unbuild --stub",
-    "postinstall": "pnpm build",
     "build": "pnpm unbuild",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
