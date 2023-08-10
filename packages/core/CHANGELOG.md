@@ -1,5 +1,11 @@
 # vite-plugin-entry-shaking
 
+## 0.3.1
+
+### Patch Changes
+
+- dc07179: Fixed postinstall script location
+
 ## 0.3.0
 
 ### Minor Changes
