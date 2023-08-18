@@ -1,5 +1,11 @@
 # vite-plugin-entry-shaking
 
+## 0.3.2
+
+### Patch Changes
+
+- f4abe88: Fixed misalignment between source entry file content and their mutated versions
+
 ## 0.3.1
 
 ### Patch Changes
