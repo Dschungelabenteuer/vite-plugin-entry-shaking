@@ -191,8 +191,6 @@ const analyzeImportStatement = async (
   const imported = await methods.getImportsMap(entryExports, entryPath, namedImports, resolver);
   const replacement = await methods.getImportReplacements(imported, entryPath, entries, resolver);
 
-  console.log('_________');
-  console.log({ code, src: src.toString(), startPosition, endPosition });
   src.overwrite(startPosition, endPosition + 1, `${replacement.join(';\n')};`);
 };
 
