@@ -104,8 +104,7 @@ export async function transformImportsIfNeeded(
   resolver: ResolveFn,
   logger: Logger,
 ): Promise<string | undefined> {
-  const sourceCode = entries.has(id) ? entries.get(id)!.source : code;
-  const [imports] = parse(sourceCode);
+  const [imports] = parse(code);
 
   const importsTarget = await methods.importsTargetEntry(id, imports, entries, resolver);
   if (!importsTarget) {
