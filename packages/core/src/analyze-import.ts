@@ -11,6 +11,10 @@ import type {
   TargetImports,
 } from './types';
 
+import { addSourceQuerySuffix } from './urls';
+
+const WILDCARD_IMPORT_PREFIX = 'import *';
+
 /**
  * Returns the import params of a single imported entity.
  * @param importString Import statement string.
@@ -167,7 +171,7 @@ const resolveImportedCircularEntities = async (
 };
 
 /**
- * Analyzes a single target import.
+ * Analyzes and transforms a single target import.
  * @param src MagicString instance to prepare transforms.
  * @param code Source code of the file.
  * @param entries _reference_ - Map of parsed entry files.
@@ -187,11 +191,42 @@ const analyzeImportStatement = async (
   endPosition: number,
   resolver: ResolveFn,
 ) => {
+  const isWildCardImport = catchWildcardImport(src, code, startPosition, endPosition, entryPath);
+  if (isWildCardImport) return;
+
   const namedImports = methods.getImportedNamedExports(code, startPosition, endPosition);
   const imported = await methods.getImportsMap(entryExports, entryPath, namedImports, resolver);
   const replacement = await methods.getImportReplacements(imported, entryPath, entries, resolver);
 
   src.overwrite(startPosition, endPosition + 1, `${replacement.join(';\n')};`);
+};
+
+/**
+ * Catches and handles import statement is a wildcard import.
+ * @param src MagicString instance to prepare transforms.
+ * @param code Source code of the file.
+ * @param startPosition Start position of the import statement.
+ */
+const catchWildcardImport = (
+  src: MagicString,
+  code: string,
+  startPosition: number,
+  endPosition: number,
+  entryPath: any,
+) => {
+  const isWildCardImport =
+    code.slice(startPosition, WILDCARD_IMPORT_PREFIX.length) === WILDCARD_IMPORT_PREFIX;
+
+  if (isWildCardImport) {
+    const [what] = code.slice(startPosition, endPosition).split('from');
+    src.overwrite(
+      startPosition,
+      endPosition + 1,
+      `${what.trim()} from "${addSourceQuerySuffix(entryPath)}";`,
+    );
+  }
+
+  return isWildCardImport;
 };
 
 const methods = {

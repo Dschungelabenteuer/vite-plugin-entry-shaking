@@ -1,6 +1,5 @@
 import fs from 'fs';
 import { resolve } from 'path';
-import type { MockedFunction } from 'vitest';
 import type { ResolveFn } from 'vite';
 import { beforeAll, describe, it, expect, vi, beforeEach } from 'vitest';
 import dedent from 'ts-dedent';
@@ -272,7 +271,7 @@ describe('doAnalyzeEntry', () => {
     const entries: PluginEntries = new Map([]);
     const targetPath = '@entry/path';
     const entryPath = '/path/to/entry';
-    (fs.readFileSync as MockedFunction<any>).mockReturnValueOnce(entrySource);
+    vi.mocked(fs.readFileSync).mockReturnValueOnce(entrySource);
 
     await EntryAnalyzer.doAnalyzeEntry(entries, targetPath);
 
@@ -403,8 +402,10 @@ describe('analyzeEntry', () => {
 });
 
 describe('analyzeEntries', () => {
-  beforeAll(() => {
+  beforeAll(async () => {
     vi.restoreAllMocks();
+    const realFs = await vi.importActual('fs') as any;
+    vi.mocked(fs.readFileSync).mockImplementation(realFs.readFileSync);
   });
 
   it('should correctly analyze entries', async () => {
