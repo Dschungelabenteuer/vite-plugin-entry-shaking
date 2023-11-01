@@ -1,5 +1,14 @@
 # vite-plugin-entry-shaking
 
+## 0.3.3
+
+### Patch Changes
+
+- e0f268e: Fixed an issue where wildcard imports would break instead of be ignored. This led to
+  further considerations about some edge cases wildcard imports could cause. See
+  [this example](./examples/issue-29/src/main.ts) for further information.
+- e0f268e: Updated dependencies and fixed dependabot alerts
+
 ## 0.3.2
 
 ### Patch Changes
