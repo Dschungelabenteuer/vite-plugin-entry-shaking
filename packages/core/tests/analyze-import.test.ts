@@ -359,7 +359,7 @@ describe('analyzeImportStatement', () => {
     const output = `${what} from "${entryPath}?source=1";`;
     const src = new MagicString(input);
 
-    (fs.existsSync as MockedFunction<any>).mockImplementation(() => true);
+    vi.mocked(fs.existsSync).mockImplementation(() => true);
     await ImportAnalyzer.analyzeImportStatement(
       src,
       input,
@@ -433,7 +433,7 @@ describe('analyzeImportStatement', () => {
       ['A_MODULE_G', { path: './modules/G', importDefault: false, originalName: 'G' }],
     ]);
     const src = new MagicString(input);
-    (fs.existsSync as MockedFunction<any>).mockImplementation(() => true);
+    vi.mocked(fs.existsSync).mockImplementation(() => true);
     await ImportAnalyzer.analyzeImportStatement(
       src,
       input,
