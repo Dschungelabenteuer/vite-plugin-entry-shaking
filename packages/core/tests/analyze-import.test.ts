@@ -1,7 +1,6 @@
 import fs from 'fs';
 import { resolve } from 'path';
 import type { ResolveFn } from 'vite';
-import type { MockedFunction } from 'vitest';
 import MagicString from 'magic-string';
 import dedent from 'ts-dedent';
 import { beforeAll, describe, it, expect, vi, beforeEach } from 'vitest';
