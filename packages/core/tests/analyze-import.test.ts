@@ -351,7 +351,32 @@ describe('resolveImportedCircularEntities', () => {
 });
 
 describe('analyzeImportStatement', () => {
-  it('should correctly return mutated entry file', async () => {
+  it('should ignore wildcard import statements', async () => {
+    vi.restoreAllMocks();
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-c'))) as string;
+    const what = 'import * as Utils';
+    const input = `${what} from "./entry-c";`;
+    const output = `${what} from "${entryPath}?source=1";`;
+    const src = new MagicString(input);
+
+    (fs.existsSync as MockedFunction<any>).mockImplementation(() => true);
+    await ImportAnalyzer.analyzeImportStatement(
+      src,
+      input,
+      getEntries(entryPath),
+      new Map(), // Irrelevant for this test's puprposes
+      entryPath,
+      0,
+      input.length - 1,
+      resolver,
+    );
+
+    const res = src.toString().toLocaleLowerCase();
+    const expected = output.toLocaleLowerCase();
+    expect(res).toStrictEqual(expected);
+  });
+
+  it('should correctly mutate file', async () => {
     vi.restoreAllMocks();
     const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
     const path = `@mocks/entry-a`;

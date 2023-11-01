@@ -4,10 +4,9 @@ import { configureLogger } from './logger';
 import { transformIfNeeded } from './transform';
 import { mergeOptions } from './options';
 import EntryAnalyzer from './analyze-entry';
+import { parseId } from './urls';
 
-export async function createEntryShakingPlugin(
-  userOptions: PluginOptions,
-): Promise<PluginOption> {
+export async function createEntryShakingPlugin(userOptions: PluginOptions): Promise<PluginOption> {
   const options = mergeOptions(userOptions);
   let logger: Logger;
   let resolver: ResolveFn;
@@ -37,9 +36,14 @@ export async function createEntryShakingPlugin(
     },
 
     load(id) {
-      if (entries.has(id)) {
-        logger.info(`Serving mutated entry file ${id}`);
-        return entries.get(id)!.updatedSource;
+      const { url, serveSource } = parseId(id);
+      const entry = entries.get(url);
+
+      if (entry) {
+        const version = serveSource ? 'original' : 'mutated';
+        const output = serveSource ? entry.source : entry.updatedSource;
+        logger.info(`Serving ${version} entry file ${url}`);
+        return output;
       }
     },
   };

@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 importers:
 
   .:
@@ -50,6 +46,21 @@ importers:
       typescript:
         specifier: ^4.6.4
         version: 4.6.4
+      vite:
+        specifier: ^4.0.5
+        version: 4.0.5(@types/node@18.7.18)
+      vite-plugin-entry-shaking:
+        specifier: workspace:*
+        version: link:../../packages/core
+
+  examples/issue-29:
+    devDependencies:
+      '@yungezeit/eslint-config-typescript':
+        specifier: ^0.0.12
+        version: 0.0.12(eslint@8.46.0)(typescript@4.8.3)
+      typescript:
+        specifier: ^4.6.4
+        version: 4.8.3
       vite:
         specifier: ^4.0.5
         version: 4.0.5(@types/node@18.7.18)
@@ -5074,3 +5085,7 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

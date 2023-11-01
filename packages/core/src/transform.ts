@@ -66,6 +66,7 @@ export async function transformImports(
   await init;
   const src = new MagicString(code);
 
+
   for (const { n: targetPath, ss: startPosition, se: endPosition } of imports) {
     const resolvedImport = targetPath && (await resolver(targetPath, id));
     const entry = resolvedImport && entries.get(resolvedImport);
