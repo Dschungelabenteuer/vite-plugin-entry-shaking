@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import { init, parse } from 'es-module-lexer';
 
 import type { ResolveFn } from 'vite';
+import { globSync } from 'fast-glob';
 import type {
   EntryExports,
   EntryImports,
@@ -10,6 +11,7 @@ import type {
   PluginEntries,
   PluginTargets,
   EntryPath,
+  EntryTarget,
 } from './types';
 import EntryCleaner from './cleanup-entry';
 import ImportAnalyzer from './analyze-import';
@@ -159,6 +161,10 @@ const analyzeEntry = async (entries: PluginEntries, entryPath: EntryPath): Promi
     throw new Error(`Could not analyze entry file "${entryPath}"`);
   });
 };
+/**
+ * @description Default Glob Options,see https://github.com/mrmlnc/fast-glob#options-3
+ */
+const defaultGlobOptions = { ignore: ['**/node_modules/**'] };
 
 /**
  * Analyzes target entry files.
@@ -171,12 +177,30 @@ const analyzeEntries = async (
 ): Promise<PluginEntries> => {
   const entries: PluginEntries = new Map([]);
   await Promise.all(
-    targets.map(async (path) => {
-      const absolutePath = (await resolver(path)) ?? path;
-      await methods.analyzeEntry(entries, absolutePath);
+    targets.map(async (target: EntryTarget) => {
+      const paths: string[] = [];
+      if (typeof target === 'string') paths.push(target);
+
+      if (typeof target !== 'string') {
+        if (!target.path && !target.glob) {
+          throw new Error('The target has at least one attribute [glob | path]');
+        }
+        if (target.path) paths.push(target.path);
+
+        const options = Object.assign(
+          defaultGlobOptions,
+          target.globOptions ? target.globOptions : {},
+        );
+
+        if (target.glob) paths.push(...globSync(target.glob, options));
+      }
+
+      for (const path of paths) {
+        const absolutePath = (await resolver(path)) ?? path;
+        await methods.analyzeEntry(entries, absolutePath);
+      }
     }),
   );
-
   return entries;
 };
 

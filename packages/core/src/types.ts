@@ -1,3 +1,4 @@
+import type { Options } from 'fast-glob';
 /** Vite plugin options. */
 export type PluginOptions = {
   targets: PluginTargets;
@@ -60,11 +61,13 @@ export type TargetImports = Map<string, ImportInput[]>;
 /** Target's path/alias as used in imports. */
 export type TargetPath = string;
 
+/** Entry Option  */
+export type EntryTarget = string | { path?: string; glob?: string; globOptions?: Options };
 /** Resolved absolute path of target. */
 export type EntryPath = string;
 
 /** List of targets being processed by the plugin. */
-export type PluginTargets = EntryPath[];
+export type PluginTargets = EntryTarget[];
 
 /** Parsed import statement output. */
 export type ParsedImportStatement = {
