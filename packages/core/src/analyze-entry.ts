@@ -25,10 +25,8 @@ const parseImportStatement = (statement: string): ParsedImportStatement => {
   };
   let [, , importContent] = statement.match(/(im|ex)port (.*) from/) ?? [, , undefined];
   if (importContent) {
-    const [namedImportsStatement, namedImportsContent] = importContent.match(/{(.*)}/) ?? [
-      ,
-      undefined,
-    ];
+    const def = [, undefined];
+    const [namedImportsStatement, namedImportsContent] = importContent.match(/{(.*)}/) ?? def;
     if (namedImportsStatement && namedImportsContent) {
       importContent = importContent.replace(namedImportsStatement, '');
       namedImportsContent.split(',').forEach((namedImport) => {
@@ -176,7 +174,6 @@ const analyzeEntries = async (
       await methods.analyzeEntry(entries, absolutePath);
     }),
   );
-
   return entries;
 };
 

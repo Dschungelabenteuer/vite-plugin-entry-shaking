@@ -1,9 +1,8 @@
-import { User, TestValue, AnotherUnused } from '@utils';
+import { Something, SomethingElse } from '@lib';
 import initExample from '../../init';
 import { name } from '../package.json';
 
-User();
-console.info(TestValue, AnotherUnused);
+console.info(Something, SomethingElse);
 
 if (import.meta.hot) {
   initExample(import.meta, name);

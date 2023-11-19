@@ -1,6 +1,7 @@
 import * as Utils from '@utils';
 import { C } from './utils/C';
 import initExample from '../../init';
+import { name } from '../package.json';
 
 /**
  * C is manually re-imported to illustrate potential collisions between
@@ -19,5 +20,5 @@ import initExample from '../../init';
 console.info(Utils, C);
 
 if (import.meta.hot) {
-  initExample(import.meta, 'issue 29');
+  initExample(import.meta, name);
 }

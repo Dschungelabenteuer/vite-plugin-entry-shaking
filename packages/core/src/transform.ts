@@ -1,4 +1,4 @@
-import type { ImportSpecifier } from 'es-module-lexer';
+import type { ExportSpecifier, ImportSpecifier } from 'es-module-lexer';
 import MagicString from 'magic-string';
 import { init, parse } from 'es-module-lexer';
 
@@ -51,6 +51,7 @@ export const importsTargetEntry = async (
  * @param code Source code of the file.
  * @param entries _reference_ - Map of parsed entry files.
  * @param imports File's list of parsed imports.
+ * @param exports File's list of parsed exports.
  * @param resolver Vite's resolve function.
  * @param logger Plugin's logger.
  */
@@ -59,14 +60,14 @@ export async function transformImports(
   code: string,
   entries: PluginEntries,
   imports: readonly ImportSpecifier[],
+  exports: readonly ExportSpecifier[],
   resolver: ResolveFn,
   logger: Logger,
 ): Promise<string | undefined> {
   // We only need to transform file if it imports at least one of targets.
   await init;
   const src = new MagicString(code);
-
-
+  const reexports = createReexportStatement(exports);
   for (const { n: targetPath, ss: startPosition, se: endPosition } of imports) {
     const resolvedImport = targetPath && (await resolver(targetPath, id));
     const entry = resolvedImport && entries.get(resolvedImport);
@@ -84,9 +85,17 @@ export async function transformImports(
       );
     }
   }
-
   logger.info(`[MATCHED] ${id}`);
-  return src.toString();
+  return [src.toString(), reexports].join('\n');
+}
+
+/**
+ * Creates a statement to reexport named imports.
+ * @param exports List of exports extracted by es-module-lexer.
+ */
+function createReexportStatement(exports: readonly ExportSpecifier[]) {
+  const namedExports = exports.map(({ n }) => n).filter(Boolean);
+  return `export { ${namedExports.join(',')} };`;
 }
 
 /**
@@ -105,13 +114,13 @@ export async function transformImportsIfNeeded(
   resolver: ResolveFn,
   logger: Logger,
 ): Promise<string | undefined> {
-  const [imports] = parse(code);
+  const [imports, exports] = parse(code);
 
   const importsTarget = await methods.importsTargetEntry(id, imports, entries, resolver);
   if (!importsTarget) {
     logger.info(paint('gray', `[IGNORED BY ANALYZIS] ${id}`));
   } else {
-    return await methods.transformImports(id, code, entries, imports, resolver, logger);
+    return await methods.transformImports(id, code, entries, imports, exports, resolver, logger);
   }
 }
 

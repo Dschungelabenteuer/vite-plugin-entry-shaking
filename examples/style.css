@@ -26,7 +26,6 @@ h1 {
   background: -webkit-linear-gradient(var(--base-color-lighter), var(--base-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: pluginTitle 16s infinite ease-in-out;
 }
 
 h2 {
@@ -47,13 +46,11 @@ h2 {
   padding: 0.8255rem;
   margin: 1.5rem;
   box-shadow: 0 0 1rem var(--shade-color-glow);
-  animation: exampleTitle 21s infinite ease-in-out;
 }
 
 p {
   color: #e1d287;
   font-size: 1.5rem;
-  animation: requests 28s infinite ease-in-out;
 }
 
 #count {
@@ -69,33 +66,4 @@ p {
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-}
-
-@keyframes pluginTitle {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(0.4rem, 1rem) scale(1.07);
-  }
-}
-
-@keyframes exampleTitle {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: translate(-0.4rem, 1rem) scale(1.04);
-    opacity: 0.7;
-  }
-}
-
-@keyframes requests {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(0.9rem, 0.9rem) scale(1.09);
-  }
 }

@@ -175,9 +175,9 @@ const resolveImportedCircularEntities = async (
  * @param src MagicString instance to prepare transforms.
  * @param code Source code of the file.
  * @param entries _reference_ - Map of parsed entry files.
- * @param entryExports List of analyzed exports of the target entry.
+ * @param entryExports List of analyzed exports of the entry file.
  * @param entryPath Absolute path to the target entry.
- * @param startPosition Start position of the import statement.
+ * @param startPosition Start positio n of the import statement.
  * @param endPosition End position of the import statement.
  * @param resolver Vite's resolve function.
  */
@@ -197,7 +197,6 @@ const analyzeImportStatement = async (
   const namedImports = methods.getImportedNamedExports(code, startPosition, endPosition);
   const imported = await methods.getImportsMap(entryExports, entryPath, namedImports, resolver);
   const replacement = await methods.getImportReplacements(imported, entryPath, entries, resolver);
-
   src.overwrite(startPosition, endPosition + 1, `${replacement.join(';\n')};`);
 };
 
