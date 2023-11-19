@@ -62,7 +62,7 @@ export type TargetImports = Map<string, ImportInput[]>;
 export type TargetPath = string;
 
 /** Entry Option  */
-export type EntryTarget = string | { path?: string; glob?: string; globOptions: Options };
+export type EntryTarget = string | { path?: string; glob?: string; globOptions?: Options };
 /** Resolved absolute path of target. */
 export type EntryPath = string;
 
