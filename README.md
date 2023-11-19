@@ -41,6 +41,28 @@ export default defineConfig({
 });
 ```
 
+### using Glob Pattern
+
+glob pattern using fast-glob ,see [fast-glob](https://github.com/mrmlnc/fast-glob)
+
+```ts
+import { defineConfig } from 'vite';
+import EntryShakingPlugin from 'vite-plugin-entry-shaking';
+
+export default defineConfig({
+  plugins: [
+    EntryShakingPlugin({
+      targets: [
+        {
+          glob: 'src/utils/*.ts',
+          globOptions: { ignore: ['a.ts'] },
+        },
+      ],
+    }),
+  ],
+});
+```
+
 ### Plugin options
 
 <table>
@@ -55,7 +77,7 @@ export default defineConfig({
   <tbody>
     <tr>
       <td>targets <em>(required)</em></td>
-      <td><code>string[]</code></td>
+      <td><code>string[] |</code><br/> <code>{ path?: string; glob?: string; globOptions: Options };</code></td>
       <td>N/A</td>
       <td>You need to list all of the entry points you want this plugin to process.</td>
     </tr>
