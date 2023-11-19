@@ -19,11 +19,9 @@ import ImportAnalyzer from './analyze-import';
  * @param statement Import statement to parse.
  */
 const parseImportStatement = (statement: string): ParsedImportStatement => {
-  const output: ParsedImportStatement = {
-    namedImports: [],
-    defaultImport: null,
-  };
-  let [, , importContent] = statement.match(/(im|ex)port (.*) from/) ?? [, , undefined];
+  const output: ParsedImportStatement = { namedImports: [], defaultImport: null };
+  const inlineStatement = statement.replace(/\n/g, '');
+  let [, , importContent] = inlineStatement.match(/(im|ex)port (.*) from/m) ?? [, , undefined];
   if (importContent) {
     const def = [, undefined];
     const [namedImportsStatement, namedImportsContent] = importContent.match(/{(.*)}/) ?? def;
