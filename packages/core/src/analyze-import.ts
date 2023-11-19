@@ -175,9 +175,9 @@ const resolveImportedCircularEntities = async (
  * @param src MagicString instance to prepare transforms.
  * @param code Source code of the file.
  * @param entries _reference_ - Map of parsed entry files.
- * @param entryExports List of analyzed exports of the entry file.
+ * @param entryExports List of analyzed exports of the target file.
  * @param entryPath Absolute path to the target entry.
- * @param startPosition Start positio n of the import statement.
+ * @param startPosition Start position of the import statement.
  * @param endPosition End position of the import statement.
  * @param resolver Vite's resolve function.
  */
