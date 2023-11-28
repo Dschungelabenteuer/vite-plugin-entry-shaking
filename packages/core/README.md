@@ -170,6 +170,12 @@ to make the code it explicitly defines work.
 
 - See `es-module-lexer`'s
   [own limitations](https://github.com/guybedford/es-module-lexer#limitations).
+
+- Import statements are not cleaned up from analyzed targets. This means if you import code that was
+  defined **within** a target, you might still load unnecessary modules. This is by design because
+  getting rid of unused imports would require us to traverse each target's AST to make sure it is
+  indeed not, which would end up quite expensive.
+
 - The following syntaxes are not handled:
   - dynamic imports
   - `import json from './json.json' assert { type: 'json' }`

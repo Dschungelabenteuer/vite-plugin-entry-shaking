@@ -13,6 +13,7 @@ export type FinalPluginOptions = Required<PluginOptions>;
 export type EntryData = {
   exports: EntryExports;
   source: string;
+  hasDefaultExport?: boolean;
   updatedSource: string;
 };
 

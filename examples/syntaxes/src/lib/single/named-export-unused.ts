@@ -1,0 +1,1 @@
+export const NamedExportUnused = 'unused named export';

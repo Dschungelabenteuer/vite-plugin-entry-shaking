@@ -1,1 +1,3 @@
-examples/**
+/examples/*
+!/examples/_shared_
+/packages/core/tests

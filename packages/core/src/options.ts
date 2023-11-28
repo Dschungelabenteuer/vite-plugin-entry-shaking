@@ -2,7 +2,7 @@ import { normalizePath } from 'vite';
 import type { FinalPluginOptions, PluginOptions } from './types';
 
 /** Default `extensions` option value. */
-const extensions = ['js', 'jsx', 'mjs', 'ts', 'tsx', 'mts'];
+export const extensions = ['js', 'mjs', 'ts', 'mts'];
 
 /** Default `ignorePatterns` option value. */
 const ignorePatterns = [/node_modules/];

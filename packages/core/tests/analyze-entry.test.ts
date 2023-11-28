@@ -6,7 +6,7 @@ import dedent from 'ts-dedent';
 
 import type { EntryExports, EntryImports, PluginEntries } from '../src/types';
 import EntryAnalyzer from '../src/analyze-entry';
-import { getTestResolver, MOCKS_FOLDER } from './utils';
+import { getTestResolver, MOCKS_FOLDER_UNIT } from './utils';
 
 vi.mock('fs');
 
@@ -55,6 +55,19 @@ describe('parseImportStatement', () => {
       expect(parsed).toMatchObject({
         namedImports: ['UserName'],
         defaultImport: 'User',
+      });
+    });
+
+    it('should correctly parse multiline export statement', () => {
+      const parsed = EntryAnalyzer.parseImportStatement(
+        dedent(`export {
+          UserId,
+          UserName,
+        } from '@model/user';`),
+      );
+      expect(parsed).toMatchObject({
+        namedImports: ['UserId', 'UserName'],
+        defaultImport: null,
       });
     });
   });
@@ -404,13 +417,13 @@ describe('analyzeEntry', () => {
 describe('analyzeEntries', () => {
   beforeAll(async () => {
     vi.restoreAllMocks();
-    const realFs = await vi.importActual('fs') as any;
+    const realFs = (await vi.importActual('fs')) as any;
     vi.mocked(fs.readFileSync).mockImplementation(realFs.readFileSync);
   });
 
   it('should correctly analyze entries', async () => {
-    const aPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
-    const bPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-b'))) as string;
+    const aPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
+    const bPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-b'))) as string;
     const entries = await EntryAnalyzer.analyzeEntries([aPath, bPath], resolver);
 
     expect(entries.size).toStrictEqual(2);

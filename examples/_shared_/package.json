@@ -1,0 +1,27 @@
+{
+  "name": "example",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@floating-ui/vue": "^1.0.2",
+    "vue": "^3.3.8",
+    "vue-router": "^4.2.5",
+    "vue-virtual-scroller": "2.0.0-beta.8"
+  },
+  "devDependencies": {
+    "@iconify/vue": "^4.1.1",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "@yungezeit/eslint-config-vue": "^0.0.13",
+    "eslint-config-prettier": "^9.0.0",
+    "typescript": "^5.2.2",
+    "vite": "^4.5.0",
+    "vite-plugin-entry-shaking": "workspace:*",
+    "vue-tsc": "^1.8.22"
+  }
+}

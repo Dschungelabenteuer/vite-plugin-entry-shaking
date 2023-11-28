@@ -1,0 +1,46 @@
+@import 'reset';
+@import 'mixins';
+@import 'variables';
+@import 'typefaces';
+@import 'virtual-scroller';
+
+body {
+  margin: 0;
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+}
+
+body,
+#app,
+#wrapper {
+  @include contained;
+}
+
+* {
+  &::-webkit-scrollbar-track {
+    box-shadow: 0 0 0 1px var(--overall-border-color);
+    border-radius: var(--radius-md);
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: var(--radius-md);
+    background-color: var(--accent-color);
+  }
+}
+
+#wrapper {
+  @include flex-col(center, normal);
+  background: var(--background-color);
+  background-image: var(--background-gradient);
+}
+
+h1 {
+  color: var(--text-emphasize-color);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}

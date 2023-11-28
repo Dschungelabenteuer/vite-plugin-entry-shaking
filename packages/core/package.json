@@ -24,6 +24,11 @@
       "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
+    },
+    "./serializer": {
+      "types": "./dist/serializer.d.ts",
+      "require": "./dist/serializer.cjs",
+      "import": "./dist/serializer.mjs"
     }
   },
   "main": "src/index.ts",

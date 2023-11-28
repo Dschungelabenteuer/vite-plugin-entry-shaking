@@ -1,10 +1,14 @@
-import type { PluginOption, Logger, ResolveFn } from 'vite';
-import type { PluginEntries, PluginOptions } from './types';
-import { configureLogger } from './logger';
+import type { PluginOption, ResolveFn } from 'vite';
+import type { PluginEntries, PluginOptions, EntryData } from './types';
+import type { Log } from './logger';
+import { Logger } from './logger';
 import { transformIfNeeded } from './transform';
 import { mergeOptions } from './options';
 import EntryAnalyzer from './analyze-entry';
 import { parseId } from './urls';
+import { JSONMap } from './serializer';
+
+export type { PluginEntries, EntryData, Log };
 
 export async function createEntryShakingPlugin(userOptions: PluginOptions): Promise<PluginOption> {
   const options = mergeOptions(userOptions);
@@ -18,7 +22,7 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
     enforce: 'post',
 
     async configResolved({ logger: loggerConfig, createResolver }) {
-      logger = configureLogger(loggerConfig, options.debug);
+      logger = new Logger(loggerConfig, options.debug);
       resolver = createResolver();
       entries = await EntryAnalyzer.analyzeEntries(options.targets, resolver);
       logger.info(`List of merged options: ${JSON.stringify(options)}`);
@@ -45,6 +49,13 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
         logger.info(`Serving ${version} entry file ${url}`);
         return output;
       }
+    },
+
+    configureServer(server) {
+      server.ws.on('debug:req', () => {
+        const logs = logger?.logs ?? [];
+        server.ws.send('debug:res', { logs, entries: JSONMap.stringify(entries) });
+      });
     },
   };
 }

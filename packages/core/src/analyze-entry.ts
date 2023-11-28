@@ -10,6 +10,7 @@ import type {
   PluginEntries,
   PluginTargets,
   EntryPath,
+  ImportParams,
 } from './types';
 import EntryCleaner from './cleanup-entry';
 import ImportAnalyzer from './analyze-import';
@@ -20,6 +21,11 @@ import ImportAnalyzer from './analyze-import';
  */
 const parseImportStatement = (statement: string): ParsedImportStatement => {
   const output: ParsedImportStatement = { namedImports: [], defaultImport: null };
+  const registerNamedImport = (s: string) => {
+    const name = s.trim();
+    if (name.length) output.namedImports.push(name);
+  };
+
   const inlineStatement = statement.replace(/\n/g, '');
   let [, , importContent] = inlineStatement.match(/(im|ex)port (.*) from/m) ?? [, , undefined];
   if (importContent) {
@@ -30,13 +36,13 @@ const parseImportStatement = (statement: string): ParsedImportStatement => {
       namedImportsContent.split(',').forEach((namedImport) => {
         const name = namedImport.split(' as ')!.map((param) => param.trim());
         if (name.length === 1) {
-          output.namedImports.push(name[0]);
+          registerNamedImport(name[0]);
         } else {
           const [originalName, alias] = name;
           if (originalName === 'default') {
             output.defaultImport = alias;
           } else {
-            output.namedImports.push(namedImport.trim());
+            registerNamedImport(namedImport);
           }
         }
       });
@@ -93,16 +99,23 @@ const analyzeEntryImport = (
  * with individual import statements to mimic tree-shaking behaviour.
  * @param entryMap _reference_ - Map of entry's analyzed exports.
  * @param analyzedImports _reference_ - Map of analyzed imports.
- * @param namedExport Name of the export.
+ * @param namedExport Name of the export e.g. (`n` in `export { ln as n }`).
+ * @param localName Local name of the export e.g. (`ln` in `export { ln as n }`).
  */
 const analyzeEntryExport = (
   entryMap: EntryExports,
   analyzedImports: EntryImports,
   namedExport: string,
+  localName?: string,
 ): void => {
-  if (namedExport && analyzedImports.has(namedExport)) {
-    const { path, importDefault, originalName } = analyzedImports.get(namedExport)!;
-    entryMap.set(namedExport, { path, importDefault, originalName });
+  if (namedExport) {
+    if (analyzedImports.has(namedExport)) {
+      const { path, importDefault, originalName } = analyzedImports.get(namedExport)!;
+      entryMap.set(namedExport, { path, importDefault, originalName });
+    } else if (localName && analyzedImports.has(localName)) {
+      const { path, importDefault } = analyzedImports.get(localName)!;
+      entryMap.set(namedExport, { path, importDefault, originalName: localName });
+    }
   }
 };
 
@@ -115,7 +128,8 @@ const doAnalyzeEntry = async (entries: PluginEntries, entryPath: EntryPath): Pro
   await init;
 
   const entryMap: EntryExports = new Map([]);
-  const analyzedImports: EntryImports = new Map([]);
+  const defaultImport: ImportParams = { path: entryPath, importDefault: true };
+  const analyzedImports: EntryImports = new Map([['default', defaultImport]]);
   const rawEntry = readFileSync(resolve(entryPath), 'utf-8');
   const [imports, exports] = parse(rawEntry);
 
@@ -131,8 +145,8 @@ const doAnalyzeEntry = async (entries: PluginEntries, entryPath: EntryPath): Pro
   });
 
   // Then analyze the exports with the gathered data.
-  exports.forEach(({ n: namedExport }) => {
-    methods.analyzeEntryExport(entryMap, analyzedImports, namedExport);
+  exports.forEach(({ n: namedExport, ln: localName }) => {
+    methods.analyzeEntryExport(entryMap, analyzedImports, namedExport, localName);
   });
 
   // Finally export entry's analyzis output.

@@ -1,38 +1,28 @@
-import type { PluginOption } from 'vite';
-import { resolve } from 'path';
 import { defineConfig } from 'vite';
-
+import { dirname, resolve } from 'path';
+import { fileURLToPath } from 'url';
+import vue from '@vitejs/plugin-vue';
 import EntryShakingPlugin from 'vite-plugin-entry-shaking';
+import { debugPlugin } from '../_shared_/vite.plugins';
 
-const pathToUtils = resolve(__dirname, 'src/utils');
-let requestCount = 0;
-let disabled = false;
-
-const countRequestPlugin = (): PluginOption => ({
-  name: 'vite-count-request-plugin',
-  configResolved(config) {
-    disabled = !config.plugins.find((plugin) => plugin.name === 'vite-plugin-entry-shaking');
-  },
-  configureServer(server) {
-    server.ws.on('count-request:fetch', () => {
-      server.ws.send('count-request:refresh', { requestCount, disabled });
-    });
-  },
-  load() {
-    requestCount += 1;
-  },
-});
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const pathToLib = resolve(__dirname, './src/lib');
 
 export default defineConfig(async () => ({
-  resolve: {
-    alias: {
-      '@utils': pathToUtils,
-    },
-  },
   plugins: [
     await EntryShakingPlugin({
-      targets: [pathToUtils],
+      targets: [pathToLib],
+      debug: true,
     }),
-    countRequestPlugin(),
+    debugPlugin(__dirname),
+    vue(),
   ],
+  resolve: {
+    alias: {
+      '@shared/styles': resolve(__dirname, '../_shared_/src/styles'),
+      '@shared/lib': resolve(__dirname, '../_shared_/src/index.ts'),
+      '@lib': pathToLib,
+    },
+  },
 }));

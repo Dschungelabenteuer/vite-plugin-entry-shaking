@@ -6,7 +6,13 @@ import dedent from 'ts-dedent';
 import { beforeAll, describe, it, expect, vi, beforeEach } from 'vitest';
 
 import ImportAnalyzer from '../src/analyze-import';
-import { getTestResolver, MOCK_IMPORT_INPUT, MOCKS_FOLDER, STUB_PATH, STUB_SOURCE } from './utils';
+import {
+  getTestResolver,
+  MOCK_IMPORT_INPUT,
+  MOCKS_FOLDER_UNIT,
+  STUB_PATH,
+  STUB_SOURCE,
+} from './utils';
 import type { EntryData, ImportInput, PluginEntries, TargetImports } from '../src/types';
 
 vi.mock('fs');
@@ -105,7 +111,7 @@ describe('getImportsMap', () => {
 
   it('should correctly feed the import map when importing a named entity [directly exported from entry]', async () => {
     const imports: string[] = ['A_MODULE_A'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
     const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
@@ -118,7 +124,7 @@ describe('getImportsMap', () => {
 
   it('should correctly feed the import map when [importing twice] a named entity [directly exported from entry]', async () => {
     const imports: string[] = ['A_MODULE_A', 'A_MODULE_A as A_COPY'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
     const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
@@ -131,7 +137,7 @@ describe('getImportsMap', () => {
 
   it('should correctly feed the import map when [importing with alias] a named entity [directly exported from entry]', async () => {
     const imports: string[] = ['A_MODULE_B as B'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
     const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
@@ -144,7 +150,7 @@ describe('getImportsMap', () => {
 
   it('should correctly feed the import map when importing a named entity [exported from entry via an alias]', async () => {
     const imports: string[] = ['A_MODULE_G'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
     const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
@@ -157,7 +163,7 @@ describe('getImportsMap', () => {
 
   it('should correctly feed the import map when [importing with alias] a named entity [exported from entry via an alias]', async () => {
     const imports: string[] = ['A_MODULE_J as JJ'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
     const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
@@ -171,7 +177,7 @@ describe('getImportsMap', () => {
   it('should correctly feed the import map when importing a named entity [exported from entry via a path alias]', async () => {
     /** Note: this requires `resolver` to be set using the mocked vite configuration. */
     const imports: string[] = ['A_MODULE_D'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
     const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
@@ -184,7 +190,7 @@ describe('getImportsMap', () => {
 
   it('should correctly feed the import map when importing a named entity [directly defined in entry]', async () => {
     const imports: string[] = ['test'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
     const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
@@ -352,7 +358,7 @@ describe('resolveImportedCircularEntities', () => {
 describe('analyzeImportStatement', () => {
   it('should ignore wildcard import statements', async () => {
     vi.restoreAllMocks();
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-c'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-c'))) as string;
     const what = 'import * as Utils';
     const input = `${what} from "./entry-c";`;
     const output = `${what} from "${entryPath}?source=1";`;
@@ -377,7 +383,7 @@ describe('analyzeImportStatement', () => {
 
   it('should correctly mutate file', async () => {
     vi.restoreAllMocks();
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
     const path = `@mocks/entry-a`;
     const imports = [
       'A_MODULE_A',

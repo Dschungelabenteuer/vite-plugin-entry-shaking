@@ -1,4 +1,4 @@
-import { cp, readFile, unlink, writeFile } from 'fs/promises';
+import { cp, readFile, writeFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -14,6 +14,7 @@ const __template = '_template_';
 const pathToExamples = resolve(__dirname, '../examples');
 const pathToTemplate = resolve(pathToExamples, __template);
 
+/** @type prompts.PromptObject */
 const namePrompt = {
   type: 'text',
   name: 'name',
@@ -25,36 +26,45 @@ const namePrompt = {
   },
 };
 
+/** @type prompts.PromptObject */
 const installPrompt = {
   type: 'confirm',
   name: 'install',
+  initial: true,
   message: 'Install dependencies?',
 };
 
 (async () => {
   const { name } = await prompts(namePrompt);
-  const prefix = `New "${name}" example`;
-  const format = (s) => `${prefix} - ${s}`;
+  if (!name) {
+    console.log('❌ Example generation aborted');
+    process.exit();
+  }
+
   // Copy template.
-  const spinner = ora(format('Copying template…')).start();
-  await cp(pathToTemplate, resolve(pathToExamples, name), { recursive: true });
+  const spinner = ora('Copying template…').start();
+  await cp(pathToTemplate, resolve(pathToExamples, name), {
+    recursive: true,
+    filter: (source) => {
+      return !source.includes('node_modules');
+    },
+  });
+
   // Prepare `package.json`.
-  spinner.text = format('Preparing example');
+  spinner.text = 'Preparing example';
   await preparePackageJson(name);
-  spinner.succeed(format('Example created!'));
+  spinner.succeed('Example created!');
 
   const { install } = await prompts(installPrompt);
   if (install) {
-    spinner.start(format('Installing dependencies…'));
+    spinner.start('Installing dependencies…');
     await run('pnpm i --ignore-scripts');
-    spinner.succeed(format('Dependencies installed!'));
+    spinner.succeed('Dependencies installed!');
   }
 })();
 
 async function preparePackageJson(name) {
   const packageJsonPath = resolve(pathToExamples, name, 'package.json');
-  const templatePackageJsonPath = `${packageJsonPath}.example`;
-  const templatePackageJson = await readFile(templatePackageJsonPath, 'utf-8');
-  await writeFile(packageJsonPath, templatePackageJson.replace('#{name}', name));
-  await unlink(templatePackageJsonPath);
+  const templatePackageJson = await readFile(packageJsonPath, 'utf-8');
+  await writeFile(packageJsonPath, templatePackageJson.replace('template', name));
 }

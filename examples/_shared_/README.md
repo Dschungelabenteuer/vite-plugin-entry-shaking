@@ -1,0 +1,1 @@
+# vite-plugin-entry-shaking's base example wrapper

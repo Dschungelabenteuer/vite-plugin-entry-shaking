@@ -1,20 +1,22 @@
-import { resolve } from 'path';
-import type { ImportSpecifier } from 'es-module-lexer';
+import type { ExportSpecifier, ImportSpecifier } from 'es-module-lexer';
 import type { ResolveFn } from 'vite';
+import { resolve } from 'path';
+import dedent from 'ts-dedent';
 import { normalizePath, createLogger } from 'vite';
 import { describe, it, expect, beforeAll, vi, beforeEach, afterEach } from 'vitest';
-import dedent from 'ts-dedent';
 
 import type { EntryData, FinalPluginOptions, PluginEntries, PluginOptions } from '../src/types';
-import Transformer, { transformIfNeeded } from '../src/transform';
-import { getTestResolver, MOCKS_FOLDER, STUB_ID, STUB_PATH, STUB_SOURCE } from './utils';
+import Transformer from '../src/transform';
+import { getTestResolver, MOCKS_FOLDER_UNIT, STUB_ID, STUB_PATH, STUB_SOURCE } from './utils';
+import { Logger } from '../src/logger';
 
-const pathToMocks = normalizePath(resolve(__dirname, MOCKS_FOLDER));
+const pathToMocks = normalizePath(resolve(__dirname, MOCKS_FOLDER_UNIT));
 const entryA = normalizePath(resolve(pathToMocks, 'entry-a/index.ts'));
 const entryAModuleA = normalizePath(resolve(pathToMocks, 'entry-a/modules/A.ts'));
 const entryAModuleH = normalizePath(resolve(pathToMocks, 'entry-a/modules/H.ts'));
 const entryB = normalizePath(resolve(pathToMocks, 'entry-b/index.ts'));
-const logger = createLogger();
+const entryC = normalizePath(resolve(pathToMocks, 'entry-c/index.ts'));
+const logger = new Logger(createLogger(), false);
 let resolver: ResolveFn;
 
 beforeAll(async () => {
@@ -75,7 +77,8 @@ describe('transformImports', () => {
   it('should not transform if it does not import any target entry', async () => {
     const id = STUB_ID;
     const code = `import { B_MODULE_B, test } from '@mocks/entry-b';`;
-    const imports = [{ n: '@mocks/entry-b', ss: 0, se: code.length - 1 }] as any;
+    const imps = [{ n: '@mocks/entry-b', ss: 0, se: code.length - 1 }] as ImportSpecifier[];
+    const exps = [] as ExportSpecifier[];
     const entries: PluginEntries = new Map([
       [
         entryA,
@@ -87,14 +90,15 @@ describe('transformImports', () => {
       ],
     ]);
 
-    const out = await Transformer.transformImports(id, code, entries, imports, resolver, logger);
+    const out = await Transformer.transformImports(id, code, entries, imps, exps, resolver, logger);
     expect(out).toStrictEqual(code);
   });
 
   it('should transform if it does import at least one target entry', async () => {
     const id = __dirname;
     const code = dedent(`import { A_MODULE_A, test } from '@mocks/entry-a';`);
-    const imports = [{ n: '@mocks/entry-a', ss: 0, se: code.length - 1 }] as any;
+    const imps = [{ n: '@mocks/entry-a', ss: 0, se: code.length - 1 }] as ImportSpecifier[];
+    const exps = [] as ExportSpecifier[];
     const entries: PluginEntries = new Map([
       [
         entryA,
@@ -106,7 +110,43 @@ describe('transformImports', () => {
       ],
     ]);
 
-    const out = await Transformer.transformImports(id, code, entries, imports, resolver, logger);
+    const out = await Transformer.transformImports(id, code, entries, imps, exps, resolver, logger);
+    expect(out).toStrictEqual(
+      dedent(`
+      import { test } from '${entryA}';
+      import { default as A_MODULE_A } from '${entryAModuleA}';
+    `),
+    );
+  });
+
+  it('should transform and re-export if it does import at least one target entry', async () => {
+    const id = __dirname;
+    const code = dedent(`export { AA, A_MODULE_E } from '@mocks/entry-c';`);
+    const imps = [{ n: '@mocks/entry-c', ss: 0, se: code.length - 1 }] as ImportSpecifier[];
+    const exps = [{ n: 'AA' }] as ExportSpecifier[];
+    const entries: PluginEntries = new Map([
+      [
+        entryA,
+        {
+          exports: new Map([
+            ['A_MODULE_A', { path: './modules/A', importDefault: true }],
+            ['A_MODULE_E', { path: './modules/EF', importDefault: false }],
+          ]),
+          source: STUB_SOURCE,
+          updatedSource: STUB_SOURCE,
+        },
+      ],
+      [
+        entryC,
+        {
+          exports: new Map([['A_MODULE_A', { path: './modules/A', importDefault: true }]]),
+          source: STUB_SOURCE,
+          updatedSource: STUB_SOURCE,
+        },
+      ],
+    ]);
+
+    const out = await Transformer.transformImports(id, code, entries, imps, exps, resolver, logger);
     expect(out).toStrictEqual(
       dedent(`
       import { test } from '${entryA}';
@@ -121,7 +161,8 @@ describe('transformImports', () => {
     async () => {
       const id = __dirname;
       const code = dedent(`import { A_MODULE_H } from '@mocks/entry-b';`);
-      const imports = [{ n: '@mocks/entry-a', ss: 0, se: code.length - 1 }] as any;
+      const imps = [{ n: '@mocks/entry-a', ss: 0, se: code.length - 1 }] as ImportSpecifier[];
+      const exps = [] as ExportSpecifier[];
       const entries: PluginEntries = new Map([
         [
           entryA,
@@ -143,8 +184,8 @@ describe('transformImports', () => {
         ],
       ]);
 
-      const out = await Transformer.transformImports(id, code, entries, imports, resolver, logger);
-      expect(out).toStrictEqual(`import { A_MODULE_H } from '${entryAModuleH}';`);
+      const o = await Transformer.transformImports(id, code, entries, imps, exps, resolver, logger);
+      expect(o).toStrictEqual(`import { A_MODULE_H } from '${entryAModuleH}';`);
     },
   );
 });
@@ -186,14 +227,29 @@ describe('transformIfNeeded', () => {
   it('should call transformImportsIfNeeded when the file is candidate', async () => {
     const res = true;
     vi.spyOn(Transformer, 'requiresTransform').mockImplementationOnce(() => res);
-    await transformIfNeeded(STUB_ID, STUB_SOURCE, new Map(), options, resolver, logger);
+    await Transformer.transformIfNeeded(STUB_ID, STUB_SOURCE, new Map(), options, resolver, logger);
     expect(Transformer.transformImportsIfNeeded).toHaveBeenCalled();
   });
 
   it('should not call transformImportsIfNeeded when the file is not candidate', async () => {
     const res = false;
     vi.spyOn(Transformer, 'requiresTransform').mockImplementationOnce(() => res);
-    await transformIfNeeded(STUB_ID, STUB_SOURCE, new Map(), options, resolver, logger);
+    await Transformer.transformIfNeeded(STUB_ID, STUB_SOURCE, new Map(), options, resolver, logger);
     expect(Transformer.transformImportsIfNeeded).not.toHaveBeenCalled();
+  });
+});
+
+describe('createReexportStatement', () => {
+  it('should return valid named re-exports statement', () => {
+    const unnamedExport = {};
+    const exports = [{ n: 'A_MODULE_A' }, unnamedExport, { n: 'A_MODULE_C' }] as ExportSpecifier[];
+    const out = Transformer.createReexportStatement(exports);
+    expect(out).toStrictEqual('export { A_MODULE_A,A_MODULE_C };');
+  });
+
+  it('should return an empty string if there are no named exports', () => {
+    const exports = [{}, {}, {}] as ExportSpecifier[];
+    const out = Transformer.createReexportStatement(exports);
+    expect(out).toStrictEqual('');
   });
 });

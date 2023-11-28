@@ -197,6 +197,7 @@ const analyzeImportStatement = async (
   const namedImports = methods.getImportedNamedExports(code, startPosition, endPosition);
   const imported = await methods.getImportsMap(entryExports, entryPath, namedImports, resolver);
   const replacement = await methods.getImportReplacements(imported, entryPath, entries, resolver);
+
   src.overwrite(startPosition, endPosition + 1, `${replacement.join(';\n')};`);
 };
 
@@ -205,13 +206,46 @@ const analyzeImportStatement = async (
  * @param src MagicString instance to prepare transforms.
  * @param code Source code of the file.
  * @param startPosition Start position of the import statement.
+ * @param endPosition End position of the import statement.
+ * @param entryPath Absolute path to the target entry.
  */
 const catchWildcardImport = (
   src: MagicString,
   code: string,
   startPosition: number,
   endPosition: number,
-  entryPath: any,
+  entryPath: EntryPath,
+) => {
+  const isWildCardImport =
+    code.slice(startPosition, WILDCARD_IMPORT_PREFIX.length) === WILDCARD_IMPORT_PREFIX;
+
+  if (isWildCardImport) {
+    const [what] = code.slice(startPosition, endPosition).split('from');
+    src.overwrite(
+      startPosition,
+      endPosition + 1,
+      `${what.trim()} from "${addSourceQuerySuffix(entryPath)}";`,
+    );
+  }
+
+  return isWildCardImport;
+};
+
+/**
+ * Catches and handles default import statement.
+ * (this only applies to `import something from 'somewhere'`).
+ * @param src MagicString instance to prepare transforms.
+ * @param code Source code of the file.
+ * @param startPosition Start position of the import statement.
+ * @param startPosition Start position of the import statement.
+ * @param entryPath Absolute path to the target entry.
+ */
+const catchDefaultImport = (
+  src: MagicString,
+  code: string,
+  startPosition: number,
+  endPosition: number,
+  entryPath: EntryPath,
 ) => {
   const isWildCardImport =
     code.slice(startPosition, WILDCARD_IMPORT_PREFIX.length) === WILDCARD_IMPORT_PREFIX;

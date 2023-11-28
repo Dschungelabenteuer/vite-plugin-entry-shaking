@@ -5,10 +5,15 @@
   },
   "overrides": [
     {
-      "files": ["tests/**/*.test.ts"],
+      "files": ["tests/**/*.test.ts", "tests/cases/**/*.ts"],
       "rules": {
         "max-len": "off",
-        "prefer-regex-literals": "off"
+        "prefer-regex-literals": "off",
+        "import/no-named-default": "off",
+        "import/no-duplicates": "off",
+        "import/order": "off",
+        "import/first": "off",
+        "import/newline-after-import": "off"
       }
     }
   ]

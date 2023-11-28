@@ -2,10 +2,10 @@ import type { ExportSpecifier, ImportSpecifier } from 'es-module-lexer';
 import MagicString from 'magic-string';
 import { init, parse } from 'es-module-lexer';
 
-import type { Logger, ResolveFn } from 'vite';
+import type { ResolveFn } from 'vite';
 import type { FinalPluginOptions, PluginEntries } from './types';
+import type { Logger } from './logger';
 import ImportAnalyzer from './analyze-import';
-import { paint } from './logger';
 
 /**
  * Determines whether a given file should be transformed based on plugin options.
@@ -86,16 +86,8 @@ export async function transformImports(
     }
   }
   logger.info(`[MATCHED] ${id}`);
-  return [src.toString(), reexports].join('\n');
-}
-
-/**
- * Creates a statement to reexport named imports.
- * @param exports List of exports extracted by es-module-lexer.
- */
-function createReexportStatement(exports: readonly ExportSpecifier[]) {
-  const namedExports = exports.map(({ n }) => n).filter(Boolean);
-  return `export { ${namedExports.join(',')} };`;
+  const out = src.toString();
+  return reexports.length ? [out, reexports].join('\n') : out;
 }
 
 /**
@@ -115,10 +107,9 @@ export async function transformImportsIfNeeded(
   logger: Logger,
 ): Promise<string | undefined> {
   const [imports, exports] = parse(code);
-
   const importsTarget = await methods.importsTargetEntry(id, imports, entries, resolver);
   if (!importsTarget) {
-    logger.info(paint('gray', `[IGNORED BY ANALYZIS] ${id}`));
+    logger.info(`Ignored by analyzis: ${id}`, undefined, true);
   } else {
     return await methods.transformImports(id, code, entries, imports, exports, resolver, logger);
   }
@@ -145,10 +136,20 @@ export async function transformIfNeeded(
   const isCandidate = methods.requiresTransform(id, options);
 
   if (!isCandidate) {
-    logger.info(paint('gray', `[IGNORED BY OPTIONS] ${id}`));
+    logger.info(`Ignored by options: ${id}`, undefined, true);
   } else {
     return await methods.transformImportsIfNeeded(id, code, entries, resolver, logger);
   }
+}
+
+/**
+ * Creates a statement to reexport named imports.
+ * @param exports List of exports extracted by es-module-lexer.
+ */
+export function createReexportStatement(exports: readonly ExportSpecifier[]) {
+  const namedExports = exports.map(({ n }) => n).filter(Boolean);
+  if (namedExports.length === 0) return '';
+  return `export { ${namedExports.join(',')} };`;
 }
 
 const methods = {
@@ -157,6 +158,7 @@ const methods = {
   transformImports,
   transformImportsIfNeeded,
   transformIfNeeded,
+  createReexportStatement,
 };
 
 export default methods;

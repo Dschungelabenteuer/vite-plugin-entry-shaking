@@ -1,0 +1,62 @@
+@mixin contained {
+  overflow: hidden;
+  height: 100vh;
+  width: 100%;
+}
+
+@mixin reset-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@mixin padding($block: var(--spacing-sm), $inline: var(--spacing-md)) {
+  padding: $block $inline;
+}
+
+@mixin border-top($color: var(--overall-border-color), $width: 1px) {
+  box-shadow: 0 #{'-' + $width} 0 0 $color;
+}
+@mixin border-bottom($color: var(--overall-border-color), $width: 1px) {
+  box-shadow: 0 $width 0 0 $color;
+}
+@mixin border-left($color: var(--overall-border-color), $width: 1px) {
+  box-shadow: #{'-' + $width} 0 0 0 $color;
+}
+@mixin border-right($color: var(--overall-border-color), $width: 1px) {
+  box-shadow: $width 0 0 0 $color;
+}
+
+@mixin flex-row($justify-content: center, $align-items: center) {
+  @include flex($justify-content, $align-items, row);
+}
+@mixin flex-col($justify-content: center, $align-items: center) {
+  @include flex($justify-content, $align-items, column);
+}
+@mixin flex($justify-content: center, $align-items: center, $flex-direction: row) {
+  display: flex;
+  justify-content: $justify-content;
+  align-items: $align-items;
+  flex-direction: $flex-direction;
+}
+
+@mixin button {
+  @include flex;
+  cursor: pointer;
+  padding: var(--spacing-lg);
+  color: var(--text-color);
+  text-decoration: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  border: 0;
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: var(--text-emphasize-color);
+  }
+
+  &:focus {
+    outline: 0;
+    box-shadow: inset 0 0 0 2px var(--accent-color);
+  }
+}

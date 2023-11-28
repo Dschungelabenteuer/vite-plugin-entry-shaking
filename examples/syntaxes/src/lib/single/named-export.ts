@@ -1,0 +1,1 @@
+export const NamedExport = 'named export';

@@ -1,3 +1,4 @@
 {
-  "extends": ["@yungezeit/typescript"]
+  "extends": ["@yungezeit/vue"],
+  "rules": { "import/order": "off" }
 }
