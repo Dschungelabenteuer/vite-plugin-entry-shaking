@@ -23,16 +23,16 @@ const parseImportStatement = (statement: string): ParsedImportStatement => {
     namedImports: [],
     defaultImport: null,
   };
-  let [, , importContent] = statement.match(/(im|ex)port (.*) from/) ?? [, , undefined];
+  let [, , importContent] = statement.match(/(im|ex)port\s+((.|\n)*)\s+from/) ?? [, , undefined];
   if (importContent) {
-    const [namedImportsStatement, namedImportsContent] = importContent.match(/{(.*)}/) ?? [
+    const [namedImportsStatement, namedImportsContent] = importContent.match(/{([\s\S]*)}/) ?? [
       ,
       undefined,
     ];
     if (namedImportsStatement && namedImportsContent) {
       importContent = importContent.replace(namedImportsStatement, '');
       namedImportsContent.split(',').forEach((namedImport) => {
-        const name = namedImport.split(' as ')!.map((param) => param.trim());
+        const name = namedImport.split(/\s+as\s+/)!.map((param) => param.trim());
         if (name.length === 1) {
           output.namedImports.push(name[0]);
         } else {

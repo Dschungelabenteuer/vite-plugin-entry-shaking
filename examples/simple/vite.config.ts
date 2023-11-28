@@ -4,7 +4,8 @@ import { defineConfig } from 'vite';
 
 import EntryShakingPlugin from 'vite-plugin-entry-shaking';
 
-const pathToUtils = resolve(__dirname, 'src/utils');
+const pathToFolder = resolve(__dirname, 'src/folder');
+const pathToSubfolder = resolve(__dirname, 'src/folder/subfolder');
 let requestCount = 0;
 let disabled = false;
 
@@ -26,12 +27,12 @@ const countRequestPlugin = (): PluginOption => ({
 export default defineConfig(async () => ({
   resolve: {
     alias: {
-      '@utils': pathToUtils,
+      '@folder': pathToFolder,
     },
   },
   plugins: [
     await EntryShakingPlugin({
-      targets: [pathToUtils],
+      targets: [pathToFolder, pathToSubfolder],
     }),
     countRequestPlugin(),
   ],

@@ -20,7 +20,7 @@ const WILDCARD_IMPORT_PREFIX = 'import *';
  * @param importString Import statement string.
  */
 const getImportParams = (importString: string) => {
-  const [name, alias] = importString.trim().split(' as ');
+  const [name, alias] = importString.trim().split(/\s+as\s+/);
   return { name, alias };
 };
 
