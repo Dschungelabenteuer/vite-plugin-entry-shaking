@@ -10,6 +10,7 @@ import {
   getTestResolver,
   MOCK_IMPORT_INPUT,
   MOCKS_FOLDER_UNIT,
+  resolveUnitEntry,
   STUB_PATH,
   STUB_SOURCE,
 } from './utils';
@@ -35,42 +36,29 @@ beforeAll(async () => {
   resolver = await getTestResolver();
 });
 
-describe('getImportParams', () => {
-  it('should return correct structure when there is no alias', () => {
-    const name = 'User';
-    expect(ImportAnalyzer.getImportParams(name)).toStrictEqual({
-      name,
-      alias: undefined,
-    });
-  });
-
-  it('should return correct structure when there is an alias', () => {
-    const name = 'User';
-    const alias = 'UserProfile';
-    expect(ImportAnalyzer.getImportParams(`${name} as ${alias}`)).toStrictEqual({ name, alias });
-  });
-});
-
-describe('getImportedNamedExports', () => {
+describe('getImportedEntryExports', () => {
   it('should return empty array if there are no named exports', () => {
-    const output = ImportAnalyzer.getImportedNamedExports(``, 0, 40);
-
+    const output = ImportAnalyzer.getImportedEntryExports(``, 0, 40);
     expect(output).toStrictEqual([]);
   });
 
   it('should return array of imported named entities from entry', () => {
     const path = `@entry/path`;
     const imports = ['UserId', 'UserName', 'User'];
-    const exportPrefix = `import {`;
-    const exportStart = `${exportPrefix} ${imports.join(', ')} `;
-    const input = `${exportStart}} from "${path}"`;
-    const output = ImportAnalyzer.getImportedNamedExports(
-      input,
-      exportPrefix.length - 1,
-      exportStart.length + 1,
-    );
+    const statement = `import { ${imports.join(', ')} } from "${path}"`;
+    const output = ImportAnalyzer.getImportedEntryExports(statement, 0, statement.length - 1);
 
     expect(output).toStrictEqual(imports);
+  });
+
+  it('should return array of imported named entities from entry (mixed)', () => {
+    const path = `@entry/path`;
+    const imports = ['UserId', 'UserName', 'User'];
+    const defaultImport = 'Def';
+    const statement = `import ${defaultImport}, { ${imports.join(', ')} } from "${path}"`;
+    const output = ImportAnalyzer.getImportedEntryExports(statement, 0, statement.length - 1);
+
+    expect(output).toStrictEqual([...imports, `default as ${defaultImport}`]);
   });
 });
 
@@ -82,55 +70,36 @@ describe('getImportsMap', () => {
     ['A_MODULE_A', { path: './modules/A', importDefault: true, originalName: undefined }],
     ['A_MODULE_B', { path: './modules/B', importDefault: true, originalName: undefined }],
     ['A_MODULE_C', { path: './modules/C', importDefault: true, originalName: undefined }],
-    [
-      'A_MODULE_D',
-      {
-        path: '@mocks/entry-a/modules/D',
-        importDefault: true,
-        originalName: undefined,
-      },
-    ],
-    [
-      'A_MODULE_E',
-      {
-        path: './modules/EF',
-        importDefault: false,
-        originalName: 'A_MODULE_E',
-      },
-    ],
-    [
-      'A_MODULE_F',
-      {
-        path: './modules/EF',
-        importDefault: false,
-        originalName: 'A_MODULE_F',
-      },
-    ],
+    ['A_MODULE_D', { path: '@mocks/entry-a/modules/D', importDefault: true, originalName: undefined }],
+    ['A_MODULE_E', { path: './modules/EF', importDefault: false, originalName: 'A_MODULE_E' }],
+    ['A_MODULE_F', { path: './modules/EF', importDefault: false, originalName: 'A_MODULE_F' }],
     ['A_MODULE_G', { path: './modules/G', importDefault: false, originalName: 'G' }],
   ]);
 
   it('should correctly feed the import map when importing a named entity [directly exported from entry]', async () => {
-    const imports: string[] = ['A_MODULE_A'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
+    const name = 'A_MODULE_A';
+    const imports: string[] = [name];
+    const entryPath = await resolveUnitEntry('entry-a');
     const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
+      name,
       alias: undefined,
       importDefault: true,
-      name: 'A_MODULE_A',
       originalName: undefined,
     });
   });
 
   it('should correctly feed the import map when [importing twice] a named entity [directly exported from entry]', async () => {
-    const imports: string[] = ['A_MODULE_A', 'A_MODULE_A as A_COPY'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
+    const name = 'A_MODULE_A';
+    const imports: string[] = [name, `${name} as A_COPY`];
+    const entryPath = await resolveUnitEntry('entry-a');
     const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
+      name,
       alias: undefined,
       importDefault: true,
-      name: 'A_MODULE_A',
       originalName: undefined,
     });
   });

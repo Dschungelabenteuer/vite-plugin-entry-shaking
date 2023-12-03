@@ -4,9 +4,6 @@
   Mimic tree-shaking behaviour when importing code from an entry file in development mode.
 </p>
 
-> **Warning** This plugin is experimental, bugs might be expected and some edge cases might not be
-> covered.
-
 > **Note** The main execution logic of this plugin only applies to development mode because it
 > addresses an issue which is specific to development mode.
 
@@ -184,3 +181,9 @@ to make the code it explicitly defines work.
 
 > **Note** This does not mean you should expect errors using these. Instead, it just means the
 > content they intend to import won't be tree-shaken by the plugin.
+
+## Useful links
+
+- [Vite's documentation](https://vitejs.dev/guide/api-plugin.html#plugin-ordering)
+- [Contribution guide](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/blob/main/CONTRIBUTING.md)
+- [Resources](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/blob/main/RESOURCES.md)

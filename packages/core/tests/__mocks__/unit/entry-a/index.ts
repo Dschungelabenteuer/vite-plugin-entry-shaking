@@ -1,4 +1,4 @@
-import A_MODULE_D from '@mocks/entry-a/modules/D';
+import A_MODULE_D from '@mocks/unit/entry-a/modules/D';
 import A_MODULE_A from './modules/A';
 import A_MODULE_B from './modules/B';
 import A_MODULE_C from './modules/C';

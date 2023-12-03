@@ -10,33 +10,30 @@ import { JSONMap } from './serializer';
 
 export type { PluginEntries, EntryData, Log };
 
+export const name = 'vite-plugin-entry-shaking';
+
 export async function createEntryShakingPlugin(userOptions: PluginOptions): Promise<PluginOption> {
+  /** Final options of the plugin. */
   const options = mergeOptions(userOptions);
-  let logger: Logger;
+  /** Vite resolver. */
   let resolver: ResolveFn;
+  /** Plugin's logger. */
+  let logger: Logger;
+  /** Registered entry files. */
   let entries: PluginEntries;
 
   return {
-    name: 'vite-plugin-entry-shaking',
+    name,
     apply: 'serve',
     enforce: 'post',
 
     async configResolved({ logger: loggerConfig, createResolver }) {
-      logger = new Logger(loggerConfig, options.debug);
       resolver = createResolver();
+      logger = new Logger(loggerConfig, options.debug);
+      logger.info('Plugin configuration resolved');
+      logger.info(`- List of merged options: ${JSON.stringify(options)}`);
       entries = await EntryAnalyzer.analyzeEntries(options.targets, resolver);
-      logger.info(`List of merged options: ${JSON.stringify(options)}`);
-      logger.info(`List of parsed entries: ${JSON.stringify([...entries.keys()])}`);
-    },
-
-    async handleHotUpdate({ file }) {
-      if (entries.has(file)) {
-        await EntryAnalyzer.doAnalyzeEntry(entries, file);
-      }
-    },
-
-    async transform(code, id) {
-      return await transformIfNeeded(id, code, entries, options, resolver, logger);
+      logger.info(`- List of parsed entries: ${JSON.stringify([...entries.keys()])}`);
     },
 
     load(id) {
@@ -48,6 +45,17 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
         const output = serveSource ? entry.source : entry.updatedSource;
         logger.info(`Serving ${version} entry file ${url}`);
         return output;
+      }
+    },
+
+    async transform(code, id) {
+      return await transformIfNeeded(id, code, entries, options, resolver, logger);
+    },
+
+    async handleHotUpdate({ file }) {
+      if (entries.has(file)) {
+        /** @todo log HMR re-triggering analyzis */
+        await EntryAnalyzer.doAnalyzeEntry(entries, file);
       }
     },
 

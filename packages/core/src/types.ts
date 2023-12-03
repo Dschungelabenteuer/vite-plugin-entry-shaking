@@ -1,21 +1,21 @@
 /** Vite plugin options. */
-export type PluginOptions = {
+export interface PluginOptions {
   targets: PluginTargets;
   extensions?: string[];
   ignorePatterns?: any[];
   debug?: boolean;
-};
+}
 
 /** Final plugin options. */
 export type FinalPluginOptions = Required<PluginOptions>;
 
 /** Target entry data. */
-export type EntryData = {
+export interface EntryData {
   exports: EntryExports;
   source: string;
-  hasDefaultExport?: boolean;
   updatedSource: string;
-};
+  hasDefaultExport?: boolean;
+}
 
 /** Target entry map. */
 export type PluginEntries = Map<EntryPath, EntryData>;
@@ -68,10 +68,10 @@ export type EntryPath = string;
 export type PluginTargets = EntryPath[];
 
 /** Parsed import statement output. */
-export type ParsedImportStatement = {
+export interface ParsedImportStatement {
   namedImports: string[];
-  defaultImport: string | null;
-};
+  defaultImports: string[];
+}
 
 /** Import statement string. */
 export type ImportStatement = `import ${string}`;

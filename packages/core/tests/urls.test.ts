@@ -1,16 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { addSourceQuerySuffix, parseId } from '../src/urls';
 
+const _ = (path: string) => `e:/path/to/${path}`;
+
 describe('addSourceQuerySuffix', () => {
   it('should add source query suffix to simple url', () => {
-    const input = 'e:/path/to/file.ext';
-    const expected = 'e:/path/to/file.ext?source=1';
+    const input = _('/file.ext');
+    const expected = _('/file.ext?source=1');
     expect(addSourceQuerySuffix(input)).toStrictEqual(expected);
   });
 
   it('should add source to existing list of query suffixes', () => {
-    const input = 'e:/path/to/file.ext?foo=bar&baz=qux';
-    const expected = 'e:/path/to/file.ext?foo=bar&baz=qux&source=1';
+    const input = _('/file.ext?foo=bar&baz=qux');
+    const expected = _('/file.ext?foo=bar&baz=qux&source=1');
     expect(addSourceQuerySuffix(input)).toStrictEqual(expected);
   });
 });
@@ -31,13 +33,13 @@ describe('parseId', () => {
   };
 
   describe('Simple URLs', () => {
-    testParseId('e:/path/to/file.ext', 'e:/path/to/file.ext?source=1');
+    testParseId(_('/file.ext'), _('/file.ext?source=1'));
   });
 
   describe('URLs with query suffixes', () => {
     testParseId(
-      'e:/path/to/file.ext?foo=bar&baz=qux',
-      'e:/path/to/file.ext?foo=bar&source=1&baz=qux',
+      _('/file.ext?foo=bar&baz=qux'),
+      _('/file.ext?foo=bar&source=1&baz=qux'),
     );
   });
 });

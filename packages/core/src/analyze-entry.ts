@@ -6,125 +6,53 @@ import type { ResolveFn } from 'vite';
 import type {
   EntryExports,
   EntryImports,
-  ParsedImportStatement,
   PluginEntries,
   PluginTargets,
   EntryPath,
   ImportParams,
 } from './types';
 import EntryCleaner from './cleanup-entry';
-import ImportAnalyzer from './analyze-import';
+import Parsers from './parse';
+import Utils from './utils';
 
 /**
- * Parses an import statement to extract default and named exports.
- * @param statement Import statement to parse.
+ * Analyzes target entry files.
+ * @see `doAnalyzeEntry`
+ * @param targets List of targets being processed by the plugin.
+ * @param resolver Vite's resolve function.
  */
-const parseImportStatement = (statement: string): ParsedImportStatement => {
-  const output: ParsedImportStatement = { namedImports: [], defaultImport: null };
-  const registerNamedImport = (s: string) => {
-    const name = s.trim();
-    if (name.length) output.namedImports.push(name);
-  };
-
-  const inlineStatement = statement.replace(/\n/g, '');
-  let [, , importContent] = inlineStatement.match(/(im|ex)port (.*) from/m) ?? [, , undefined];
-  if (importContent) {
-    const def = [, undefined];
-    const [namedImportsStatement, namedImportsContent] = importContent.match(/{(.*)}/) ?? def;
-    if (namedImportsStatement && namedImportsContent) {
-      importContent = importContent.replace(namedImportsStatement, '');
-      namedImportsContent.split(',').forEach((namedImport) => {
-        const name = namedImport.split(' as ')!.map((param) => param.trim());
-        if (name.length === 1) {
-          registerNamedImport(name[0]);
-        } else {
-          const [originalName, alias] = name;
-          if (originalName === 'default') {
-            output.defaultImport = alias;
-          } else {
-            registerNamedImport(namedImport);
-          }
-        }
-      });
-    }
-
-    const defaultImport = importContent.replace(/,/g, '').trim();
-    output.defaultImport = defaultImport.length ? defaultImport : output.defaultImport;
-  }
-
-  return output;
-};
+async function analyzeEntries(targets: PluginTargets, resolver: ResolveFn): Promise<PluginEntries> {
+  const entries: PluginEntries = new Map([]);
+  await Utils.parallelize(targets, async (path) => {
+    const absolutePath = (await resolver(path)) ?? path;
+    await methods.analyzeEntry(entries, absolutePath);
+  });
+  return entries;
+}
 
 /**
- * Analyzes an import of an entry point.
- * This is required because we need to store their paths to
- * later remap named exports that rely on import statements.
- * @param rawEntry Source code of the entry file.
- * @param analyzedImports _reference_ - Map of analyzed imports.
- * @param path Path of the imported resource.
- * @param startPosition Import statement start position (based on rawEntry).
- * @param endPosition Import statement end position (based on rawEntry).
- */
-const analyzeEntryImport = (
-  rawEntry: string,
-  analyzedImports: EntryImports,
-  path: string,
-  startPosition: number,
-  endPosition: number,
-): void => {
-  const statement = rawEntry.slice(startPosition, endPosition);
-
-  const { namedImports, defaultImport } = methods.parseImportStatement(statement);
-
-  if (defaultImport) {
-    analyzedImports.set(defaultImport, { path, importDefault: true });
-  }
-
-  if (namedImports.length) {
-    namedImports.forEach((namedImport) => {
-      const { name, alias } = ImportAnalyzer.getImportParams(namedImport);
-      analyzedImports.set(alias ?? name, {
-        path,
-        importDefault: false,
-        originalName: name,
-      });
-    });
-  }
-};
-
-/**
- * Analyzes an export of an entry point.
- * This maps named exports to their origin paths so that we
- * can later rewrite any import statement of the entry file
- * with individual import statements to mimic tree-shaking behaviour.
- * @param entryMap _reference_ - Map of entry's analyzed exports.
- * @param analyzedImports _reference_ - Map of analyzed imports.
- * @param namedExport Name of the export e.g. (`n` in `export { ln as n }`).
- * @param localName Local name of the export e.g. (`ln` in `export { ln as n }`).
- */
-const analyzeEntryExport = (
-  entryMap: EntryExports,
-  analyzedImports: EntryImports,
-  namedExport: string,
-  localName?: string,
-): void => {
-  if (namedExport) {
-    if (analyzedImports.has(namedExport)) {
-      const { path, importDefault, originalName } = analyzedImports.get(namedExport)!;
-      entryMap.set(namedExport, { path, importDefault, originalName });
-    } else if (localName && analyzedImports.has(localName)) {
-      const { path, importDefault } = analyzedImports.get(localName)!;
-      entryMap.set(namedExport, { path, importDefault, originalName: localName });
-    }
-  }
-};
-
-/**
- * Analyzes an entry file to feed a list of exports.
+ * Analyzes an entry file if it was not analyzed before.
+ * @see `doAnalyzeEntry`
  * @param entries _reference_ - Map of parsed entry files.
  * @param entryPath Absolute path of the entry point.
  */
-const doAnalyzeEntry = async (entries: PluginEntries, entryPath: EntryPath): Promise<void> => {
+async function analyzeEntry(entries: PluginEntries, entryPath: EntryPath): Promise<void> {
+  if (entries.has(entryPath)) return;
+
+  await methods.doAnalyzeEntry(entries, entryPath).catch(() => {
+    throw new Error(`Could not analyze entry file "${entryPath}"`);
+  });
+}
+
+/**
+ * Analyzes an entry file and extracts information about its exports.
+ * Also, it creates a cleaned-up version of an entry's source code in
+ * case it still needs to be served (e.g. through unsupported syntaxes
+ * or when importing code the entry actually owns).
+ * @param entries _reference_ - Map of parsed entry files.
+ * @param entryPath Absolute path of the entry point.
+ */
+async function doAnalyzeEntry(entries: PluginEntries, entryPath: EntryPath): Promise<void> {
   await init;
 
   const entryMap: EntryExports = new Map([]);
@@ -134,7 +62,7 @@ const doAnalyzeEntry = async (entries: PluginEntries, entryPath: EntryPath): Pro
   const [imports, exports] = parse(rawEntry);
 
   // First analyze the imported entities of the entry.
-  imports.forEach(({ n: path, ss: startPosition, se: endPosition }) => {
+  for (const { n: path, ss: startPosition, se: endPosition } of imports) {
     methods.analyzeEntryImport(
       rawEntry,
       analyzedImports,
@@ -142,7 +70,7 @@ const doAnalyzeEntry = async (entries: PluginEntries, entryPath: EntryPath): Pro
       startPosition,
       endPosition,
     );
-  });
+  }
 
   // Then analyze the exports with the gathered data.
   exports.forEach(({ n: namedExport, ln: localName }) => {
@@ -155,47 +83,75 @@ const doAnalyzeEntry = async (entries: PluginEntries, entryPath: EntryPath): Pro
     source: rawEntry,
     updatedSource: EntryCleaner.cleanupEntry(rawEntry, entryMap, exports),
   });
-};
+}
 
 /**
- * Analyzes an entry file to feed a list of exports, if it was not analyzed before.
- * @param entries _reference_ - Map of parsed entry files.
- * @param entryPath Absolute path of the entry point.
+ * Analyzes a single import statement made from an entry point.
+ * This is required because we need to store their paths to
+ * later remap named exports that rely on import statements.
+ * @param rawEntry Source code of the entry file.
+ * @param analyzedImports _reference_ - Map of analyzed imports.
+ * @param path Path of the imported resource.
+ * @param startPosition Import statement start position (based on rawEntry).
+ * @param endPosition Import statement end position (based on rawEntry).
  */
-const analyzeEntry = async (entries: PluginEntries, entryPath: EntryPath): Promise<void> => {
-  if (entries.has(entryPath)) return;
+function analyzeEntryImport(
+  rawEntry: string,
+  analyzedImports: EntryImports,
+  path: string,
+  startPosition: number,
+  endPosition: number,
+): void {
+  const statement = rawEntry.slice(startPosition, endPosition);
+  const { namedImports, defaultImports } = Parsers.parseImportStatement(statement);
 
-  await methods.doAnalyzeEntry(entries, entryPath).catch(() => {
-    throw new Error(`Could not analyze entry file "${entryPath}"`);
+  defaultImports.forEach((defaultImport) => {
+    analyzedImports.set(defaultImport, { path, importDefault: true });
   });
-};
+
+  namedImports.forEach((namedImport) => {
+    const { name, alias } = Parsers.parseImportParams(namedImport);
+    analyzedImports.set(alias ?? name, {
+      path,
+      importDefault: false,
+      originalName: name,
+    });
+  });
+}
 
 /**
- * Analyzes target entry files.
- * @param targets List of targets being processed by the plugin.
- * @param resolver Vite's resolve function.
+ * Analyzes a single export statement made from an entry point.
+ * This maps named exports to their origin paths so that we
+ * can later rewrite any import statement of the entry file
+ * with individual import statements to mimic tree-shaking behaviour.
+ * @param entryMap _reference_ - Map of entry's analyzed exports.
+ * @param analyzedImports _reference_ - Map of analyzed imports.
+ * @param namedExport Name of the export e.g. (`n` in `export { ln as n }`).
+ * @param localName Local name of the export e.g. (`ln` in `export { ln as n }`).
  */
-const analyzeEntries = async (
-  targets: PluginTargets,
-  resolver: ResolveFn,
-): Promise<PluginEntries> => {
-  const entries: PluginEntries = new Map([]);
-  await Promise.all(
-    targets.map(async (path) => {
-      const absolutePath = (await resolver(path)) ?? path;
-      await methods.analyzeEntry(entries, absolutePath);
-    }),
-  );
-  return entries;
-};
+function analyzeEntryExport(
+  entryMap: EntryExports,
+  analyzedImports: EntryImports,
+  namedExport: string,
+  localName?: string,
+): void {
+  if (namedExport) {
+    if (analyzedImports.has(namedExport)) {
+      const { path, importDefault, originalName } = analyzedImports.get(namedExport)!;
+      entryMap.set(namedExport, { path, importDefault, originalName });
+    } else if (localName && analyzedImports.has(localName)) {
+      const { path, importDefault } = analyzedImports.get(localName)!;
+      entryMap.set(namedExport, { path, importDefault, originalName: localName });
+    }
+  }
+}
 
 const methods = {
-  parseImportStatement,
+  analyzeEntries,
+  analyzeEntry,
+  doAnalyzeEntry,
   analyzeEntryImport,
   analyzeEntryExport,
-  doAnalyzeEntry,
-  analyzeEntry,
-  analyzeEntries,
 };
 
 export default methods;

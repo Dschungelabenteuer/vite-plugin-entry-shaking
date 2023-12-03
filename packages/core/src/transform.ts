@@ -12,11 +12,11 @@ import ImportAnalyzer from './analyze-import';
  * @param id Resolved id of the file.
  * @param options Final plugin options.
  */
-export const requiresTransform = (id: string, options: FinalPluginOptions) => {
+export function requiresTransform(id: string, options: FinalPluginOptions) {
   const extension = id.split('.').pop()!;
   const isIgnored = options.ignorePatterns.some((pattern) => id.match(pattern));
   return !isIgnored && options.extensions.includes(extension);
-};
+}
 
 /**
  * Determines wether a target entry point is imported.
@@ -25,12 +25,12 @@ export const requiresTransform = (id: string, options: FinalPluginOptions) => {
  * @param entries _reference_ - Map of parsed entry files.
  * @param resolver Vite's resolve function.
  */
-export const importsTargetEntry = async (
+export async function importsTargetEntry(
   id: string,
   imports: readonly ImportSpecifier[],
   entries: PluginEntries,
   resolver: ResolveFn,
-) => {
+) {
   try {
     return await Promise.any(
       imports.map(async (importParams) => {
@@ -43,7 +43,7 @@ export const importsTargetEntry = async (
   } catch (e) {
     return false;
   }
-};
+}
 
 /**
  * Transforms imports of targeted entry files.
@@ -68,8 +68,10 @@ export async function transformImports(
   await init;
   const src = new MagicString(code);
   const reexports = createReexportStatement(exports);
-  for (const { n: targetPath, ss: startPosition, se: endPosition } of imports) {
-    const resolvedImport = targetPath && (await resolver(targetPath, id));
+
+  // Analyze the imported entities of the file.
+  for (const { n: path, ss: startPosition, se: endPosition } of imports) {
+    const resolvedImport = path && (await resolver(path, id));
     const entry = resolvedImport && entries.get(resolvedImport);
     // If the active import is one of the targets, let's analyze it.
     if (entry) {
@@ -108,11 +110,9 @@ export async function transformImportsIfNeeded(
 ): Promise<string | undefined> {
   const [imports, exports] = parse(code);
   const importsTarget = await methods.importsTargetEntry(id, imports, entries, resolver);
-  if (!importsTarget) {
-    logger.info(`Ignored by analyzis: ${id}`, undefined, true);
-  } else {
-    return await methods.transformImports(id, code, entries, imports, exports, resolver, logger);
-  }
+  const { transformImports: transform } = methods;
+  if (importsTarget) return await transform(id, code, entries, imports, exports, resolver, logger);
+  logger.info(`Ignored by analyzis: ${id}`, undefined, true);
 }
 
 /**

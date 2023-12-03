@@ -18,7 +18,7 @@ free to create a
 2. [Forking the repository](#forking-the-repository)
 3. [Installing dependencies](#installing-dependencies)
 4. [Start developing](#start-developing)
-5. [Checking your work](#start-developing)
+5. [Checking your work](#checking-your-work)
 6. [Adding a changeset](#adding-a-changeset)
 7. [Submitting a pull request](#submitting-a-pull-request)
 
@@ -92,6 +92,10 @@ This will start [unbuild](https://github.com/unjs/unbuild)'s passive watcher so 
 your changes without having to actually rebuild anything. When the passive watcher is launched, you
 can test your changes against on of the provided
 [examples](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/examples).
+
+The
+["Resources" document](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/blob/main/RESOURCES.md)
+also may help you understand how the plugin works under the hood.
 
 ## Checking your work
 

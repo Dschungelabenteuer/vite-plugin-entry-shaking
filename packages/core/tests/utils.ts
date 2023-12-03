@@ -1,14 +1,16 @@
 import { resolve } from 'path';
 import { resolveConfig, createLogger } from 'vite';
 import { init, parse } from 'es-module-lexer';
-import { expect } from 'vitest';
+import { expect, vi } from 'vitest';
 import dedent from 'ts-dedent';
 
-import type { PluginOptions } from '../src/types';
+import type { EntryData, PluginOptions } from '../src/types';
 import EntryAnalyzer from '../src/analyze-entry';
 import { Logger } from '../src/logger';
 import { extensions } from '../src/options';
 import { transformIfNeeded } from '../src/transform';
+import type { Parallel } from '../src/utils';
+import utils from '../src/utils';
 
 /** Case structure. */
 export type Case = {
@@ -41,6 +43,14 @@ export const STUB_SOURCE = '';
 export const STUB_PATH = '';
 /** Stub for the content of an id. */
 export const STUB_ID = '';
+/** Stub for an empty analyzed entry data. */
+export const STUB_EMPTY_ENTRY_DATA: EntryData = {
+  exports: new Map(),
+  source: STUB_SOURCE,
+  updatedSource: STUB_SOURCE,
+};
+
+
 /** Stub for Vite's configuration.. */
 export const VITE_CONFIG = {
   resolve: {
@@ -67,6 +77,16 @@ export const targetRemains = dedent(`
   console.info('This is being printed from target, which means target was requested', CodeDefinedFromTarget);
   export default "Default export from target";
 `);
+
+/**
+ * This transforms the original `parallelize` implementation so
+ * that execution is… well… not parallel anymore. This ensures
+ * consistent ordering when testing against hard-coded inputs. */
+const sequentialize: Parallel = async (items, callback) => {
+  for (const [i, v] of items.entries()) {
+    await callback(v, i, items);
+  }
+}
 
 /** Creates a test path resolver. */
 export const getTestResolver = async () =>
@@ -125,6 +145,9 @@ export async function testCase(
   expectedImportRemainsCount = 0,
 ) {
   if (!target) throw new Error('Case target is undefined');
+
+  vi.spyOn(utils, 'parallelize').mockImplementation(sequentialize);
+
   await init;
   const res = await runCase(input, { targets: [target!] });
   const remainsLength = targetRemains.split('\n').length;
@@ -142,6 +165,32 @@ export async function testCase(
   // Target should only contain code it defines.
   const targetContentEnd = lines.slice(remainsLength * -1).join('\n');
   expect(targetContentEnd).toStrictEqual(targetRemains);
+}
+
+/**
+ * Creates a simple entry data object, with the ability
+ * to pass an exports map.
+ */
+export function createMockEntryData(
+  exports: EntryData['exports'] = new Map()
+): EntryData {
+  return {
+    exports,
+    source: STUB_SOURCE,
+    updatedSource: STUB_SOURCE,
+  };
+}
+
+/**
+ * This resolves the path to one of mock entries from 'unit' folder.
+ * @param name Name of the entry (will match `${name}.ts` or `${name}/index.ts`).
+ */
+export async function resolveUnitEntry(name: string) {
+  const resolver = await getResolver();
+  const entryPath = resolve(__dirname, MOCKS_FOLDER_UNIT, name);
+  const path = await resolver(entryPath);
+  if (!path) throw new Error(`Could not resolve mock entry "${name}"`);
+  return path;
 }
 
 /**

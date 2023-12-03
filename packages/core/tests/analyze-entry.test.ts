@@ -1,12 +1,11 @@
 import fs from 'fs';
-import { resolve } from 'path';
 import type { ResolveFn } from 'vite';
 import { beforeAll, describe, it, expect, vi, beforeEach } from 'vitest';
 import dedent from 'ts-dedent';
 
 import type { EntryExports, EntryImports, PluginEntries } from '../src/types';
 import EntryAnalyzer from '../src/analyze-entry';
-import { getTestResolver, MOCKS_FOLDER_UNIT } from './utils';
+import { getTestResolver, resolveUnitEntry } from './utils';
 
 vi.mock('fs');
 
@@ -14,123 +13,6 @@ let resolver: ResolveFn;
 
 beforeAll(async () => {
   resolver = await getTestResolver();
-});
-
-describe('parseImportStatement', () => {
-  describe('aggregated export statements', () => {
-    it('should correctly parse aggregated export statement', () => {
-      const parsed = EntryAnalyzer.parseImportStatement(
-        `export { UserId, UserName } from '@model/user';`,
-      );
-      expect(parsed).toMatchObject({
-        namedImports: ['UserId', 'UserName'],
-        defaultImport: null,
-      });
-    });
-
-    it('should correctly parse aggregated export statement with alias', () => {
-      const parsed = EntryAnalyzer.parseImportStatement(
-        `export { UserId as UserIdentifier, UserName } from '@model/user';`,
-      );
-      expect(parsed).toMatchObject({
-        namedImports: ['UserId as UserIdentifier', 'UserName'],
-        defaultImport: null,
-      });
-    });
-
-    it('should correctly parse aggregated export statement with only aliased default export', () => {
-      const parsed = EntryAnalyzer.parseImportStatement(
-        `export { default as User } from '@model/user';`,
-      );
-      expect(parsed).toMatchObject({
-        namedImports: [],
-        defaultImport: 'User',
-      });
-    });
-
-    it('should correctly parse aggregated export statement with aliased default export', () => {
-      const parsed = EntryAnalyzer.parseImportStatement(
-        `export { default as User, UserName } from '@model/user';`,
-      );
-      expect(parsed).toMatchObject({
-        namedImports: ['UserName'],
-        defaultImport: 'User',
-      });
-    });
-
-    it('should correctly parse multiline export statement', () => {
-      const parsed = EntryAnalyzer.parseImportStatement(
-        dedent(`export {
-          UserId,
-          UserName,
-        } from '@model/user';`),
-      );
-      expect(parsed).toMatchObject({
-        namedImports: ['UserId', 'UserName'],
-        defaultImport: null,
-      });
-    });
-  });
-
-  describe('import statements', () => {
-    it('should correctly parse import statement when only importing named exports', () => {
-      const parsed = EntryAnalyzer.parseImportStatement(
-        `import { UserId, UserName } from '@model/user';`,
-      );
-      expect(parsed).toMatchObject({
-        namedImports: ['UserId', 'UserName'],
-        defaultImport: null,
-      });
-    });
-
-    it('should correctly parse import statement when only importing default export', () => {
-      const parsed = EntryAnalyzer.parseImportStatement(`import User from '@model/user';`);
-      expect(parsed).toMatchObject({
-        namedImports: [],
-        defaultImport: 'User',
-      });
-    });
-
-    it('should correctly parse import statement when importing default export then named exports', () => {
-      const parsed = EntryAnalyzer.parseImportStatement(
-        `import User, { UserId, UserName } from '@model/user';`,
-      );
-      expect(parsed).toMatchObject({
-        namedImports: ['UserId', 'UserName'],
-        defaultImport: 'User',
-      });
-    });
-
-    it('should correctly parse import statement when importing named exports then default export', () => {
-      const parsed = EntryAnalyzer.parseImportStatement(
-        `import { UserId, UserName }, User from '@model/user';`,
-      );
-      expect(parsed).toMatchObject({
-        namedImports: ['UserId', 'UserName'],
-        defaultImport: 'User',
-      });
-    });
-
-    it('should correctly parse import statement when importing named exports with aliases', () => {
-      const parsed = EntryAnalyzer.parseImportStatement(
-        `import { UserId as UserIdentifier, UserName }, User from '@model/user';`,
-      );
-      expect(parsed).toMatchObject({
-        namedImports: ['UserId as UserIdentifier', 'UserName'],
-        defaultImport: 'User',
-      });
-    });
-
-    it('should correctly parse import statement when importing default export with alias', () => {
-      const parsed = EntryAnalyzer.parseImportStatement(
-        `import { default as User, UserName } from '@model/user';`,
-      );
-      expect(parsed).toMatchObject({
-        namedImports: ['UserName'],
-        defaultImport: 'User',
-      });
-    });
-  });
 });
 
 describe('analyzeEntryImport', () => {
@@ -151,48 +33,52 @@ describe('analyzeEntryImport', () => {
 
   describe('aggregated export statements', () => {
     it('should feed the `analyzedImports` map if this is an aggregated export', () => {
-      const output = run(`export { UserId } from '${path}'`);
+      const originalName = 'UserId';
+      const output = run(`export { ${originalName} } from '${path}'`);
 
       expect(output.analyzedImports.size).toStrictEqual(1);
       expect(output.analyzedImports.get('UserId')).toStrictEqual({
         path,
         importDefault: false,
-        originalName: 'UserId',
+        originalName,
       });
     });
 
     it('should feed the `analyzedImports` map if this is an aggregated default export with alias', () => {
-      const output = run(`export { default as User } from '${path}'`);
+      const alias = 'User';
+      const output = run(`export { default as ${alias} } from '${path}'`);
 
       expect(output.analyzedImports.size).toStrictEqual(1);
-      expect(output.analyzedImports.get('User')).toStrictEqual({
+      expect(output.analyzedImports.get(alias)).toStrictEqual({
         path,
         importDefault: true,
       });
     });
 
     it('should feed the `analyzedImports` map if this is an aggregated export with alias', () => {
-      const output = run(`export { UserId as UserIdentifier } from '${path}'`);
+      const originalName = 'UserId';
+      const alias = 'User';
+      const output = run(`export { ${originalName} as ${alias} } from '${path}'`);
 
       expect(output.analyzedImports.size).toStrictEqual(1);
-      expect(output.analyzedImports.get('UserIdentifier')).toStrictEqual({
+      expect(output.analyzedImports.get(alias)).toStrictEqual({
         path,
         importDefault: false,
-        originalName: 'UserId',
+        originalName,
       });
     });
   });
 
   describe('import statements', () => {
     it('should feed the `analyzedImports` map if it imports named exports', () => {
-      const namedImport = `GroupId`;
-      const output = run(`import { ${namedImport} } from "${path}"`);
+      const originalName = `GroupId`;
+      const output = run(`import { ${originalName} } from "${path}"`);
 
       expect(output.analyzedImports.size).toStrictEqual(1);
-      expect(output.analyzedImports.get(namedImport)).toStrictEqual({
+      expect(output.analyzedImports.get(originalName)).toStrictEqual({
         path,
         importDefault: false,
-        originalName: namedImport,
+        originalName,
       });
     });
 
@@ -208,25 +94,25 @@ describe('analyzeEntryImport', () => {
     });
 
     it('should feed the `analyzedImports` map if it imports a named export with an alias', () => {
-      const moduleImport = `User`;
-      const importAlias = `MyUser`;
-      const importString = `${moduleImport} as ${importAlias}`;
+      const originalName = `User`;
+      const alias = `MyUser`;
+      const importString = `${originalName} as ${alias}`;
       const output = run(`import { ${importString} } from "${path}"`);
 
       expect(output.analyzedImports.size).toStrictEqual(1);
-      expect(output.analyzedImports.get(importAlias)).toStrictEqual({
+      expect(output.analyzedImports.get(alias)).toStrictEqual({
         path,
         importDefault: false,
-        originalName: moduleImport,
+        originalName,
       });
     });
 
     it('should feed the `analyzedImports` map if it imports a default export with an alias', () => {
-      const importAlias = `MyUser`;
-      const output = run(`import { default as ${importAlias} } from "${path}"`);
+      const alias = `MyUser`;
+      const output = run(`import { default as ${alias} } from "${path}"`);
 
       expect(output.analyzedImports.size).toStrictEqual(1);
-      expect(output.analyzedImports.get(importAlias)).toStrictEqual({
+      expect(output.analyzedImports.get(alias)).toStrictEqual({
         path,
         importDefault: true,
       });
@@ -396,13 +282,11 @@ describe('analyzeEntry', () => {
 
   it('should directly return void if entry was already parsed', async () => {
     await EntryAnalyzer.analyzeEntry(new Map([[path, {}]]) as any, path);
-
     expect(EntryAnalyzer.doAnalyzeEntry).not.toHaveBeenCalled();
   });
 
   it('should call doAnalyzeEntry if entry was not already parsed', async () => {
     await EntryAnalyzer.analyzeEntry(new Map([]), path);
-
     expect(EntryAnalyzer.doAnalyzeEntry).toHaveBeenCalledWith(expect.anything(), path);
   });
 
@@ -422,8 +306,8 @@ describe('analyzeEntries', () => {
   });
 
   it('should correctly analyze entries', async () => {
-    const aPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
-    const bPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-b'))) as string;
+    const aPath = await resolveUnitEntry('entry-a');
+    const bPath = await resolveUnitEntry('entry-b');
     const entries = await EntryAnalyzer.analyzeEntries([aPath, bPath], resolver);
 
     expect(entries.size).toStrictEqual(2);
