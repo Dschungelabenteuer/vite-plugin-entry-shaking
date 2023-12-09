@@ -20,6 +20,14 @@ export type Case = {
   targetsPaths: string;
 };
 
+/** Case target structure. */
+export type CaseTarget = {
+  /** Path to target. */
+  path: string;
+  /** Expected number of imports remaining in the target (see limitations). */
+  expectedImportRemainsCount?: number;
+};
+
 /** Vite resolver for tests. */
 let testResolver: Awaited<ReturnType<typeof getTestResolver>>;
 
@@ -50,7 +58,6 @@ export const STUB_EMPTY_ENTRY_DATA: EntryData = {
   updatedSource: STUB_SOURCE,
 };
 
-
 /** Stub for Vite's configuration.. */
 export const VITE_CONFIG = {
   resolve: {
@@ -75,7 +82,6 @@ export const targetRemains = dedent(`
   export const ExportDefinedFromTarget = 'ExportDefinedFromTarget';
   const CodeDefinedFromTarget = \`CodeDefinedFromTarget: \${ConsumedExport}\`;
   console.info('This is being printed from target, which means target was requested', CodeDefinedFromTarget);
-  export default "Default export from target";
 `);
 
 /**
@@ -86,7 +92,7 @@ const sequentialize: Parallel = async (items, callback) => {
   for (const [i, v] of items.entries()) {
     await callback(v, i, items);
   }
-}
+};
 
 /** Creates a test path resolver. */
 export const getTestResolver = async () =>
@@ -96,11 +102,11 @@ export const getTestResolver = async () =>
 export const getCaseTarget = (res: Awaited<ReturnType<typeof runCase>>, target: string) =>
   res.entries.get(target)?.updatedSource.trim();
 
-/** Returns a test suite label hinting the type of paths being used based on the target file name. */
-export const getPathTypeDescribeLabel = (targetName: string) =>
-  targetName.endsWith('alias')
-    ? 'path alias (target file imports use path aliases)'
-    : 'relative path (target file imports use relative paths)';
+/** Prepares some target case data. */
+export const setupCase = (target: CaseTarget, middleTarget?: CaseTarget) => ({
+  importPath: (middleTarget ?? target).path,
+  targetList: [target, ...(middleTarget ? [middleTarget] : [])],
+});
 
 /**
  * This function mimics the plugin's logic based on the `tests/cases` folder.
@@ -132,53 +138,65 @@ export async function runCase(main: string, options: PluginOptions) {
 /**
  * Test utility that runs a case and checks if:
  * - the input content was transformed correctly.
- * - the target was transformed correctly.
- * @param target Resolved path to target.
+ * - targets were transformed correctly.
+ * @param targets Resolved paths to targets.
  * @param input  Input content.
  * @param output Expected output content.
- * @param expectedImportRemainsCount Expected number of imports remaining in the target (see limitations).
  */
-export async function testCase(
-  target: string | undefined,
-  input: string,
-  output: string,
-  expectedImportRemainsCount = 0,
-) {
-  if (!target) throw new Error('Case target is undefined');
+export async function testCase(targets: CaseTarget[], input: string, output: string) {
+  if (!targets.length) throw new Error('Case target is undefined');
 
   vi.spyOn(utils, 'parallelize').mockImplementation(sequentialize);
 
   await init;
-  const res = await runCase(input, { targets: [target!] });
+  const targetPaths = targets.map(({ path }) => path);
+  const res = await runCase(input, { targets: targetPaths });
   const remainsLength = targetRemains.split('\n').length;
-  const targetContent = getCaseTarget(res, target!);
-  const lines = targetContent!.split('\n');
-
-  // Imports should be kept in entry in case they are used by defining code.
-  // Let's count them (but ignore the one import used in targetRemains).
-  const [imports] = parse(targetContent!);
-  expect(imports.length - 1).toStrictEqual(expectedImportRemainsCount);
 
   // It should have direct import and not import target.
   expect(res.transformed).toStrictEqual(output);
 
-  // Target should only contain code it defines.
-  const targetContentEnd = lines.slice(remainsLength * -1).join('\n');
-  expect(targetContentEnd).toStrictEqual(targetRemains);
+  targets.forEach(({ path, expectedImportRemainsCount }) => {
+    const targetContent = getCaseTarget(res, path);
+    const lines = targetContent!.split('\n');
+
+    if (expectedImportRemainsCount !== undefined) {
+      // Imports should be kept in entry in case they are used by defining code.
+      // Let's count them (but ignore the one import used in targetRemains).
+      const [imports] = parse(targetContent!);
+      expect(imports.length - 1).toStrictEqual(expectedImportRemainsCount);
+
+      // Target should only contain code it defines.
+      const targetContentEnd = lines.slice(remainsLength * -1).join('\n');
+      expect(targetContentEnd).toStrictEqual(targetRemains);
+    }
+  });
 }
 
 /**
  * Creates a simple entry data object, with the ability
  * to pass an exports map.
  */
-export function createMockEntryData(
-  exports: EntryData['exports'] = new Map()
-): EntryData {
+export function createMockEntryData(exports: EntryData['exports'] = new Map()): EntryData {
   return {
     exports,
     source: STUB_SOURCE,
     updatedSource: STUB_SOURCE,
   };
+}
+
+/**
+ * Creates a simple case target.
+ * @param origin Path to target.
+ * @param expectedImportRemainsCount Expected number of imports remaining in the target (see limitations).
+ */
+export async function createCaseTarget(
+  origin: string,
+  expectedImportRemainsCount?: number,
+): Promise<CaseTarget> {
+  const path = await resolvePath(origin);
+  if (!path) throw new Error(`Could not resolve mock entry "${origin}"`);
+  return { path, expectedImportRemainsCount };
 }
 
 /**

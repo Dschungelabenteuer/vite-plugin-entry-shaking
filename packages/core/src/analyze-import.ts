@@ -1,3 +1,4 @@
+/* eslint-disable no-continue */
 import type MagicString from 'magic-string';
 import type { ResolveFn } from 'vite';
 import { normalizePath } from 'vite';
@@ -76,7 +77,7 @@ async function getImportsMap(
  */
 const formatImportReplacement = ({ name, alias, originalName, importDefault }: ImportInput) => {
   if (importDefault) return `default as ${alias ?? originalName ?? name}`;
-  if (originalName) return `${originalName}${alias ? ` as ${alias}` : ` as ${name}`}`;
+  if (originalName) return `${originalName} as ${alias ?? name}`;
   return `${name}${alias ? ` as ${alias}` : ''}`;
 };
 
@@ -148,18 +149,29 @@ const resolveImportedCircularEntities = async (
   resolver: ResolveFn,
   path: string,
 ) => {
-  const output: ImportStatement[] = [];
+  const entityMap = new Map<string, string[]>();
   const originalEntry = entries.get(path)!;
   for (const entity of imported) {
-    const { originalName } = entity;
+    const { originalName, alias } = entity;
     if (originalName && originalEntry.exports.has(originalName)) {
       const originalImport = originalEntry.exports.get(originalName)!;
       const resolvedPath = await resolver(originalImport.path, path);
-      const resolvedImports = methods.formatImportReplacement(entity);
-      output.push(`import { ${resolvedImports} } from '${resolvedPath}'`);
+      if (!resolvedPath) continue;
+
+      const resolvedImports = methods.formatImportReplacement({
+        ...originalImport,
+        name: originalName,
+        alias,
+      });
+
+      entityMap.set(resolvedPath, [...(entityMap.get(resolvedPath) ?? []), resolvedImports]);
     }
   }
-  return output;
+
+  const imports = [...entityMap.entries()];
+  return imports.map(
+    ([p, ents]) => `import { ${ents.join(', ')} } from '${p}'`,
+  ) as ImportStatement[];
 };
 
 /**
@@ -187,6 +199,7 @@ const analyzeImportStatement = async (
   if (isWildCardImport) return;
 
   const imports = methods.getImportedEntryExports(code, startPosition, endPosition);
+
   const imported = await methods.getImportsMap(entryExports, entryPath, imports, resolver);
   const replacement = await methods.getImportReplacements(imported, entryPath, entries, resolver);
   src.overwrite(startPosition, endPosition + 1, `${replacement.join(';\n')};`);

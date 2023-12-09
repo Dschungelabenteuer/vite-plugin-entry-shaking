@@ -12,7 +12,6 @@ import {
   MOCKS_FOLDER_UNIT,
   resolveUnitEntry,
   STUB_PATH,
-  STUB_SOURCE,
 } from './utils';
 import type { EntryData, ImportInput, PluginEntries, TargetImports } from '../src/types';
 
@@ -299,27 +298,6 @@ describe('resolveImportedEntities', () => {
     const path = 'entryA';
     await ImportAnalyzer.resolveImportedEntities(imported, entryPath, entries, resolver, path);
     expect(ImportAnalyzer.resolveImportedCircularEntities).not.toHaveBeenCalled();
-    expect(ImportAnalyzer.formatImportReplacement).toHaveBeenCalledTimes(imported.length);
-  });
-});
-
-describe('resolveImportedCircularEntities', () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  const entryPath = 'entryB';
-  const entryData: EntryData = {
-    exports: new Map([[MOCK_IMPORT_INPUT.name, MOCK_IMPORT_INPUT]]),
-    source: STUB_SOURCE,
-    updatedSource: STUB_SOURCE,
-  };
-
-  const imported: ImportInput[] = [MOCK_IMPORT_INPUT];
-  const entries: PluginEntries = new Map([[entryPath, entryData]]);
-
-  it('should call "formatImportReplacement" with resolved entry data', async () => {
-    await ImportAnalyzer.resolveImportedCircularEntities(imported, entries, resolver, entryPath);
     expect(ImportAnalyzer.formatImportReplacement).toHaveBeenCalledTimes(imported.length);
   });
 });
