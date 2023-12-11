@@ -5,7 +5,12 @@ import type { ParsedImportStatement } from './types';
  * @param statement Import statement to parse.
  */
 export function parseImportStatement(statement: string): ParsedImportStatement {
-  const output: ParsedImportStatement = { namedImports: [], defaultImports: [] };
+  const output: ParsedImportStatement = {
+    namedImports: [],
+    defaultImports: [],
+    wildcardImport: undefined,
+  };
+
   const inlineStatement = statement.replace(/\n/g, '');
   const [, , importContent] = inlineStatement.match(/(im|ex)port (.*) from/m) ?? [, , undefined];
   return importContent ? methods.parseImportStatementContent(importContent) : output;
@@ -16,16 +21,21 @@ export function parseImportStatement(statement: string): ParsedImportStatement {
  * @param statement Import statement to parse.
  */
 export function parseImportStatementContent(importContent: string) {
-  const output: ParsedImportStatement = { namedImports: [], defaultImports: [] };
-
-  const registerNamedImport = (s: string) => {
-    const name = s.trim();
-    if (name.length) output.namedImports.push(name);
+  const output: ParsedImportStatement = {
+    namedImports: [],
+    defaultImports: [],
+    wildcardImport: undefined,
   };
 
-  const registerDefaultImport = (s: string) => {
+  const registerImport = (target: 'namedImports' | 'defaultImports') => (s: string) => {
     const name = s.trim();
-    if (name.length) output.defaultImports.push(name);
+    if (name.length) output[target].push(name);
+  };
+
+  const registerNamedImport = registerImport('namedImports');
+  const registerDefaultImport = registerImport('defaultImports');
+  const registerWildcardImport = (s: string) => {
+    output.wildcardImport = s.trim();
   };
 
   const def = [, undefined];
@@ -48,7 +58,12 @@ export function parseImportStatementContent(importContent: string) {
   }
 
   const defaultImport = importContent.replace(/,/g, '').trim();
-  if (defaultImport.length) registerDefaultImport(defaultImport);
+
+  if (defaultImport.startsWith('*')) {
+    registerWildcardImport(defaultImport);
+  } else if (defaultImport.length) {
+    registerDefaultImport(defaultImport);
+  }
 
   return output;
 }

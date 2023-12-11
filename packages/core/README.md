@@ -69,6 +69,12 @@ export default defineConfig({
       <td>This specifies RegExp/string whose matched paths must be ignored by the plugin.</td>
     </tr>
     <tr>
+      <td>maxWildcardDepth</td>
+      <td><code>number</code></td>
+      <td><code>0</code></td>
+      <td>How deep should this plugin run static analysis when encountering wildcards? <a href="">Read more</a></td>
+    </tr>
+    <tr>
       <td>debug</td>
       <td><code>boolean</code></td>
       <td><code>false</code></td>
@@ -171,13 +177,15 @@ to make the code it explicitly defines work.
 - Import statements are not cleaned up from analyzed targets. This means if you import code that was
   defined **within** a target, you might still load unnecessary modules. This is by design because
   getting rid of unused imports would require us to traverse each target's AST to make sure it is
-  indeed not, which would end up quite expensive.
+  indeed not used, which would end up quite expensive.
+
+- By default, tree-shaking wildcard imports only work when imported path is part of target list.
+  Other wildcard imports may be handled by setting the `maxWildcardDepth` option.
+  [Read more](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/blob/main/RESOURCES.md#wildcardExports)
 
 - The following syntaxes are not handled:
   - dynamic imports
   - `import json from './json.json' assert { type: 'json' }`
-  - `import * as xxx from '…'`
-  - `export * from '…'`
 
 > **Note** This does not mean you should expect errors using these. Instead, it just means the
 > content they intend to import won't be tree-shaken by the plugin.

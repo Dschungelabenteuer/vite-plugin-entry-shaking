@@ -19,7 +19,7 @@ export function requiresTransform(id: string, options: FinalPluginOptions) {
 }
 
 /**
- * Determines wether a target entry point is imported.
+ * Determines whether a target entry point is imported.
  * @param id Resolved id of the file.
  * @param imports List of imports.
  * @param entries _reference_ - Map of parsed entry files.
@@ -79,7 +79,7 @@ export async function transformImports(
         src,
         code,
         entries,
-        entry.exports,
+        entry,
         resolvedImport,
         startPosition,
         endPosition,
@@ -112,7 +112,7 @@ export async function transformImportsIfNeeded(
   const importsTarget = await methods.importsTargetEntry(id, imports, entries, resolver);
   const { transformImports: transform } = methods;
   if (importsTarget) return await transform(id, code, entries, imports, exports, resolver, logger);
-  logger.info(`Ignored by analyzis: ${id}`, undefined, true);
+  logger.info(`Ignored by analysis: ${id}`, undefined, true);
 }
 
 /**

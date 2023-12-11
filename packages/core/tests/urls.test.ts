@@ -37,9 +37,6 @@ describe('parseId', () => {
   });
 
   describe('URLs with query suffixes', () => {
-    testParseId(
-      _('/file.ext?foo=bar&baz=qux'),
-      _('/file.ext?foo=bar&source=1&baz=qux'),
-    );
+    testParseId(_('/file.ext?foo=bar&baz=qux'), _('/file.ext?foo=bar&source=1&baz=qux'));
   });
 });

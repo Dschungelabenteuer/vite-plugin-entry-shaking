@@ -27,6 +27,7 @@ const getEntries = (entryPath: string): PluginEntries =>
         exports: new Map([['A_MODULE_A', { path: './modules/A', importDefault: true }]]),
         source: '',
         updatedSource: '',
+        depth: 0,
       },
     ],
   ]);
@@ -62,24 +63,31 @@ describe('getImportedEntryExports', () => {
 });
 
 describe('getImportsMap', () => {
-  const entryExports = new Map([
-    ['A_MODULE_H', { path: './modules/H', importDefault: false, originalName: 'A_MODULE_H' }],
-    ['A_MODULE_I', { path: './modules/IJ', importDefault: true, originalName: undefined }],
-    ['A_MODULE_J', { path: './modules/IJ', importDefault: false, originalName: 'J' }],
-    ['A_MODULE_A', { path: './modules/A', importDefault: true, originalName: undefined }],
-    ['A_MODULE_B', { path: './modules/B', importDefault: true, originalName: undefined }],
-    ['A_MODULE_C', { path: './modules/C', importDefault: true, originalName: undefined }],
-    ['A_MODULE_D', { path: '@mocks/entry-a/modules/D', importDefault: true, originalName: undefined }],
-    ['A_MODULE_E', { path: './modules/EF', importDefault: false, originalName: 'A_MODULE_E' }],
-    ['A_MODULE_F', { path: './modules/EF', importDefault: false, originalName: 'A_MODULE_F' }],
-    ['A_MODULE_G', { path: './modules/G', importDefault: false, originalName: 'G' }],
-  ]);
+  const entry = {
+    exports: new Map([
+      ['A_MODULE_H', { path: './modules/H', importDefault: false, originalName: 'A_MODULE_H' }],
+      ['A_MODULE_I', { path: './modules/IJ', importDefault: true, originalName: undefined }],
+      ['A_MODULE_J', { path: './modules/IJ', importDefault: false, originalName: 'J' }],
+      ['A_MODULE_A', { path: './modules/A', importDefault: true, originalName: undefined }],
+      ['A_MODULE_B', { path: './modules/B', importDefault: true, originalName: undefined }],
+      ['A_MODULE_C', { path: './modules/C', importDefault: true, originalName: undefined }],
+      [
+        'A_MODULE_D',
+        { path: '@mocks/entry-a/modules/D', importDefault: true, originalName: undefined },
+      ],
+      ['A_MODULE_E', { path: './modules/EF', importDefault: false, originalName: 'A_MODULE_E' }],
+      ['A_MODULE_F', { path: './modules/EF', importDefault: false, originalName: 'A_MODULE_F' }],
+      ['A_MODULE_G', { path: './modules/G', importDefault: false, originalName: 'G' }],
+    ]),
+  } as EntryData;
+
+  const entries = new Map([['@mocks/entry-a', entry]]);
 
   it('should correctly feed the import map when importing a named entity [directly exported from entry]', async () => {
     const name = 'A_MODULE_A';
     const imports: string[] = [name];
     const entryPath = await resolveUnitEntry('entry-a');
-    const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
+    const output = await ImportAnalyzer.getImportsMap(entries, entry, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
       name,
@@ -93,7 +101,7 @@ describe('getImportsMap', () => {
     const name = 'A_MODULE_A';
     const imports: string[] = [name, `${name} as A_COPY`];
     const entryPath = await resolveUnitEntry('entry-a');
-    const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
+    const output = await ImportAnalyzer.getImportsMap(entries, entry, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
       name,
@@ -106,7 +114,7 @@ describe('getImportsMap', () => {
   it('should correctly feed the import map when [importing with alias] a named entity [directly exported from entry]', async () => {
     const imports: string[] = ['A_MODULE_B as B'];
     const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
-    const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
+    const output = await ImportAnalyzer.getImportsMap(entries, entry, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
       alias: 'B',
@@ -119,7 +127,7 @@ describe('getImportsMap', () => {
   it('should correctly feed the import map when importing a named entity [exported from entry via an alias]', async () => {
     const imports: string[] = ['A_MODULE_G'];
     const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
-    const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
+    const output = await ImportAnalyzer.getImportsMap(entries, entry, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
       alias: undefined,
@@ -132,7 +140,7 @@ describe('getImportsMap', () => {
   it('should correctly feed the import map when [importing with alias] a named entity [exported from entry via an alias]', async () => {
     const imports: string[] = ['A_MODULE_J as JJ'];
     const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
-    const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
+    const output = await ImportAnalyzer.getImportsMap(entries, entry, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
       alias: 'JJ',
@@ -146,7 +154,7 @@ describe('getImportsMap', () => {
     /** Note: this requires `resolver` to be set using the mocked vite configuration. */
     const imports: string[] = ['A_MODULE_D'];
     const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
-    const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
+    const output = await ImportAnalyzer.getImportsMap(entries, entry, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
       alias: undefined,
@@ -159,7 +167,7 @@ describe('getImportsMap', () => {
   it('should correctly feed the import map when importing a named entity [directly defined in entry]', async () => {
     const imports: string[] = ['test'];
     const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
-    const output = await ImportAnalyzer.getImportsMap(entryExports, entryPath, imports, resolver);
+    const output = await ImportAnalyzer.getImportsMap(entries, entry, entryPath, imports, resolver);
     expect(output.size).toStrictEqual(1);
     expect([...output.values()][0][0]).toStrictEqual({
       importDefault: false,
@@ -305,6 +313,7 @@ describe('resolveImportedEntities', () => {
 describe('analyzeImportStatement', () => {
   it('should ignore wildcard import statements', async () => {
     vi.restoreAllMocks();
+    const entry = { exports: new Map() } as EntryData;
     const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-c'))) as string;
     const what = 'import * as Utils';
     const input = `${what} from "./entry-c";`;
@@ -316,7 +325,7 @@ describe('analyzeImportStatement', () => {
       src,
       input,
       getEntries(entryPath),
-      new Map(), // Irrelevant for this test's puprposes
+      entry, // Irrelevant for this test's puprposes
       entryPath,
       0,
       input.length - 1,
@@ -344,53 +353,55 @@ describe('analyzeImportStatement', () => {
     const importPrefix = `import {`;
     const importStart = `${importPrefix} ${imports.join(', ')} `;
     const input = `${importStart}} from "${path}";`;
-    const entryExports = new Map([
-      [
-        'A_MODULE_H',
-        {
-          path: './modules/H',
-          importDefault: false,
-          originalName: 'A_MODULE_H',
-        },
-      ],
-      ['A_MODULE_I', { path: './modules/IJ', importDefault: true, originalName: undefined }],
-      ['A_MODULE_J', { path: './modules/IJ', importDefault: false, originalName: 'J' }],
-      ['A_MODULE_A', { path: './modules/A', importDefault: true, originalName: undefined }],
-      ['A_MODULE_B', { path: './modules/B', importDefault: true, originalName: undefined }],
-      ['A_MODULE_C', { path: './modules/C', importDefault: true, originalName: undefined }],
-      [
-        'A_MODULE_D',
-        {
-          path: '@mocks/entry-a/modules/D',
-          importDefault: true,
-          originalName: undefined,
-        },
-      ],
-      [
-        'A_MODULE_E',
-        {
-          path: './modules/EF',
-          importDefault: false,
-          originalName: 'A_MODULE_E',
-        },
-      ],
-      [
-        'A_MODULE_F',
-        {
-          path: './modules/EF',
-          importDefault: false,
-          originalName: 'A_MODULE_F',
-        },
-      ],
-      ['A_MODULE_G', { path: './modules/G', importDefault: false, originalName: 'G' }],
-    ]);
+    const entry = {
+      exports: new Map([
+        [
+          'A_MODULE_H',
+          {
+            path: './modules/H',
+            importDefault: false,
+            originalName: 'A_MODULE_H',
+          },
+        ],
+        ['A_MODULE_I', { path: './modules/IJ', importDefault: true, originalName: undefined }],
+        ['A_MODULE_J', { path: './modules/IJ', importDefault: false, originalName: 'J' }],
+        ['A_MODULE_A', { path: './modules/A', importDefault: true, originalName: undefined }],
+        ['A_MODULE_B', { path: './modules/B', importDefault: true, originalName: undefined }],
+        ['A_MODULE_C', { path: './modules/C', importDefault: true, originalName: undefined }],
+        [
+          'A_MODULE_D',
+          {
+            path: '@mocks/entry-a/modules/D',
+            importDefault: true,
+            originalName: undefined,
+          },
+        ],
+        [
+          'A_MODULE_E',
+          {
+            path: './modules/EF',
+            importDefault: false,
+            originalName: 'A_MODULE_E',
+          },
+        ],
+        [
+          'A_MODULE_F',
+          {
+            path: './modules/EF',
+            importDefault: false,
+            originalName: 'A_MODULE_F',
+          },
+        ],
+        ['A_MODULE_G', { path: './modules/G', importDefault: false, originalName: 'G' }],
+      ]),
+    } as EntryData;
     const src = new MagicString(input);
     vi.mocked(fs.existsSync).mockImplementation(() => true);
     await ImportAnalyzer.analyzeImportStatement(
       src,
       input,
       getEntries(entryPath),
-      entryExports,
+      entry,
       entryPath,
       0,
       input.length - 1,

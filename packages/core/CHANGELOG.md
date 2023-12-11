@@ -47,8 +47,8 @@
   #### New features
 
   - Added HMR support for the entry points. In previous releases, when editing one of the consumed
-    entry points, you would need to restart the dev server to re-run the plugin analyzis and
-    cleanups of entry points. Editing any entry point will now automatically re-trigger its analyzis
+    entry points, you would need to restart the dev server to re-run the plugin analysis and
+    cleanups of entry points. Editing any entry point will now automatically re-trigger its analysis
     and cleanup, and following served files should be served accordingly.
 
   #### Governance

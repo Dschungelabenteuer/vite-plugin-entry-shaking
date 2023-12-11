@@ -10,7 +10,7 @@ import { name } from '../package.json';
  *
  * In versions <= 0.3.2, such a scenario would result in `Utils` only exposing
  * `A` and `B` because the served module would be the one that was proceeded
- * (and cleaned up) in the early entry analyzis stage.
+ * (and cleaned up) in the early entry analysis stage.
  *
  * Despite this being a weird practice, this could still lead to undesired
  * and hard-to-track issues. Instead, in such scenarios, we should serve

@@ -15,6 +15,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.0",
     "@yungezeit/eslint-config-vue": "^0.0.13",
+    "sass": "^1.69.5",
     "typescript": "^5.2.2",
     "vite": "^4.5.0",
     "vite-plugin-entry-shaking": "workspace:*",

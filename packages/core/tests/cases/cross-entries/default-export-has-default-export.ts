@@ -1,1 +1,1 @@
-export default "Some default export"
+export default "Some default export";

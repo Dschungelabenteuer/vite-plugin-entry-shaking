@@ -23,7 +23,8 @@ const aliasA = _a('a');
 
 const logger = new Logger(createLogger(), false);
 let resolver: ResolveFn;
-let entryA: string; let entryAModuleA: string;
+let entryA: string;
+let entryAModuleA: string;
 let entryB: string;
 
 beforeAll(async () => {
@@ -36,6 +37,7 @@ beforeAll(async () => {
 describe('requiresTransform', () => {
   const defaultOptions: FinalPluginOptions = {
     extensions: ['ext'],
+    maxWildcardDepth: 0,
     ignorePatterns: [/node_modules/],
     debug: false,
     targets: [],
@@ -90,14 +92,13 @@ describe('importsTargetEntry', () => {
  */
 
 describe('transformImports', () => {
-
   beforeEach(() => {
     vi.spyOn(ImportAnalyzer, 'analyzeImportStatement');
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
-  })
+  });
 
   /**
    * Creates a one-line import statement and returns some parameters.
@@ -119,7 +120,16 @@ describe('transformImports', () => {
     return { code, imps, exps };
   }
 
-  const getExpectedParams = (code: string, entries: PluginEntries, entry: string) => [expect.anything(), code, entries, entries.get(entry)?.exports, entry, expect.any(Number), expect.any(Number), expect.any(Function)]
+  const getExpectedParams = (code: string, entries: PluginEntries, entry: string) => [
+    expect.anything(),
+    code,
+    entries,
+    entries.get(entry),
+    entry,
+    expect.any(Number),
+    expect.any(Number),
+    expect.any(Function),
+  ];
 
   const MOCK_EMPTY_ENTRY_DATA = createMockEntryData();
 
@@ -164,11 +174,9 @@ describe('transformImports', () => {
     const { code: hCode, imps: hImps, exps: hExps } = createOneLineImport(`{ ${nameH} }`, aliasA);
     const exportsA = new Map([
       [nameA, { path: './modules/A', importDefault: true }],
-      [nameH, { path: './modules/H', importDefault: false }]
+      [nameH, { path: './modules/H', importDefault: false }],
     ]);
-    const entries: PluginEntries = new Map([
-      [entryA, createMockEntryData(exportsA)]
-    ]);
+    const entries: PluginEntries = new Map([[entryA, createMockEntryData(exportsA)]]);
 
     // We won't test output, just function calls, so let's merge in a silly way.
     const code = `${aCode}\n${hCode}`;

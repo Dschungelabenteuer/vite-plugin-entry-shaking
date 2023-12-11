@@ -1,15 +1,17 @@
+import type { ResolvedConfig } from 'vite';
 import { resolve } from 'path';
 import { resolveConfig, createLogger } from 'vite';
 import { init, parse } from 'es-module-lexer';
 import { expect, vi } from 'vitest';
 import dedent from 'ts-dedent';
 
-import type { EntryData, PluginOptions } from '../src/types';
+import type { EntryData, PluginOptions, WildcardExports } from '../src/types';
+import type { Parallel } from '../src/utils';
 import EntryAnalyzer from '../src/analyze-entry';
 import { Logger } from '../src/logger';
 import { extensions } from '../src/options';
 import { transformIfNeeded } from '../src/transform';
-import type { Parallel } from '../src/utils';
+import { Context } from '../src/context';
 import utils from '../src/utils';
 
 /** Case structure. */
@@ -56,6 +58,7 @@ export const STUB_EMPTY_ENTRY_DATA: EntryData = {
   exports: new Map(),
   source: STUB_SOURCE,
   updatedSource: STUB_SOURCE,
+  depth: 0,
 };
 
 /** Stub for Vite's configuration.. */
@@ -78,6 +81,7 @@ export const ALIAS_IMPORT_EXPECTATION = 'should also work when using an alias im
 /** Target remains (this should be the only remaining content in targets). */
 export const targetRemains = dedent(`
   /** Below content should not be removed from the transformed target. */
+  import "@test-modules/sideffect-module";
   import { ConsumedExport } from '@test-modules/consumed-export';
   export const ExportDefinedFromTarget = 'ExportDefinedFromTarget';
   const CodeDefinedFromTarget = \`CodeDefinedFromTarget: \${ConsumedExport}\`;
@@ -118,12 +122,14 @@ export async function runCase(main: string, options: PluginOptions) {
   const logger = new Logger(createLogger(), false);
   const finalOptions: Required<PluginOptions> = {
     ...options,
+    maxWildcardDepth: options.maxWildcardDepth ?? 0,
     ignorePatterns: options.ignorePatterns ?? [],
     debug: false,
     extensions,
   };
 
-  const entries = await EntryAnalyzer.analyzeEntries(options.targets, resolver);
+  const context = await createTestContext(finalOptions);
+  const entries = await EntryAnalyzer.analyzeEntries(context);
   const transformed = await transformIfNeeded(
     MOCK_MAIN_FILE,
     main,
@@ -142,15 +148,21 @@ export async function runCase(main: string, options: PluginOptions) {
  * @param targets Resolved paths to targets.
  * @param input  Input content.
  * @param output Expected output content.
+ * @param options Plugin options.
  */
-export async function testCase(targets: CaseTarget[], input: string, output: string) {
+export async function testCase(
+  targets: CaseTarget[],
+  input: string,
+  output: string,
+  options?: Partial<PluginOptions>,
+) {
   if (!targets.length) throw new Error('Case target is undefined');
 
   vi.spyOn(utils, 'parallelize').mockImplementation(sequentialize);
 
   await init;
   const targetPaths = targets.map(({ path }) => path);
-  const res = await runCase(input, { targets: targetPaths });
+  const res = await runCase(input, { ...(options ?? {}), targets: targetPaths });
   const remainsLength = targetRemains.split('\n').length;
 
   // It should have direct import and not import target.
@@ -162,9 +174,9 @@ export async function testCase(targets: CaseTarget[], input: string, output: str
 
     if (expectedImportRemainsCount !== undefined) {
       // Imports should be kept in entry in case they are used by defining code.
-      // Let's count them (but ignore the one import used in targetRemains).
+      // Let's count them (but ignore both imports used in targetRemains).
       const [imports] = parse(targetContent!);
-      expect(imports.length - 1).toStrictEqual(expectedImportRemainsCount);
+      expect(imports.length - 2).toStrictEqual(expectedImportRemainsCount);
 
       // Target should only contain code it defines.
       const targetContentEnd = lines.slice(remainsLength * -1).join('\n');
@@ -174,14 +186,43 @@ export async function testCase(targets: CaseTarget[], input: string, output: str
 }
 
 /**
+ * Creates a test context.
+ * @param options Plugin options.
+ */
+export async function createTestContext(options: PluginOptions) {
+  const resolver = await getTestResolver();
+
+  const config = {
+    createResolver: () => resolver,
+    logger: createLogger(),
+  } as ResolvedConfig;
+  return new Context(options as Required<PluginOptions>, config);
+}
+
+/**
+ * Creates a test wildcard exports structure.
+ */
+export function createTestWildcardExports(
+  named?: WildcardExports['named'],
+  direct?: WildcardExports['direct'],
+) {
+  return {
+    named: named ?? new Map(),
+    direct: direct ?? [],
+  };
+}
+
+/**
  * Creates a simple entry data object, with the ability
  * to pass an exports map.
+ * @param exports List of exports.
  */
 export function createMockEntryData(exports: EntryData['exports'] = new Map()): EntryData {
   return {
     exports,
     source: STUB_SOURCE,
     updatedSource: STUB_SOURCE,
+    depth: 0,
   };
 }
 

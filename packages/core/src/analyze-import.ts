@@ -4,7 +4,7 @@ import type { ResolveFn } from 'vite';
 import { normalizePath } from 'vite';
 
 import type {
-  EntryExports,
+  EntryData,
   EntryPath,
   ImportInput,
   ImportStatement,
@@ -35,16 +35,18 @@ function getImportedEntryExports(code: string, startPosition: number, endPositio
 
 /**
  * Returns a map of structured information about entities imported from target entry.
- * @param entryExports List of analyzed exports of the target entry.
+ * @param entries _reference_ - Map of parsed entry files.
+ * @param entry Imported entry data.
  * @param entryPath Absolute path to the target entry.
- * @param imports List of named imports.
+ * @param imports List of imports.
  * @param resolver Vite's resolve function.
  *
  * @note Imports are proceeded in parallel, so the output order is not guaranteed.
  * While this does not affect the plugin's behavior, it may affect tests.
  */
 async function getImportsMap(
-  entryExports: EntryExports,
+  entries: PluginEntries,
+  entry: EntryData,
   entryPath: EntryPath,
   imports: string[],
   resolver: ResolveFn,
@@ -53,22 +55,160 @@ async function getImportsMap(
 
   await Utils.parallelize(imports, async (importString) => {
     const { name, alias } = Parsers.parseImportParams(importString);
-    const namedImport = entryExports.get(name);
-    if (namedImport) {
-      const resolvedPath = await resolver(namedImport.path, entryPath);
-      if (resolvedPath) {
-        const { importDefault, originalName } = namedImport;
-        map.set(resolvedPath, [
-          ...(map.get(resolvedPath) ?? []),
-          { name, importDefault, originalName, alias },
-        ]);
-      }
-    } else {
-      map.set(entryPath, [...(map.get(entryPath) ?? []), { name, importDefault: false }]);
-    }
+    const found = await resolveImport(entries, entry, entryPath, map, name, alias, resolver);
+    if (found) return;
+
+    map.set(entryPath, [...(map.get(entryPath) ?? []), { name, importDefault: false }]);
   });
 
   return map;
+}
+
+/**
+ * Resolves an import from an import statement.
+ * @param entries _reference_ - Map of parsed entry files.
+ * @param entry Imported entry data.
+ * @param path Absolute path to the target entry.
+ * @param map _reference_ - Map of imports.
+ * @param name Name of the import.
+ * @param alias Alias of the import.
+ * @param resolver Vite's resolve function.
+ */
+export async function resolveImport(
+  entries: PluginEntries,
+  entry: EntryData,
+  path: EntryPath,
+  map: TargetImports,
+  name: string,
+  alias: string,
+  resolver: ResolveFn,
+) {
+  const namedImport = await findNamedImport(entry, path, map, name, alias, resolver);
+  if (namedImport) return true;
+
+  const namedWildcard = await findNamedWildcard(entries, entry, path, map, name, alias, resolver);
+  if (namedWildcard) return true;
+
+  const out = await findDirectWildcardExports(entries, entry, path, map, name, alias, resolver);
+  return out !== undefined;
+}
+
+/**
+ * Tries to find and register a named import from an import statement.
+ * Returns true if it found the entity.
+ * @param entry Imported entry data.
+ * @param entryPath Absolute path to the target entry.
+ * @param map _reference_ - Map of imports.
+ * @param name Name of the import.
+ * @param alias Alias of the import.
+ * @param resolver Vite's resolve function.
+ */
+export async function findNamedImport(
+  entry: EntryData,
+  entryPath: EntryPath,
+  map: TargetImports,
+  name: string,
+  alias: string,
+  resolver: ResolveFn,
+) {
+  const namedImport = entry.exports.get(name);
+  if (namedImport) {
+    const resolvedPath = await resolver(namedImport.path, entryPath);
+    if (resolvedPath) {
+      const { importDefault, originalName } = namedImport;
+      map.set(resolvedPath, [
+        ...(map.get(resolvedPath) ?? []),
+        { name, importDefault, originalName, alias },
+      ]);
+    }
+    return namedImport;
+  }
+}
+
+/**
+ * Tries to find and register an entity that was wildcard-imported and
+ * re-exported using an alias (`import/export * as Something from '…'`).
+ * Returns true if it found the entity.
+ * @param entries _reference_ - Map of parsed entry files.
+ * @param entry Imported entry data.
+ * @param entryPath Absolute path to the target entry.
+ * @param map _reference_ - Map of imports.
+ * @param name Name of the import.
+ * @param alias Alias of the import.
+ * @param resolver Vite's resolve function.
+ */
+export async function findNamedWildcard(
+  entries: PluginEntries,
+  entry: EntryData,
+  entryPath: EntryPath,
+  map: TargetImports,
+  name: string,
+  alias: string,
+  resolver: ResolveFn,
+) {
+  const wildcardImport = entry.wildcardExports?.named.get(name);
+  if (wildcardImport) {
+    const resolvedPath = await resolver(wildcardImport, entryPath);
+    const resolvedEntry = resolvedPath ? entries.get(resolvedPath) : undefined;
+    if (resolvedPath && resolvedEntry) {
+      map.set(resolvedPath, [
+        ...(map.get(resolvedPath) ?? []),
+        { name: '*', importDefault: true, alias: name },
+      ]);
+      return true;
+    }
+  }
+}
+
+/**
+ * Tries to find and register an entity that was directly wildcard-exported (`export * from '…`).
+ * Returns true if it found the entity.
+ * @param entries _reference_ - Map of parsed entry files.
+ * @param entry Imported entry data.
+ * @param entryPath Absolute path to the target entry.
+ * @param map _reference_ - Map of imports.
+ * @param name Name of the import.
+ * @param alias Alias of the import.
+ * @param resolver Vite's resolve function.
+ */
+export async function findDirectWildcardExports(
+  entries: PluginEntries,
+  entry: EntryData,
+  entryPath: EntryPath,
+  map: TargetImports,
+  name: string,
+  alias: string,
+  resolver: ResolveFn,
+) {
+  const wildcardExports = entry.wildcardExports?.direct ?? [];
+  for (const wildcardExportPath of wildcardExports) {
+    const resolvedPath = await resolver(wildcardExportPath, entryPath);
+    const resolvedEntry = resolvedPath ? entries.get(resolvedPath) : undefined;
+    const resolvedExport = resolvedEntry ? resolvedEntry.exports.get(name) : undefined;
+    if (resolvedPath) {
+      if (resolvedExport) {
+        map.set(resolvedPath, [
+          ...(map.get(resolvedPath) ?? []),
+          { name, ...resolvedExport, alias },
+        ]);
+        return resolvedExport;
+      }
+
+      if (resolvedEntry && resolvedEntry.wildcardExports) {
+        const found = await resolveImport(
+          entries,
+          resolvedEntry,
+          resolvedPath,
+          map,
+          name,
+          alias,
+          resolver,
+        );
+
+        if (found) return true;
+      }
+    }
+  }
 }
 
 /**
@@ -151,8 +291,16 @@ const resolveImportedCircularEntities = async (
 ) => {
   const entityMap = new Map<string, string[]>();
   const originalEntry = entries.get(path)!;
+  const wildcardImports: ImportStatement[] = [];
+
   for (const entity of imported) {
-    const { originalName, alias } = entity;
+    const { originalName, alias, name, importDefault } = entity;
+
+    if (importDefault && name === '*') {
+      wildcardImports.push(`import * as ${alias} from '${path}'`);
+      continue;
+    }
+
     if (originalName && originalEntry.exports.has(originalName)) {
       const originalImport = originalEntry.exports.get(originalName)!;
       const resolvedPath = await resolver(originalImport.path, path);
@@ -169,9 +317,11 @@ const resolveImportedCircularEntities = async (
   }
 
   const imports = [...entityMap.entries()];
-  return imports.map(
+  const formattedImports = imports.map(
     ([p, ents]) => `import { ${ents.join(', ')} } from '${p}'`,
   ) as ImportStatement[];
+
+  return [...formattedImports, ...wildcardImports];
 };
 
 /**
@@ -179,7 +329,7 @@ const resolveImportedCircularEntities = async (
  * @param src MagicString instance to prepare transforms.
  * @param code Source code of the file.
  * @param entries _reference_ - Map of parsed entry files.
- * @param entryExports List of analyzed exports of the target file.
+ * @param entry Imported entry data.
  * @param entryPath Absolute path to the target entry.
  * @param startPosition Start position of the import statement.
  * @param endPosition End position of the import statement.
@@ -189,7 +339,7 @@ const analyzeImportStatement = async (
   src: MagicString,
   code: string,
   entries: PluginEntries,
-  entryExports: EntryExports,
+  entry: EntryData,
   entryPath: EntryPath,
   startPosition: number,
   endPosition: number,
@@ -199,8 +349,7 @@ const analyzeImportStatement = async (
   if (isWildCardImport) return;
 
   const imports = methods.getImportedEntryExports(code, startPosition, endPosition);
-
-  const imported = await methods.getImportsMap(entryExports, entryPath, imports, resolver);
+  const imported = await methods.getImportsMap(entries, entry, entryPath, imports, resolver);
   const replacement = await methods.getImportReplacements(imported, entryPath, entries, resolver);
   src.overwrite(startPosition, endPosition + 1, `${replacement.join(';\n')};`);
 };

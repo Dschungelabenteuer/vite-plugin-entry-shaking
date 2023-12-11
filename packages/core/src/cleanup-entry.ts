@@ -39,7 +39,8 @@ const removeResolvedExports = (
   const output = new MagicString(rawEntry);
   const replace = new Set<ReplacementData>([]);
   exports.forEach(({ n: exportedName, s: lineStart, e: lineEnd }) => {
-    if (entryMap.has(exportedName) && exportedName !== 'default') {
+    const exported = entryMap.get(exportedName);
+    if (exported && !exported.selfDefined && exportedName !== 'default') {
       replace.add([lineStart, lineEnd, '']);
     }
   });

@@ -16,5 +16,6 @@ export const mergeOptions = (userOptions: PluginOptions): FinalPluginOptions => 
   ignorePatterns: [...ignorePatterns, ...(userOptions.ignorePatterns ?? [])],
   debug: false,
   ...userOptions,
+  maxWildcardDepth: userOptions.maxWildcardDepth ?? 0,
   targets: userOptions.targets.map(normalizePath),
 });

@@ -31,7 +31,7 @@ import {
   testWithDefaultDirectReexport,
   testWithDefaultImportReexport,
   testWithDestructuredDefaultImport,
-} from '../default-export/setup'
+} from '../default-export/setup';
 
 const casePath = '@test-cases/cross-entries';
 
@@ -76,10 +76,10 @@ export function testCrossEntriesImportsExports() {
 
     describe('default export', async () => {
       const baseCasePath = `${casePath}/default-export`;
-      testHasDefaultExport(await createCaseTarget(`${baseCasePath}-has-default-export`))
-      testWithDefaultDirectReexport(await createCaseTarget(`${baseCasePath}-with-default-direct-reexport`))
-      testWithDefaultImportReexport(await createCaseTarget(`${baseCasePath}-with-default-import-reexport`))
-      testWithDestructuredDefaultImport(await createCaseTarget(`${baseCasePath}-with-destructured-default-import`))
+      testHasDefaultExport(await createCaseTarget(`${baseCasePath}-has-default-export`));
+      testWithDefaultDirectReexport(await createCaseTarget(`${baseCasePath}-with-default-direct-reexport`));
+      testWithDefaultImportReexport(await createCaseTarget(`${baseCasePath}-with-default-import-reexport`));
+      testWithDestructuredDefaultImport(await createCaseTarget(`${baseCasePath}-with-destructured-default-import`));
     })
   });
 }

@@ -1,6 +1,5 @@
-import { NamedExportOne, NamedExportTwo } from '@test-modules/named-exports';
-export { NamedExportOne, NamedExportTwo as AliasedNamedExportTwo };
-export { NamedExportOne as NamedExportOneDupe, NamedExportTwo as NamedExportTwoDupe } from '@test-modules/named-exports';
+import * as NamedExports from '@test-modules/named-exports';
+export { NamedExports };
 
 /** Below content should not be removed from the transformed target. */
 import "@test-modules/sideffect-module";
