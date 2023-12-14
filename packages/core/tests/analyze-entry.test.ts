@@ -8,11 +8,184 @@ import { createTestContext, createTestWildcardExports, resolveUnitEntry } from '
 
 vi.mock('fs');
 
+describe('analyzeEntries', () => {
+  beforeAll(async () => {
+    vi.restoreAllMocks();
+    const realFs = (await vi.importActual('fs')) as any;
+    vi.mocked(fs.readFileSync).mockImplementation(realFs.readFileSync);
+  });
+
+  it('should correctly analyze entries', async () => {
+    const aPath = await resolveUnitEntry('entry-a');
+    const bPath = await resolveUnitEntry('entry-b');
+    const targets = [aPath, bPath];
+    const ctx = await createTestContext({ targets });
+    ctx.entries = await EntryAnalyzer.analyzeEntries(ctx);
+
+    expect(ctx.entries.size).toStrictEqual(2);
+    expect(ctx.entries.has(aPath)).toStrictEqual(true);
+    expect(ctx.entries.has(bPath)).toStrictEqual(true);
+  });
+});
+
+describe('analyzeEntry', () => {
+  const path = '@entry/path';
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementation(() => Promise.resolve());
+  });
+
+  it('should directly return void if entry was already parsed', async () => {
+    const ctx = await createTestContext({ targets: [path] });
+    ctx.entries = new Map([[path, {}]]) as any;
+    await EntryAnalyzer.analyzeEntry(ctx, path, 0);
+    expect(EntryAnalyzer.doAnalyzeEntry).not.toHaveBeenCalled();
+  });
+
+  it('should call doAnalyzeEntry if entry was not already parsed', async () => {
+    const ctx = await createTestContext({ targets: [path] });
+    ctx.entries = new Map([]) as any;
+    await EntryAnalyzer.analyzeEntry(ctx, path, 0);
+    expect(EntryAnalyzer.doAnalyzeEntry).toHaveBeenCalledWith(ctx, path, 0);
+  });
+
+  it('should throw error if anything went wrong while analyzing entry file', async () => {
+    const ctx = await createTestContext({ targets: [path] });
+    ctx.entries = new Map([]) as any;
+    vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementationOnce(() => Promise.reject());
+    expect(async () => {
+      await EntryAnalyzer.analyzeEntry(ctx, path, 0);
+    }).rejects.toThrowError();
+  });
+});
+
+describe('doAnalyzeEntry', () => {
+  beforeAll(() => {
+    vi.restoreAllMocks();
+  });
+
+  const run = async (entrySource: string) => {
+    const entries: PluginEntries = new Map([]);
+    const targetPath = '@entry/path';
+    const entryPath = '/path/to/entry';
+    const ctx = await createTestContext({ targets: [targetPath] });
+    ctx.entries = entries;
+    vi.mocked(fs.readFileSync).mockReturnValueOnce(entrySource);
+
+    await EntryAnalyzer.doAnalyzeEntry(ctx, targetPath, 0);
+
+    return { entries, targetPath, entryPath };
+  };
+
+  it('should feed the `entries` map even though it does not export anything', async () => {
+    const output = await run(``);
+    expect(output.entries.size).toStrictEqual(1);
+  });
+
+  it('should feed the `entries` map with simple import/exports', async () => {
+    const output = await run(
+      dedent(`
+      import User from '@models/User';
+      import { Group } from '@models/Group';
+      import Article from '../models/Article';
+
+      export { Article };
+      export { User, Group };
+    `),
+    );
+    expect(output.entries.size).toStrictEqual(1);
+    expect(output.entries.get(output.targetPath)?.exports.get('User')).toMatchObject({
+      path: '@models/User',
+      importDefault: true,
+    });
+    expect(output.entries.get(output.targetPath)?.exports.get('Group')).toMatchObject({
+      path: '@models/Group',
+      importDefault: false,
+    });
+    expect(output.entries.get(output.targetPath)?.exports.get('Article')).toMatchObject({
+      path: '../models/Article',
+      importDefault: true,
+    });
+  });
+
+  it('should feed the `entries` map with renamed import/exports', async () => {
+    const output = await run(
+      dedent(`
+      import { User as MyUser } from '@models/User';
+
+      export { MyUser };
+    `),
+    );
+    expect(output.entries.size).toStrictEqual(1);
+    expect(output.entries.get(output.targetPath)?.exports.has('User')).toStrictEqual(false);
+  });
+
+  it('should feed the `entries` map with aggregated exports', async () => {
+    const output = await run(
+      dedent(`
+      export { User, UserId } from '@models/User';
+      export { Group } from '../models/Group';
+    `),
+    );
+    expect(output.entries.size).toStrictEqual(1);
+    expect(output.entries.get(output.targetPath)?.exports.get('UserId')).toMatchObject({
+      path: '@models/User',
+      importDefault: false,
+    });
+    expect(output.entries.get(output.targetPath)?.exports.get('User')).toMatchObject({
+      path: '@models/User',
+      importDefault: false,
+    });
+    expect(output.entries.get(output.targetPath)?.exports.get('Group')).toMatchObject({
+      path: '../models/Group',
+      importDefault: false,
+    });
+  });
+
+  it('should ignore exports which are not direct re-exports of imports', async () => {
+    const output = await run(
+      dedent(`
+      import { User, UserName, UserId } from '@models/User';
+      import Group from '../models/Group';
+      export { User, UserName };
+      export { Test } from '../models/Test';
+      export let TestValue = 'value';
+      export const MyGroup = Group;
+      export function TestFunction() {
+        return User;
+      };
+    `),
+    );
+    const resolvedEntry = output.entries.get(output.targetPath);
+
+    expect(output.entries.size).toStrictEqual(1);
+    expect(resolvedEntry?.exports.get('User')).toMatchObject({
+      path: '@models/User',
+      importDefault: false,
+    });
+    expect(resolvedEntry?.exports.get('UserName')).toMatchObject({
+      path: '@models/User',
+      importDefault: false,
+    });
+
+    expect(resolvedEntry?.exports.has('UserId')).toStrictEqual(false);
+    expect(resolvedEntry?.exports.has('Group')).toStrictEqual(false);
+    expect(resolvedEntry?.exports.get('TestValue')?.selfDefined).toStrictEqual(true);
+    expect(resolvedEntry?.exports.get('MyGroup')?.selfDefined).toStrictEqual(true);
+    expect(resolvedEntry?.exports.get('TestFunction')?.selfDefined).toStrictEqual(true);
+  });
+});
+
 describe('analyzeEntryImport', async () => {
   const path = '@any/path';
   const entryPath = '/path/to/entry';
   const ctx = await createTestContext({ targets: [entryPath] });
   const wildcardImports = createTestWildcardExports();
+
+  beforeAll(() => {
+    vi.restoreAllMocks();
+  });
 
   const run = (input: string) => {
     const analyzedImports: EntryImports = new Map([]);
@@ -162,86 +335,12 @@ describe('analyzeEntryImport', async () => {
   });
 });
 
-describe('registerWildcardImportIfNeeded', () => {
-  beforeEach(() => {
-    vi.restoreAllMocks();
-    vi.spyOn(EntryAnalyzer, 'registerWildcardImport');
-  });
-
-  describe('if wildcard-imported is another target entry', () => {
-    const entryOnePath = '/path/to/entry';
-    const otherTargetEntryPath = '/path/to/other';
-
-    it('should call `registerWildcardImport` even if `maxWildcardDepth` was not set', async () => {
-      const ctx = await createTestContext({ targets: [entryOnePath, otherTargetEntryPath] });
-      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, otherTargetEntryPath, entryOnePath, 0);
-      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
-      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
-        ctx,
-        otherTargetEntryPath,
-        entryOnePath,
-        1,
-      );
-    });
-
-    it('should call `registerWildcardImport` even if `maxWildcardDepth` was reached', async () => {
-      const ctx = await createTestContext({
-        targets: [entryOnePath, otherTargetEntryPath],
-        maxWildcardDepth: 2,
-      });
-      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, otherTargetEntryPath, entryOnePath, 3);
-      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
-      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
-        ctx,
-        otherTargetEntryPath,
-        entryOnePath,
-        4,
-      );
-    });
-  });
-
-  describe('if wildcard-imported is not another target entry', () => {
-    const entryOnePath = '/path/to/entry';
-    const wildcardExportedPath = '/path/to/wildcard';
-
-    it('should not call `registerWildcardImport` if `maxWildcardDepth` was not set', async () => {
-      const ctx = await createTestContext({ targets: [entryOnePath] });
-      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, wildcardExportedPath, entryOnePath, 0);
-      expect(EntryAnalyzer.registerWildcardImport).not.toHaveBeenCalled();
-    });
-
-    it('should not call `registerWildcardImport` if `maxWildcardDepth` was reached', async () => {
-      const ctx = await createTestContext({ targets: [entryOnePath], maxWildcardDepth: 2 });
-      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, wildcardExportedPath, entryOnePath, 3);
-      expect(EntryAnalyzer.registerWildcardImport).not.toHaveBeenCalled();
-    });
-
-    it('should call `registerWildcardImport` if `maxWildcardDepth` was not reached', async () => {
-      const ctx = await createTestContext({ targets: [entryOnePath], maxWildcardDepth: 2 });
-      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, wildcardExportedPath, entryOnePath, 1);
-      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
-      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
-        ctx,
-        wildcardExportedPath,
-        entryOnePath,
-        2,
-      );
-    });
-  });
-});
-
-describe('registerWildcardImport', () => {
-  it('should not register wildcard-imported module as a target if it is already a target', () => {
-    // It should still register it as… well… a wildcard import.
-  });
-
-  it('should register wildcard-imported module as a target if it is already a target', () => {
-    // It should still register it as… well… a wildcard import.
-  });
-});
-
 describe('analyzeEntryExport', () => {
   const entryPath = '@mocks/entry-a';
+
+  beforeAll(() => {
+    vi.restoreAllMocks();
+  });
 
   it('should correctly feed the `entryMap` when the export relies on a named import statement', () => {
     const path = `@any/path`;
@@ -308,166 +407,114 @@ describe('analyzeEntryExport', () => {
   });
 });
 
-describe('doAnalyzeEntry', () => {
-  const run = async (entrySource: string) => {
-    const entries: PluginEntries = new Map([]);
-    const targetPath = '@entry/path';
-    const entryPath = '/path/to/entry';
-    const ctx = await createTestContext({ targets: [targetPath] });
-    ctx.entries = entries;
-    vi.mocked(fs.readFileSync).mockReturnValueOnce(entrySource);
-
-    await EntryAnalyzer.doAnalyzeEntry(ctx, targetPath, 0);
-
-    return { entries, targetPath, entryPath };
-  };
-
-  it('should feed the `entries` map even though it does not export anything', async () => {
-    const output = await run(``);
-    expect(output.entries.size).toStrictEqual(1);
+describe('registerWildcardImportIfNeeded', () => {
+  beforeAll(() => {
+    vi.restoreAllMocks();
   });
-
-  it('should feed the `entries` map with simple import/exports', async () => {
-    const output = await run(
-      dedent(`
-      import User from '@models/User';
-      import { Group } from '@models/Group';
-      import Article from '../models/Article';
-
-      export { Article };
-      export { User, Group };
-    `),
-    );
-    expect(output.entries.size).toStrictEqual(1);
-    expect(output.entries.get(output.targetPath)?.exports.get('User')).toMatchObject({
-      path: '@models/User',
-      importDefault: true,
-    });
-    expect(output.entries.get(output.targetPath)?.exports.get('Group')).toMatchObject({
-      path: '@models/Group',
-      importDefault: false,
-    });
-    expect(output.entries.get(output.targetPath)?.exports.get('Article')).toMatchObject({
-      path: '../models/Article',
-      importDefault: true,
-    });
-  });
-
-  it('should feed the `entries` map with renamed import/exports', async () => {
-    const output = await run(
-      dedent(`
-      import { User as MyUser } from '@models/User';
-
-      export { MyUser };
-    `),
-    );
-    expect(output.entries.size).toStrictEqual(1);
-    expect(output.entries.get(output.targetPath)?.exports.has('User')).toStrictEqual(false);
-  });
-
-  it('should feed the `entries` map with aggregated exports', async () => {
-    const output = await run(
-      dedent(`
-      export { User, UserId } from '@models/User';
-      export { Group } from '../models/Group';
-    `),
-    );
-    expect(output.entries.size).toStrictEqual(1);
-    expect(output.entries.get(output.targetPath)?.exports.get('UserId')).toMatchObject({
-      path: '@models/User',
-      importDefault: false,
-    });
-    expect(output.entries.get(output.targetPath)?.exports.get('User')).toMatchObject({
-      path: '@models/User',
-      importDefault: false,
-    });
-    expect(output.entries.get(output.targetPath)?.exports.get('Group')).toMatchObject({
-      path: '../models/Group',
-      importDefault: false,
-    });
-  });
-
-  it('should ignore exports which are not direct re-exports of imports', async () => {
-    const output = await run(
-      dedent(`
-      import { User, UserName, UserId } from '@models/User';
-      import Group from '../models/Group';
-      export { User, UserName };
-      export { Test } from '../models/Test';
-      export let TestValue = 'value';
-      export const MyGroup = Group;
-      export function TestFunction() {
-        return User;
-      };
-    `),
-    );
-    const resolvedEntry = output.entries.get(output.targetPath);
-
-    expect(output.entries.size).toStrictEqual(1);
-    expect(resolvedEntry?.exports.get('User')).toMatchObject({
-      path: '@models/User',
-      importDefault: false,
-    });
-    expect(resolvedEntry?.exports.get('UserName')).toMatchObject({
-      path: '@models/User',
-      importDefault: false,
-    });
-
-    expect(resolvedEntry?.exports.has('UserId')).toStrictEqual(false);
-    expect(resolvedEntry?.exports.has('Group')).toStrictEqual(false);
-    expect(resolvedEntry?.exports.get('TestValue')?.selfDefined).toStrictEqual(true);
-    expect(resolvedEntry?.exports.get('MyGroup')?.selfDefined).toStrictEqual(true);
-    expect(resolvedEntry?.exports.get('TestFunction')?.selfDefined).toStrictEqual(true);
-  });
-});
-
-describe('analyzeEntry', () => {
-  const path = '@entry/path';
 
   beforeEach(() => {
-    vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementation(() => Promise.resolve());
+    vi.spyOn(EntryAnalyzer, 'registerWildcardImport');
   });
 
-  it('should directly return void if entry was already parsed', async () => {
-    const ctx = await createTestContext({ targets: [path] });
-    ctx.entries = new Map([[path, {}]]) as any;
-    await EntryAnalyzer.analyzeEntry(ctx, path, 0);
-    expect(EntryAnalyzer.doAnalyzeEntry).not.toHaveBeenCalled();
+  describe('if wildcard-imported is another target entry', () => {
+    const entryOnePath = '/path/to/entry';
+    const otherTargetEntryPath = '/path/to/other';
+
+    it('should call `registerWildcardImport` even if `maxWildcardDepth` was not set', async () => {
+      const ctx = await createTestContext({ targets: [entryOnePath, otherTargetEntryPath] });
+      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, otherTargetEntryPath, entryOnePath, 0);
+      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
+      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
+        ctx,
+        otherTargetEntryPath,
+        entryOnePath,
+        1,
+      );
+    });
+
+    it('should call `registerWildcardImport` even if `maxWildcardDepth` was reached', async () => {
+      const targets = [entryOnePath, otherTargetEntryPath];
+      const ctx = await createTestContext({ targets, maxWildcardDepth: 2 });
+      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, otherTargetEntryPath, entryOnePath, 3);
+      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
+      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
+        ctx,
+        otherTargetEntryPath,
+        entryOnePath,
+        4,
+      );
+    });
   });
 
-  it('should call doAnalyzeEntry if entry was not already parsed', async () => {
-    const ctx = await createTestContext({ targets: [path] });
-    ctx.entries = new Map([]) as any;
-    await EntryAnalyzer.analyzeEntry(ctx, path, 0);
-    expect(EntryAnalyzer.doAnalyzeEntry).toHaveBeenCalledWith(ctx, path, 0);
-  });
+  describe('if wildcard-imported is not another target entry', () => {
+    const entryOnePath = '/path/to/entry';
+    const wildcardExportedPath = '/path/to/wildcard';
 
-  it('should throw error if anything went wrong while analyzing entry file', async () => {
-    const ctx = await createTestContext({ targets: [path] });
-    ctx.entries = new Map([]) as any;
-    vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementationOnce(() => Promise.reject());
-    expect(async () => {
-      await EntryAnalyzer.analyzeEntry(ctx, path, 0);
-    }).rejects.toThrowError();
+    it('should not call `registerWildcardImport` if `maxWildcardDepth` was not set', async () => {
+      const ctx = await createTestContext({ targets: [entryOnePath] });
+      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, wildcardExportedPath, entryOnePath, 0);
+      expect(EntryAnalyzer.registerWildcardImport).not.toHaveBeenCalled();
+    });
+
+    it('should not call `registerWildcardImport` if `maxWildcardDepth` was reached', async () => {
+      const ctx = await createTestContext({ targets: [entryOnePath], maxWildcardDepth: 2 });
+      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, wildcardExportedPath, entryOnePath, 3);
+      expect(EntryAnalyzer.registerWildcardImport).not.toHaveBeenCalled();
+    });
+
+    it('should call `registerWildcardImport` if `maxWildcardDepth` was not reached', async () => {
+      const ctx = await createTestContext({ targets: [entryOnePath], maxWildcardDepth: 2 });
+      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, wildcardExportedPath, entryOnePath, 1);
+      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
+      expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
+        ctx,
+        wildcardExportedPath,
+        entryOnePath,
+        2,
+      );
+    });
   });
 });
 
-describe('analyzeEntries', () => {
+describe('registerWildcardImport', () => {
   beforeAll(async () => {
     vi.restoreAllMocks();
     const realFs = (await vi.importActual('fs')) as any;
     vi.mocked(fs.readFileSync).mockImplementation(realFs.readFileSync);
   });
 
-  it('should correctly analyze entries', async () => {
+  it('should not register wildcard-imported module as a target if it could not be resolved', async () => {
+    vi.spyOn(EntryAnalyzer, 'analyzeEntry');
+    const aPath = await resolveUnitEntry('entry-a');
+    const ctx = await createTestContext({ targets: [aPath], maxWildcardDepth: 2 });
+
+    await EntryAnalyzer.registerWildcardImport(ctx, '/path/to/the-void', aPath, 0);
+
+    expect(ctx.targets.size).toStrictEqual(1);
+    expect(EntryAnalyzer.analyzeEntry).not.toHaveBeenCalled();
+  });
+
+  it('should not register wildcard-imported module as a target if it is already a target', async () => {
+    vi.spyOn(EntryAnalyzer, 'analyzeEntry');
     const aPath = await resolveUnitEntry('entry-a');
     const bPath = await resolveUnitEntry('entry-b');
-    const targets = [aPath, bPath];
-    const ctx = await createTestContext({ targets });
-    ctx.entries = await EntryAnalyzer.analyzeEntries(ctx);
+    const ctx = await createTestContext({ targets: [aPath, bPath], maxWildcardDepth: 2 });
 
-    expect(ctx.entries.size).toStrictEqual(2);
-    expect(ctx.entries.has(aPath)).toStrictEqual(true);
-    expect(ctx.entries.has(bPath)).toStrictEqual(true);
+    await EntryAnalyzer.registerWildcardImport(ctx, bPath, aPath, 0);
+
+    expect(ctx.targets.size).toStrictEqual(2);
+    expect(EntryAnalyzer.analyzeEntry).not.toHaveBeenCalled();
+  });
+
+  it('should register wildcard-imported module as a target if it is NOT already a target', async () => {
+    vi.spyOn(EntryAnalyzer, 'analyzeEntry');
+    const aPath = await resolveUnitEntry('entry-a');
+    const t = await resolveUnitEntry('entry-a/modules/A');
+    const ctx = await createTestContext({ targets: [aPath], maxWildcardDepth: 2 });
+
+    await EntryAnalyzer.registerWildcardImport(ctx, './modules/A', aPath, 0);
+
+    expect(ctx.targets.size).toStrictEqual(2);
+    expect(EntryAnalyzer.analyzeEntry).toHaveBeenCalledWith(ctx, t, 0);
   });
 });

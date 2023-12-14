@@ -1,5 +1,5 @@
 import type { ResolveFn, ResolvedConfig } from 'vite';
-import type { CaughtWildcards, ExtendedTargets, PluginEntries, PluginOptions } from './types';
+import type { ExtendedTargets, PluginEntries, PluginOptions } from './types';
 import { Logger } from './logger';
 
 import EntryAnalyzer from './analyze-entry';
@@ -8,13 +8,10 @@ import { transformIfNeeded } from './transform';
 
 /** Plugin's context. */
 export class Context {
-  /** Registered entry files. */
+  /** Map of analyzed entries. */
   public entries: PluginEntries = new Map();
 
-  /** Caught wildcard imports to be proceeded.  */
-  public wildcards: CaughtWildcards = new Map();
-
-  /** Registered targets. */
+  /** Map of registered targets. */
   public targets: ExtendedTargets = new Map();
 
   /** Vite resolver. */
@@ -52,14 +49,7 @@ export class Context {
   }
 
   public async transformFile(code: string, id: string) {
-    return await transformIfNeeded(
-      id,
-      code,
-      this.entries,
-      this.options,
-      this.resolver,
-      this.logger,
-    );
+    return await transformIfNeeded(this, id, code);
   }
 
   public async updateFile(id: string) {

@@ -27,13 +27,14 @@ async function analyzeEntries(ctx: Context) {
  * Analyzes an entry file if it was not analyzed before.
  * @see `doAnalyzeEntry`
  * @param ctx _reference_ Plugin's entry analysis context.
- * @param entryPath Absolute path of the entry point.
+ * @param entryPath Absolute path of the entry file.
  * @param depth Static analysis' context depth.
  */
 async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number) {
   if (ctx.entries.has(entryPath)) return;
 
-  await methods.doAnalyzeEntry(ctx, entryPath, depth).catch(() => {
+  await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e) => {
+    console.error(e);
     throw new Error(`Could not analyze entry file "${entryPath}"`);
   });
 }
@@ -44,7 +45,7 @@ async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number) {
  * case it still needs to be served (e.g. through unsupported syntaxes
  * or when importing code the entry actually owns).
  * @param ctx _reference_ Plugin's entry analysis context.
- * @param entryPath Absolute path of the entry point.
+ * @param entryPath Absolute path of the entry file.
  * @param depth Static analysis' context depth.
  */
 async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number) {
@@ -94,9 +95,7 @@ async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number)
 }
 
 /**
- * Analyzes a single import statement made from an entry point.
- * This is required because we need to store their paths to
- * later remap named exports that rely on import statements.
+ * Analyzes a single import statement made from an entry.
  * @param ctx Plugin's entry analysis context.
  * @param rawEntry Source code of the entry file.
  * @param wildcardExports _reference_ - aught wildcard exports.
@@ -146,7 +145,7 @@ async function analyzeEntryImport(
 }
 
 /**
- * Analyzes a single export statement made from an entry point.
+ * Analyzes a single export statement made from an entry.
  * This maps named exports to their origin paths so that we
  * can later rewrite any import statement of the entry file
  * with individual import statements to mimic tree-shaking behaviour.
@@ -185,7 +184,7 @@ function analyzeEntryExport(
 
 /**
  * If the wildcard-imported module is not a target entry and the max depth
- * was not exceeded, registers it so that we can analyze it as an implicit
+ * was not reached, registers it so that we can analyze it as an implicit
  * target to later resolve its exports.
  * @see `registerWildcardImport`
  * @param ctx Plugin's entry analysis context.
@@ -206,8 +205,8 @@ async function registerWildcardImportIfNeeded(
 }
 
 /**
- * Registers a wildcard import/export encountered while analyzing a target.
- * Those are analyzed as implicit targets.
+ * Registers a wildcard import/export encountered while analyzing an entry.
+ * Those are added as implicit targets and analyzed like entries.
  * @param ctx Plugin's entry analysis context.
  * @param path Path to the wildcard-imported module.
  * @param importedFrom Path the wildcard-imported module was imported from.
@@ -220,13 +219,9 @@ async function registerWildcardImport(
   depth: number,
 ) {
   const resolvedPath = await ctx.resolver(path, importedFrom);
-  if (!resolvedPath) return;
-  const registered = ctx.wildcards.get(resolvedPath) ?? [];
-  if (!ctx.targets.has(resolvedPath)) {
-    ctx.targets.set(resolvedPath, depth);
-    await methods.analyzeEntry(ctx, resolvedPath, depth);
-  }
-  ctx.wildcards.set(resolvedPath, [...registered, { importedFrom, depth }]);
+  if (!resolvedPath || ctx.targets.has(resolvedPath)) return;
+  ctx.targets.set(resolvedPath, depth);
+  await methods.analyzeEntry(ctx, resolvedPath, depth);
 }
 
 const methods = {

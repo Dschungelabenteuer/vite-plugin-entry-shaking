@@ -29,19 +29,8 @@ export interface EntryData {
   depth: number;
 }
 
-/** Target entry map. */
+/** Map of analyzed entries indexed by their absolute path. */
 export type PluginEntries = Map<EntryPath, EntryData>;
-
-/** Caught wildcards map. */
-export type CaughtWildcards = Map<string, CaughtWildcard[]>;
-
-/** Caught wildcard import structure. */
-export type CaughtWildcard = {
-  /** Static analysis-wise depth at which the wildcard import occured. */
-  depth: number;
-  /** Path the wildcard-imported module was imported from. */
-  importedFrom: string;
-};
 
 /** Named import. */
 export type ImportName = string;

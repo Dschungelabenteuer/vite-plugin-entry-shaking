@@ -21,22 +21,96 @@ both `handleHotUpdate` and `configureServer` as they're not relevant at first. T
 pretty straight-forward and should be quite understandable by just reading it. It basically does
 only two things:
 
-1. First analyzes entries set through the `targets` option.
+1. First analyzes entries set in the `targets` option.
 2. Then transforms served files accordingly.
+
+The whole plugin logic is driven by a plugin `Context` class that stores and shares the following
+properties:
+
+| **Property** | **Type**          | **Description**             |
+| ------------ | ----------------- | --------------------------- |
+| `entries`    | `PluginEntries`   | Map of analyzed entry files |
+| `targets`    | `ExtendedTargets` | Map of registered targets   |
+| `resolver`   | `ResolveFn`       | Vite's resolver             |
+| `logger`     | `Logger`          | Plugin's Logger             |
+
+Here is an overview of the main files it uses:
+
+<table>
+  <thead>
+    <tr><th colspan="2">Plugin logic</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>index.ts</code></td>
+      <td><code>options.ts</code></td>
+    </tr>
+    <tr>
+      <td><code>context.ts</code></td>
+      <td><code>logger.ts</code></td>
+    </tr>
+  </tbody>
+  <thead>
+    <tr>
+      <th>Analyzing entries</th>
+      <th>Transforming files</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>analyze-entry.ts</code></td>
+      <td><code>cleanup-entry.ts</code></td>
+    </tr>
+    <tr>
+      <td><code>transform.ts</code></td>
+      <td><code>analyze-import.ts</code></td>
+    </tr>
+  </tbody>
+  <thead>
+      <tr><th colspan="2">Utilities</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>parse.ts</code></td>
+      <td><code>serializer.ts</code></td>
+    </tr>
+    <tr>
+      <td><code>urls.ts</code></td>
+      <td><code>utils.ts</code></td>
+    </tr>
+  </tbody>
+  <thead>
+    <tr><th colspan="2">Types</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="2"><code>types.ts</code></td>
+    </tr>
+  </tbody>
+</table>
+
+> **Note:** You may encounter both "targets" and "entries" terms used interchangeably across the
+> codebase, issues or documentation. They basically mean the same thing, but I would usually
+> consider "target" as a path and "entry" as a file _(do not trust me though, I use them
+> inconsistently myself)_.
 
 ### 1. Analyzing entries
 
 Once Vite's final configuration is resolved through the `configResolved` hook, the plugin starts
-analyzing the entries set through the `targets` option. The idea is to collect valuable information
-about every single entity they export. This let us later rewrite "imports from some entry" to
-"imports from entity's actual source".
+analyzing the entries set in the `targets` option. The idea is to collect valuable information about
+every single entity they export. This let us later rewrite "imports from some entry" to "imports
+from entity's actual source".
 
-> **Note:** The `configResolved` hook is async because we don't want Vite to start serving files
-> before the analysis is done. This is why we use `await` here.
+The `configResolved` hook is async because we don't want Vite to start serving files before the
+analysis is done. This is why we `await` the analysis here. This may delay startup time based on the
+amount of targets you've specified.
 
-This analysis is a mandatory step which feeds a map of `EntryData` for each `EntryPath`, where
-`EntryPath` is the absolute path to an entry file and `EntryData` an object of the following
-structure:
+This analysis is a mandatory step which feeds a map of `EntryData` for each `EntryPath`. The
+underlying code is pretty simple and should be intelligible when reading from top to bottom. Let's
+still provide further insight:
+
+- `EntryPath` is the absolute path to an entry file (a target)
+- `EntryData` is an object of the following structure:
 
 ##### `EntryData`
 
@@ -69,27 +143,27 @@ means whenever one imports code defined from an entry file, some module could st
 though they're not actually used (which somehow clashes the purpose of this plugin).
 
 Such pattern (mixing both [facade](https://github.com/guybedford/es-module-lexer#facade-detection)
-and code definition) is not recommended and could be considered bad practice, but should definitely
-be supported and not break anything. Using this plugin probably means one's main motivation is to
-reduce the amount of unnecessary requests. Therefore, by default, warnings are emitted whenever a
-target both imports modules and exposes code it actually defines. Despite the warnings hinting for
-quite an easy (and recommended) code-split, it may be silenced through the `ignoreMixedTarget`
-option.
+and code definition) is not recommended and could be considered a bad practice, but should
+definitely be supported and not break anything. Using this plugin probably means one's main
+motivation is to reduce the amount of unnecessary requests. Therefore, by default, warnings are
+emitted whenever a target both imports modules and exposes code it actually defines. Despite the
+warnings hinting for quite an easy (and recommended) code-split, it may be silenced through the
+`ignoreMixedTarget` option.
 
 #### `wildcardExports`
 
 Entry files may aggregate modules by either:
 
-- directly exporting `* from './some-module'`
+- directly exporting `* from './some-module'` or `* as SomeAlias from './some-module'`
 - importing `* as SomeAlias from './some-module'` and then exporting `SomeAlias`
 
 Such patterns are quite common and may even be the reason why you ended up here in the first place.
 Being able to mimic tree-shaking behaviour on such patterns requires us to also analyze all of
 wildcard-imported modules, which could lead to
 [performance issues](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues/34#issuecomment-1815494589).
-Wildcard imports/exports of targets do not have incidence on performances since targets are analyzed
-anyway so they should work out of the box. However, wildcard-importing a non-target module may
-introduce some bloat. Especially if the module itsself exports wildcard-imported modules, etc.
+Wildcard imports/exports of other entries do not have incidence on performances since these are
+analyzed anyway; they should work out of the box. However, wildcard-importing a non-target module
+may introduce some bloat. Especially if the module itsself exports wildcard-imported modules, etc.
 
 Therefore, by default, this plugin only analyzes and tree-shakes wildcard-imports of modules that
 are defined as targets. However, this may be overidden through the `maxWildcardDepth` option (which
@@ -107,9 +181,9 @@ export * from './child-1';
 export * from './child-2';
 ```
 
-The `child-1` wildcard import occurs in depth `1`, which does not exceed the `maxWildcardDepth`
+The `child-1` wildcard import occurs in depth `0`, which does not exceed the `maxWildcardDepth`
 option, we therefore add `child-1` as an implicit target. `child-1` wildcard-exports `child-2` in
-depth `2`, which exceeds the `maxWildcardDepth` option. We therefore do not do anything, the
+depth `1`, which reaches the `maxWildcardDepth` option. We therefore do not do anything, the
 `child-2` export will remain untouched and won't be tree-shaken.
 
 Wildcard exports are stored for each target as `WildcardExports`, which have the following
@@ -119,6 +193,9 @@ structure:
 | ------------ | --------------------- | ------------------------------------------------------------- |
 | `named`      | `Map<string, string>` | Map of named export to resolved wildcard-imported module path |
 | `direct`     | `string[]`            | Direct wildcard exports' paths                                |
+
+In other words, `named` are for aliased wildcard imports/exports, and `direct` are for direct
+wildcard exports.
 
 #### `exports`
 
@@ -156,19 +233,19 @@ The first step is to retrieve data that were gathered for such targets. This dat
 accessed through the `context.entries` map, where each map key is the absolute path to the relevant
 target.
 
-#### Parse import statement
+#### Analyze import statement
 
 Once we know which target we're dealing with, we need to parse the import statement to get details
 about the imported entities. This could either be:
 
-- a wildcard import (e.g. `import * from './some-module'`)
-- a named import (e.g. `import { Thing } from './some-module'`)
 - a default import (e.g. `import Something from './some-module'`)
-- a mixed import (e.g. `import Something, { Thing } from './some-module'`)
+- named import(s) (e.g. `import { Thing } from './some-module'`)
+- a wildcard import (e.g. `import * from './some-module'`)
+- mixed imports (e.g. `import Something, { Thing } from './some-module'`)
 
 #### Resolve imported entities
 
-Once we know exatcly what was imported, we need to resolve the actual source of each imported
+Once we know exactly what was imported, we need to resolve the actual source of each imported
 entity. There are several possible scenarios:
 
 - **default import:** importing a default export from a target is pretty straight-forward because it
@@ -178,26 +255,28 @@ entity. There are several possible scenarios:
   should be exposed by entry's `exports` map. If it does not exist, maybe we're importing an entity
   from a wildcard-exported module. See next point.
 - **wildcard import:** If a named entity could not be resolved by an entry's `export` map, there's
-  still a chance it was exported from a wildcard-imported module. Here's the decision tree that gets
-  applied:
+  still a chance it was re-exported from a wildcard-imported module. Here's the decision tree that
+  gets applied:
 
   - We first try to find the entity inside `context.wildcards.named`'s map. Matching the entity
     against that map means it was wildcard-imported with an alias and re-exported (e.g.
-    `import * as Alias from '…'` then `export { Alias }`).
+    `import * as Alias from '…'` then `export { Alias }` or `export * as Alias from '…'`).
   - If it's still not resolved, maybe it was re-exported with a wildcard-export statement (e.g.
     `export * from '…'`). We need to find the entity across paths saved in the
-    `context.wildcards.direct` array. These paths should be registered as implicit targets
-    beforehand.
+    `context.wildcards.direct` array. These paths should be registered as implicit targets and
+    analyzed beforehand.
 
   If nothing was resolved, then the import statement won't be transported to preserve original
-  behaviour and avoid possible errors.
+  behaviour.
 
 #### Rewrite import statement
 
 At this point, all imported entities should be re-written: instead of importing them from a given
-target, they should be imported from their actual sources.
+target, they should be imported from their actual sources. Vite then serves the transformed file :-)
 
 <!-- @todo
+
+### Debugging
 
 ### Logging
 

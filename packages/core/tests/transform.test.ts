@@ -1,82 +1,97 @@
 import type { ExportSpecifier, ImportSpecifier } from 'es-module-lexer';
-import type { ResolveFn } from 'vite';
 import dedent from 'ts-dedent';
-import { createLogger } from 'vite';
 import { describe, it, expect, beforeAll, vi, beforeEach, afterEach } from 'vitest';
 
-import type { EntryData, FinalPluginOptions, PluginEntries, PluginOptions } from '../src/types';
+import type { EntryData, FinalPluginOptions, PluginEntries } from '../src/types';
 import Transformer from '../src/transform';
 import ImportAnalyzer from '../src/analyze-import';
-import { Logger } from '../src/logger';
 import {
   createMockEntryData,
-  getTestResolver,
+  createTestContext,
   resolveUnitEntry,
   STUB_ID,
   STUB_SOURCE,
 } from './utils';
+import type { Context } from '../src/context';
 
 const _a = (name: string) => `@mocks/${_e(name)}`;
 const _e = (name: string) => `entry-${name}`;
 const ANY_PATH = 'any-path';
 const aliasA = _a('a');
+const defaultOptions: FinalPluginOptions = {
+  extensions: ['ext'],
+  maxWildcardDepth: 0,
+  ignorePatterns: [/node_modules/],
+  debug: false,
+  targets: [],
+};
 
-const logger = new Logger(createLogger(), false);
-let resolver: ResolveFn;
 let entryA: string;
 let entryAModuleA: string;
 let entryB: string;
 
 beforeAll(async () => {
-  resolver = await getTestResolver();
   entryA = await resolveUnitEntry(_e('a'));
   entryB = await resolveUnitEntry(_e('b'));
   entryAModuleA = await resolveUnitEntry(`${_e('a')}/modules/A.ts`);
 });
 
-describe('requiresTransform', () => {
-  const defaultOptions: FinalPluginOptions = {
-    extensions: ['ext'],
-    maxWildcardDepth: 0,
-    ignorePatterns: [/node_modules/],
-    debug: false,
-    targets: [],
-  };
-
-  it('should return false if served file is ignored', () => {
-    const id = '/path/to/another-project/file.ext';
-    const ignorePatterns = [/another-project/];
-    const options: FinalPluginOptions = { ...defaultOptions, ignorePatterns };
-    expect(Transformer.requiresTransform(id, options)).toStrictEqual(false);
+describe('transformIfNeeded', () => {
+  beforeAll(() => {
+    vi.restoreAllMocks();
   });
 
-  it('should return false if served file extension is not within config extension list', () => {
-    const id = '/path/to/project/file.anotherext';
-    const options = defaultOptions;
-    expect(Transformer.requiresTransform(id, options)).toStrictEqual(false);
+  beforeEach(() => {
+    vi.spyOn(Transformer, 'transformImportsIfNeeded').mockImplementationOnce(() =>
+      Promise.resolve(''),
+    );
   });
 
-  it('should return true if served file must be transformed by the plugin', () => {
-    const id = '/path/to/project/file.ext';
-    const options = defaultOptions;
-    expect(Transformer.requiresTransform(id, options)).toStrictEqual(true);
+  it('should call transformImportsIfNeeded when the file is candidate', async () => {
+    const res = true;
+    const ctx = await createTestContext({ targets: [] });
+    vi.spyOn(Transformer, 'requiresTransform').mockImplementationOnce(() => res);
+    await Transformer.transformIfNeeded(ctx, STUB_ID, STUB_SOURCE);
+    expect(Transformer.transformImportsIfNeeded).toHaveBeenCalled();
+  });
+
+  it('should not call transformImportsIfNeeded when the file is not candidate', async () => {
+    const res = false;
+    const ctx = await createTestContext({ targets: [] });
+    vi.spyOn(Transformer, 'requiresTransform').mockImplementationOnce(() => res);
+    await Transformer.transformIfNeeded(ctx, STUB_ID, STUB_SOURCE);
+    expect(Transformer.transformImportsIfNeeded).not.toHaveBeenCalled();
   });
 });
 
-describe('importsTargetEntry', () => {
-  const imports = [{ n: aliasA }, { n: undefined }] as ImportSpecifier[];
-
-  it('should return true if any import targets one of the entries using aliases', async () => {
-    // should also work with relative paths and bare imports.
-    const entries = new Map([[entryA, {} as EntryData]]);
-    const result = await Transformer.importsTargetEntry(ANY_PATH, imports, entries, resolver);
-    expect(result).toStrictEqual(true);
+describe('transformImportsIfNeeded', () => {
+  beforeAll(() => {
+    vi.restoreAllMocks();
   });
 
-  it('should return false if none of the imports target one of the entries', async () => {
-    const entries = new Map([]) as PluginEntries;
-    const result = await Transformer.importsTargetEntry(ANY_PATH, imports, entries, resolver);
-    expect(result).toStrictEqual(false);
+  beforeEach(() => {
+    vi.spyOn(Transformer, 'transformImports').mockImplementationOnce(() => Promise.resolve(''));
+    vi.doMock('es-module-lexer', () => ({ parse: vi.fn().mockReturnValue([]) }));
+  });
+
+  afterEach(() => {
+    vi.doUnmock('es-module-lexer');
+  });
+
+  it('should call transformImports when the file is candidate', async () => {
+    const res = true;
+    const ctx = await createTestContext({ targets: [] });
+    vi.spyOn(Transformer, 'importsTargetEntry').mockImplementationOnce(() => Promise.resolve(res));
+    await Transformer.transformImportsIfNeeded(ctx, STUB_ID, STUB_SOURCE);
+    expect(Transformer.transformImports).toHaveBeenCalled();
+  });
+
+  it('should not call transformImports when the file is not candidate', async () => {
+    const res = false;
+    const ctx = await createTestContext({ targets: [] });
+    vi.spyOn(Transformer, 'importsTargetEntry').mockImplementationOnce(() => Promise.resolve(res));
+    await Transformer.transformImportsIfNeeded(ctx, STUB_ID, STUB_SOURCE);
+    expect(Transformer.transformImports).not.toHaveBeenCalled();
   });
 });
 
@@ -92,6 +107,10 @@ describe('importsTargetEntry', () => {
  */
 
 describe('transformImports', () => {
+  beforeAll(() => {
+    vi.restoreAllMocks();
+  });
+
   beforeEach(() => {
     vi.spyOn(ImportAnalyzer, 'analyzeImportStatement');
   });
@@ -120,15 +139,14 @@ describe('transformImports', () => {
     return { code, imps, exps };
   }
 
-  const getExpectedParams = (code: string, entries: PluginEntries, entry: string) => [
+  const getExpectedParams = (ctx: Context, code: string, entryPath: string) => [
+    ctx,
     expect.anything(),
     code,
-    entries,
-    entries.get(entry),
-    entry,
+    ctx.entries.get(entryPath),
+    entryPath,
     expect.any(Number),
     expect.any(Number),
-    expect.any(Function),
   ];
 
   const MOCK_EMPTY_ENTRY_DATA = createMockEntryData();
@@ -136,9 +154,10 @@ describe('transformImports', () => {
   it('should not transform if it does not import any target entry (unresolved import)', async () => {
     const id = STUB_ID;
     const { code, imps, exps } = createOneLineImport('{ anything }', 'anywhere');
-    const entries: PluginEntries = new Map([[entryA, MOCK_EMPTY_ENTRY_DATA] as const]);
+    const ctx = await createTestContext({ targets: [entryA] });
+    ctx.entries = new Map([[entryA, MOCK_EMPTY_ENTRY_DATA] as const]);
 
-    const out = await Transformer.transformImports(id, code, entries, imps, exps, resolver, logger);
+    const out = await Transformer.transformImports(ctx, id, code, imps, exps);
     expect(ImportAnalyzer.analyzeImportStatement).not.toHaveBeenCalled();
     expect(out).toStrictEqual(code);
   });
@@ -146,9 +165,10 @@ describe('transformImports', () => {
   it('should not transform if it does not import any target entry (resolved import)', async () => {
     const id = STUB_ID;
     const { code, imps, exps } = createOneLineImport('{ anything }', entryB);
-    const entries: PluginEntries = new Map([[entryA, MOCK_EMPTY_ENTRY_DATA] as const]);
+    const ctx = await createTestContext({ targets: [entryA] });
+    ctx.entries = new Map([[entryA, MOCK_EMPTY_ENTRY_DATA] as const]);
 
-    const out = await Transformer.transformImports(id, code, entries, imps, exps, resolver, logger);
+    const out = await Transformer.transformImports(ctx, id, code, imps, exps);
     expect(ImportAnalyzer.analyzeImportStatement).not.toHaveBeenCalled();
     expect(out).toStrictEqual(code);
   });
@@ -157,11 +177,12 @@ describe('transformImports', () => {
     const id = __dirname;
     const name = 'A_MODULE_A';
     const { code, imps, exps } = createOneLineImport(`{ ${name} }`, aliasA);
+    const ctx = await createTestContext({ targets: [entryA] });
     const exports = new Map([[name, { path: './modules/A', importDefault: true }]]);
-    const entries: PluginEntries = new Map([[entryA, createMockEntryData(exports)]]);
+    ctx.entries = new Map([[entryA, createMockEntryData(exports)]]);
 
-    const out = await Transformer.transformImports(id, code, entries, imps, exps, resolver, logger);
-    const params = getExpectedParams(code, entries, entryA);
+    const out = await Transformer.transformImports(ctx, id, code, imps, exps);
+    const params = getExpectedParams(ctx, code, entryA);
     expect(ImportAnalyzer.analyzeImportStatement).toHaveBeenNthCalledWith(1, ...params);
     expect(out).toStrictEqual(dedent(`import { default as ${name} } from '${entryAModuleA}';`));
   });
@@ -172,69 +193,69 @@ describe('transformImports', () => {
     const nameH = 'A_MODULE_H';
     const { code: aCode, imps: aImps, exps: aExps } = createOneLineImport(`{ ${nameA} }`, aliasA);
     const { code: hCode, imps: hImps, exps: hExps } = createOneLineImport(`{ ${nameH} }`, aliasA);
+    const ctx = await createTestContext({ targets: [] });
     const exportsA = new Map([
       [nameA, { path: './modules/A', importDefault: true }],
       [nameH, { path: './modules/H', importDefault: false }],
     ]);
-    const entries: PluginEntries = new Map([[entryA, createMockEntryData(exportsA)]]);
+    ctx.entries = new Map([[entryA, createMockEntryData(exportsA)]]);
 
     // We won't test output, just function calls, so let's merge in a silly way.
     const code = `${aCode}\n${hCode}`;
     const imps = [...aImps, ...hImps];
     const exps = [...aExps, ...hExps];
-    await Transformer.transformImports(id, code, entries, imps, exps, resolver, logger);
-    const params = getExpectedParams(code, entries, entryA);
+    await Transformer.transformImports(ctx, id, code, imps, exps);
+    const params = getExpectedParams(ctx, code, entryA);
     expect(ImportAnalyzer.analyzeImportStatement).toHaveBeenNthCalledWith(1, ...params);
     expect(ImportAnalyzer.analyzeImportStatement).toHaveBeenNthCalledWith(2, ...params);
   });
 });
 
-describe('transformImportsIfNeeded', () => {
-  beforeEach(() => {
-    vi.spyOn(Transformer, 'transformImports').mockImplementationOnce(() => Promise.resolve(''));
-    vi.doMock('es-module-lexer', () => ({ parse: vi.fn().mockReturnValue([]) }));
+describe('requiresTransform', () => {
+  beforeAll(() => {
+    vi.restoreAllMocks();
   });
 
-  afterEach(() => {
-    vi.doUnmock('es-module-lexer');
+  it('should return false if served file is ignored', async () => {
+    const id = '/path/to/another-project/file.ext';
+    const ignorePatterns = [/another-project/];
+    const ctx = await createTestContext({ ...defaultOptions, ignorePatterns });
+    expect(Transformer.requiresTransform(ctx, id)).toStrictEqual(false);
   });
 
-  it('should call transformImports when the file is candidate', async () => {
-    const res = true;
-    vi.spyOn(Transformer, 'importsTargetEntry').mockImplementationOnce(() => Promise.resolve(res));
-    await Transformer.transformImportsIfNeeded(STUB_ID, STUB_SOURCE, new Map(), resolver, logger);
-    expect(Transformer.transformImports).toHaveBeenCalled();
+  it('should return false if served file extension is not within config extension list', async () => {
+    const ctx = await createTestContext(defaultOptions);
+    const id = '/path/to/project/file.anotherext';
+    expect(Transformer.requiresTransform(ctx, id)).toStrictEqual(false);
   });
 
-  it('should not call transformImports when the file is not candidate', async () => {
-    const res = false;
-    vi.spyOn(Transformer, 'importsTargetEntry').mockImplementationOnce(() => Promise.resolve(res));
-    await Transformer.transformImportsIfNeeded(STUB_ID, STUB_SOURCE, new Map(), resolver, logger);
-    expect(Transformer.transformImports).not.toHaveBeenCalled();
+  it('should return true if served file must be transformed by the plugin', async () => {
+    const ctx = await createTestContext(defaultOptions);
+    const id = '/path/to/project/file.ext';
+    expect(Transformer.requiresTransform(ctx, id)).toStrictEqual(true);
   });
 });
 
-describe('transformIfNeeded', () => {
-  const options = {} as unknown as Required<PluginOptions>;
+describe('importsTargetEntry', () => {
+  const imports = [{ n: aliasA }, { n: undefined }] as ImportSpecifier[];
 
-  beforeEach(() => {
-    vi.spyOn(Transformer, 'transformImportsIfNeeded').mockImplementationOnce(() =>
-      Promise.resolve(''),
-    );
+  beforeAll(() => {
+    vi.restoreAllMocks();
   });
 
-  it('should call transformImportsIfNeeded when the file is candidate', async () => {
-    const res = true;
-    vi.spyOn(Transformer, 'requiresTransform').mockImplementationOnce(() => res);
-    await Transformer.transformIfNeeded(STUB_ID, STUB_SOURCE, new Map(), options, resolver, logger);
-    expect(Transformer.transformImportsIfNeeded).toHaveBeenCalled();
+  it('should return true if any import targets one of the entries using aliases', async () => {
+    // should also work with relative paths and bare imports.
+    const ctx = await createTestContext(defaultOptions);
+    ctx.entries = new Map([[entryA, {} as EntryData]]);
+    const result = await Transformer.importsTargetEntry(ctx, ANY_PATH, imports);
+    expect(result).toStrictEqual(true);
   });
 
-  it('should not call transformImportsIfNeeded when the file is not candidate', async () => {
-    const res = false;
-    vi.spyOn(Transformer, 'requiresTransform').mockImplementationOnce(() => res);
-    await Transformer.transformIfNeeded(STUB_ID, STUB_SOURCE, new Map(), options, resolver, logger);
-    expect(Transformer.transformImportsIfNeeded).not.toHaveBeenCalled();
+  it('should return false if none of the imports target one of the entries', async () => {
+    const ctx = await createTestContext(defaultOptions);
+    ctx.entries = new Map([]) as PluginEntries;
+    const result = await Transformer.importsTargetEntry(ctx, ANY_PATH, imports);
+    expect(result).toStrictEqual(false);
   });
 });
 

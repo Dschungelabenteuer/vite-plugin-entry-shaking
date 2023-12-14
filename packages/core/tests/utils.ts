@@ -8,7 +8,6 @@ import dedent from 'ts-dedent';
 import type { EntryData, PluginOptions, WildcardExports } from '../src/types';
 import type { Parallel } from '../src/utils';
 import EntryAnalyzer from '../src/analyze-entry';
-import { Logger } from '../src/logger';
 import { extensions } from '../src/options';
 import { transformIfNeeded } from '../src/transform';
 import { Context } from '../src/context';
@@ -118,8 +117,6 @@ export const setupCase = (target: CaseTarget, middleTarget?: CaseTarget) => ({
  * @param options Plugin options.
  */
 export async function runCase(main: string, options: PluginOptions) {
-  const resolver = await getResolver();
-  const logger = new Logger(createLogger(), false);
   const finalOptions: Required<PluginOptions> = {
     ...options,
     maxWildcardDepth: options.maxWildcardDepth ?? 0,
@@ -130,14 +127,7 @@ export async function runCase(main: string, options: PluginOptions) {
 
   const context = await createTestContext(finalOptions);
   const entries = await EntryAnalyzer.analyzeEntries(context);
-  const transformed = await transformIfNeeded(
-    MOCK_MAIN_FILE,
-    main,
-    entries,
-    finalOptions,
-    resolver,
-    logger,
-  );
+  const transformed = await transformIfNeeded(context, MOCK_MAIN_FILE, main);
   return { entries, transformed };
 }
 

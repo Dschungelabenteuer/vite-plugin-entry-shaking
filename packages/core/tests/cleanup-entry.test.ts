@@ -139,6 +139,13 @@ beforeAll(async () => {
   mockedExports = await getMockedExports();
 });
 
+describe('cleanupEntry', () => {
+  it('should correctly clean up entry file (integration)', () => {
+    const output = EntryCleaner.cleanupEntry(mockedRawEntry, mockedEntryMap, mockedExports);
+    expect(output).toStrictEqual(mockedCleanedEntry);
+  });
+});
+
 describe('reformatRemainingExports', () => {
   it('should correctly reformat remaining exports (integration)', () => {
     const output = EntryCleaner.reformatRemainingExports(mockedRemovedEmptyEntry);
@@ -173,12 +180,5 @@ describe('removeResolvedExports', () => {
     const output = EntryCleaner.removeResolvedExports(input, entryExports, exports);
 
     expect(output).toStrictEqual(input);
-  });
-});
-
-describe('cleanupEntry', () => {
-  it('should correctly clean up entry file (integration)', () => {
-    const output = EntryCleaner.cleanupEntry(mockedRawEntry, mockedEntryMap, mockedExports);
-    expect(output).toStrictEqual(mockedCleanedEntry);
   });
 });
