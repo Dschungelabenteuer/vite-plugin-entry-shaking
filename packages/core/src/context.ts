@@ -20,13 +20,16 @@ export class Context {
   /** Plugin's logger. */
   public logger: Logger;
 
+  /** Plugin's debugger. */
+  public debugger: any;
+
   constructor(
     public options: Required<PluginOptions>,
     public config: ResolvedConfig,
   ) {
     this.registerTargets();
     this.resolver = config.createResolver();
-    this.logger = new Logger(config.logger, options.debug);
+    this.logger = new Logger(config.logger, false);
     this.logger.info('Plugin configuration resolved');
   }
 
@@ -43,7 +46,7 @@ export class Context {
     if (entry) {
       const version = serveSource ? 'original' : 'mutated';
       const output = serveSource ? entry.source : entry.updatedSource;
-      this.logger.info(`Serving ${version} entry file ${url}`);
+      this.logger.info(`Serving ${version} version entry file ${url}`);
       return output;
     }
   }

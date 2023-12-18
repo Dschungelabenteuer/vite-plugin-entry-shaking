@@ -2,10 +2,9 @@ import type { PluginOption } from 'vite';
 import type { PluginEntries, PluginOptions, EntryData } from './types';
 import type { Log } from './logger';
 import { mergeOptions } from './options';
-import { JSONMap } from './serializer';
 import { Context } from './context';
 
-export type { PluginEntries, EntryData, Log };
+export type { PluginEntries, EntryData, Context, Log };
 
 export const name = 'vite-plugin-entry-shaking';
 
@@ -37,11 +36,11 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
       await context.updateFile(file);
     },
 
-    configureServer(server) {
-      server.ws.on('debug:req', () => {
-        const logs = context.logger?.logs ?? [];
-        server.ws.send('debug:res', { logs, entries: JSONMap.stringify(context.entries) });
-      });
+    async configureServer(server) {
+      if (context.options.debug) {
+        const { attachDebugger } = await import('vite-plugin-entry-shaking-debugger');
+        attachDebugger(server, context);
+      }
     },
   };
 }

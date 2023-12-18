@@ -1,4 +1,3 @@
 /examples/*
-!/examples/_shared_
 /packages/core/tests/__mocks__
 /packages/core/tests/cases

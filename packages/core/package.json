@@ -24,11 +24,6 @@
       "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
-    },
-    "./serializer": {
-      "types": "./dist/serializer.d.ts",
-      "require": "./dist/serializer.cjs",
-      "import": "./dist/serializer.mjs"
     }
   },
   "main": "src/index.ts",
@@ -60,6 +55,9 @@
     "es-module-lexer": "^1.3.1",
     "magic-string": "^0.30.5"
   },
+  "optionalDependencies": {
+    "vite-plugin-entry-shaking-debugger": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "^20.8.10",
     "@vitest/coverage-istanbul": "^0.34.6",
@@ -70,6 +68,7 @@
     "typescript": "^5.2.2",
     "unbuild": "^2.0.0",
     "vite": "^4.5.0",
+    "vite-plugin-entry-shaking-debugger": "workspace:*",
     "vitest": "^0.34.6"
   }
 }

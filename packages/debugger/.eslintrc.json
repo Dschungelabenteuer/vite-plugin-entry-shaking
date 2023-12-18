@@ -1,0 +1,3 @@
+{
+  "extends": ["@yungezeit/vue", "prettier"]
+}

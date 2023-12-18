@@ -72,7 +72,6 @@ Here is an overview of the main files it uses:
   <tbody>
     <tr>
       <td><code>parse.ts</code></td>
-      <td><code>serializer.ts</code></td>
     </tr>
     <tr>
       <td><code>urls.ts</code></td>

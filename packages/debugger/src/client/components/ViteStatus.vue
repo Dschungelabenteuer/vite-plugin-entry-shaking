@@ -1,0 +1,65 @@
+<script setup lang="ts">
+import { computed } from 'vue';
+import { Icon } from '@iconify/vue';
+import { store } from '../store';
+
+const name = 'vite server';
+
+const status = computed(() => {
+  switch (store.status) {
+    case 'connected':
+      return { icon: 'tabler:circle-check', label: `Connected to ${name}` };
+    case 'disconnected':
+      return { icon: 'tabler:circle-x', label: `Disconnected from ${name}` };
+    case 'connecting':
+      return { icon: 'tabler:refresh', label: `Connecting to ${name}…` };
+    default:
+      return { icon: 'tabler:alert-triangle', label: 'Something is odd' };
+  }
+});
+</script>
+
+<template>
+  <div :class="['vite-status', store.status]">
+    <Icon :icon="status.icon" />
+    {{ status.label }}
+  </div>
+</template>
+
+<style lang="scss">
+@import '../styles/mixins';
+
+.vite-status {
+  @include flex;
+
+  svg {
+    margin-inline: var(--spacing-md);
+  }
+
+  .connected {
+    color: var(--success-color);
+  }
+
+  .disconnected {
+    color: var(--error-color);
+  }
+
+  .connecting {
+    svg {
+      animation: spin 800ms infinite linear;
+      @media (prefers-reduced-motion: reduce) {
+        animation: spin 6s infinite linear;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>

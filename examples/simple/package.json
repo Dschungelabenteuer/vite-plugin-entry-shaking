@@ -5,20 +5,13 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "vue": "^3.3.8",
-    "vue-router": "^4.2.5"
-  },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.5.0",
-    "@yungezeit/eslint-config-vue": "^0.0.13",
+    "@yungezeit/eslint-config-typescript": "^0.0.13",
     "sass": "^1.69.5",
     "typescript": "^5.2.2",
     "vite": "^4.5.0",
-    "vite-plugin-entry-shaking": "workspace:*",
-    "vue-tsc": "^1.8.22"
+    "vite-plugin-entry-shaking": "workspace:*"
   }
 }

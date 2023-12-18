@@ -20,11 +20,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@shared/styles/*": ["../_shared_/src/styles/*"],
-      "@shared/lib": ["../_shared_/src/index.ts"],
       "@lib/*": ["./src/lib/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
-  "references": [{ "path": "./tsconfig.node.json" }, { "path": "../_shared_" }]
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

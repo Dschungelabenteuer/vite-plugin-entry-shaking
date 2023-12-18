@@ -1,0 +1,93 @@
+/// Common colors.
+[data-color-scheme] {
+  --background-gradient: linear-gradient(
+    133deg,
+    var(--background-color) 0%,
+    var(--background-color-alt)
+  );
+  --tagline-color: var(--text-subtle-color);
+  --name-color: var(--text-emphasize-color);
+  --color-dark-blue: #141c2f;
+  --vite-orange: #ffbc00;
+  --vite-purple: #6345c1;
+}
+
+/// Light color scheme.
+[data-color-scheme='light'] {
+  --text-color: #7a8397;
+  --text-subtle-color: #79859c;
+  --text-emphasize-color: var(--color-dark-blue);
+  --accent-color: #29a157;
+  --accent-color-contrast: #fff;
+  --overall-background-color: #fff;
+  --overall-border-color: #ddd;
+  --background-color: #ffffff;
+  --background-color-alt: #d8e8f3;
+  --button-outline-color: var(--overall-border-color);
+  --error-color: #ce2c2c;
+  --success-color: #57964e;
+  --illustration-color: var(--color-dark-blue);
+  --illustration-leaves-outline: #fff;
+  --illustration-leaves-color: #4b7145;
+  --illustration-trunk-color: #75502f;
+  --illustration-background-gradient-start: transparent;
+  --illustration-background-gradient-end: transparent;
+}
+
+/// Dark color scheme.
+[data-color-scheme='dark'] {
+  --text-color: #c4b4a9;
+  --text-subtle-color: #8b7768;
+  --accent-color: #ffae2f;
+  --accent-color-contrast: #1f130f;
+  --text-emphasize-color: #ffffffdd;
+  --overall-background-color: #00000044;
+  --overall-border-color: #ffffff0c;
+  --background-color: #110f1d;
+  --background-color-alt: #1f130f;
+  --button-outline-color: #3d2d2c;
+  --error-color: #a85151;
+  --success-color: #8cce89;
+  --illustration-color: #0a040a;
+  --illustration-leaves-outline: #60785f;
+  --illustration-leaves-color: #222922; // #60785f
+  --illustration-trunk-color: #332f2b;
+  --illustration-background-gradient-start: #cf8664;
+  --illustration-background-gradient-end: transparent;
+}
+
+/// Common variables.
+:root {
+  --spacing-sm: 0.25rem;
+  --spacing-md: 0.5rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.325rem;
+
+  --radius-md: 0.34rem;
+  --radius-lg: 0.72rem;
+
+  --font-size-2xl: 2rem;
+  --font-size-xl: 1.4rem;
+  --font-size-lg: 1.25rem;
+  --font-size-md: 1.14rem;
+  --font-size-sm: 1rem;
+  --font-size-xs: 0.7rem;
+
+  --size-header: 3rem;
+  --size-footer: 3.5rem;
+  --size-page: calc(100vh - var(--size-header) - var(--size-footer));
+}
+
+/// Transitions.
+:root {
+  --transition-duration-short: 170ms;
+
+  @media (prefers-reduced-motion: reduce) {
+    --transition-duration-short: 0ms;
+  }
+}
+
+/// Breakpoints.
+$breakpoint-xs: 460px;
+$breakpoint-sm: 610px;
+$breakpoint-md: 820px;
