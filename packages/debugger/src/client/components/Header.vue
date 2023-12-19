@@ -28,6 +28,7 @@ withDefaults(defineProps<HeaderProps>(), { showTitle: true, showNavigation: true
 @import '../styles/variables';
 
 .header {
+  z-index: 10;
   @include flex(normal, center);
   @include border-bottom;
   padding-inline-start: var(--spacing-md);
@@ -35,8 +36,8 @@ withDefaults(defineProps<HeaderProps>(), { showTitle: true, showNavigation: true
 
   &__title {
     @include flex(normal, center);
+    color: var(--text-emphasize-color);
     padding-inline: var(--spacing-md);
-    color: var(--text-color);
     text-decoration: none;
     font-weight: 600;
 

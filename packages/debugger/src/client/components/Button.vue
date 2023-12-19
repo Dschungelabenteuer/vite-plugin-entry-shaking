@@ -1,18 +1,24 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { Icon } from '@iconify/vue';
 
 type ButtonProps = {
   icon: string;
   label: string;
+  size: 'medium' | 'large';
 };
 
-defineProps<ButtonProps>();
+const props = withDefaults(defineProps<ButtonProps>(), {
+  size: 'medium',
+});
+
+const classes = computed(() => ['button', props.size]);
 
 const emit = defineEmits<{ click: [] }>();
 </script>
 
 <template>
-  <button class="button">
+  <button :class="classes">
     <Icon
       v-if="icon"
       :icon="icon"
@@ -26,5 +32,13 @@ const emit = defineEmits<{ click: [] }>();
 
 .button {
   @include button;
+
+  &.medium {
+    @include button-medium;
+  }
+
+  &.large {
+    @include button-large;
+  }
 }
 </style>

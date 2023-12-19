@@ -42,6 +42,7 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
           aria-expanded="false"
           icon="tabler:arrow-bar-left"
           label="Show metrics"
+          size="large"
           @click="toggle"
         />
       </li>
@@ -71,6 +72,7 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
   a,
   button {
     @include button;
+    @include button-large;
     transition: ease var(--transition-duration-short);
   }
 

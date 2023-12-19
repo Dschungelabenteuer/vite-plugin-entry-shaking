@@ -42,7 +42,6 @@
 @mixin button {
   @include flex;
   cursor: pointer;
-  padding: var(--spacing-lg);
   color: var(--text-color);
   text-decoration: none;
   background: transparent;
@@ -62,4 +61,12 @@
       inset 0 0 0 4px var(--background-color),
       inset 0 0 0 6px var(--accent-color);
   }
+}
+
+@mixin button-medium {
+  padding: calc(var(--spacing-md) + 3px);
+}
+
+@mixin button-large {
+  padding: var(--spacing-lg);
 }

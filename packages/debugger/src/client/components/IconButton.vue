@@ -8,10 +8,13 @@ type Booleanish = 'true' | 'false';
 type IconButtonProps = {
   icon: string;
   label: string;
+  size?: 'medium' | 'large';
 };
 
 defineOptions({ inheritAttrs: false });
-defineProps<IconButtonProps>();
+const props = withDefaults(defineProps<IconButtonProps>(), {
+  size: 'medium',
+});
 
 const emit = defineEmits<{ click: [] }>();
 const attrs = useAttrs();
@@ -22,6 +25,7 @@ const isOpen = ref(false);
 const id = computed(() => attrs['id'] as string);
 const ariaControls = computed(() => attrs['aria-expanded'] as string);
 const ariaExpanded = computed(() => attrs['aria-expanded'] as Booleanish);
+const classes = computed(() => ['icon-button', props.size]);
 
 const { floatingStyles } = useFloating(reference, floating, {
   whileElementsMounted: autoUpdate,
@@ -35,7 +39,7 @@ defineExpose({ reference });
   <button
     :id="id"
     ref="reference"
-    class="icon-button"
+    :class="classes"
     :aria-label="label"
     :aria-expanded="ariaExpanded"
     :aria-controls="ariaControls"
@@ -61,5 +65,13 @@ defineExpose({ reference });
 
 .icon-button {
   @include button;
+
+  &.medium {
+    @include button-medium;
+  }
+
+  &.large {
+    @include button-large;
+  }
 }
 </style>

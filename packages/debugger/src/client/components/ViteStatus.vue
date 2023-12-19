@@ -37,11 +37,11 @@ const status = computed(() => {
   }
 
   .connected {
-    color: var(--success-color);
+    color: var(--status-color-success);
   }
 
   .disconnected {
-    color: var(--error-color);
+    color: var(--status-color-error);
   }
 
   .connecting {

@@ -17,6 +17,7 @@ const colorSchemeIcon = computed(() => (colorScheme === 'dark' ? 'tabler:sun' : 
     <div id="color-scheme-switcher">
       <IconButton
         :icon="colorSchemeIcon"
+        size="large"
         label="Toggle color scheme"
         @click="swapColorScheme"
       />
@@ -28,6 +29,7 @@ const colorSchemeIcon = computed(() => (colorScheme === 'dark' ? 'tabler:sun' : 
 @import '../styles/mixins';
 
 .footer {
+  z-index: 100;
   @include flex(normal, center);
   @include border-top;
   padding-inline: var(--spacing-md);

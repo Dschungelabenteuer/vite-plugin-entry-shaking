@@ -13,7 +13,8 @@
 }
 
 /// Light color scheme.
-[data-color-scheme='light'] {
+[data-color-scheme='light'],
+[data-color-scheme='light'] *::backdrop {
   --text-color: #7a8397;
   --text-subtle-color: #79859c;
   --text-emphasize-color: var(--color-dark-blue);
@@ -23,19 +24,40 @@
   --overall-border-color: #ddd;
   --background-color: #ffffff;
   --background-color-alt: #d8e8f3;
+  --browser-background-color: #fbfdfe;
   --button-outline-color: var(--overall-border-color);
-  --error-color: #ce2c2c;
-  --success-color: #57964e;
+  --status-color-info: #3288d6;
+  --status-color-warning: #ffae2f;
+  --status-color-error: #ce2c2c;
+  --status-color-success: #57964e;
   --illustration-color: var(--color-dark-blue);
   --illustration-leaves-outline: #fff;
   --illustration-leaves-color: #4b7145;
   --illustration-trunk-color: #75502f;
   --illustration-background-gradient-start: transparent;
   --illustration-background-gradient-end: transparent;
+  --field-background-color: #fff;
+  --field-border-color: var(--overall-border-color);
+  --field-text-color: var(--text-color);
+  --field-background-color-hover: #fff;
+  --field-border-color-hover: color-mix(in srgb, var(--field-border-color) 80%, black);
+  --field-text-color-hover: color-mix(in srgb, var(--field-text-color) 80%, black);
+  --field-background-color-focus: #fff;
+  --field-border-color-focus: var(--accent-color);
+  --field-text-color-focus: var(--accent-color);
+  --modal-background-color: #fff;
+  --modal-backdrop-color: #ffffff22;
+  --shadow-color: 0deg 0% 85%;
+  --modal-shadow: 0 0 0 1px var(--overall-border-color),
+    0.4px 0.7px 0.9px hsl(var(--shadow-color) / 0.22),
+    1.1px 2px 2.6px -0.8px hsl(var(--shadow-color) / 0.22),
+    2.7px 4.8px 6.2px -1.7px hsl(var(--shadow-color) / 0.22),
+    6.5px 11.4px 14.8px -2.5px hsl(var(--shadow-color) / 0.22);
 }
 
 /// Dark color scheme.
-[data-color-scheme='dark'] {
+[data-color-scheme='dark'],
+[data-color-scheme='dark'] *::backdrop {
   --text-color: #c4b4a9;
   --text-subtle-color: #8b7768;
   --accent-color: #ffae2f;
@@ -45,15 +67,35 @@
   --overall-border-color: #ffffff0c;
   --background-color: #110f1d;
   --background-color-alt: #1f130f;
+  --browser-background-color: transparent;
   --button-outline-color: #3d2d2c;
-  --error-color: #a85151;
-  --success-color: #8cce89;
+  --status-color-info: #90b7ff;
+  --status-color-warning: #ffae2f;
+  --status-color-error: #a85151;
+  --status-color-success: #447623;
   --illustration-color: #0a040a;
   --illustration-leaves-outline: #60785f;
   --illustration-leaves-color: #222922; // #60785f
   --illustration-trunk-color: #332f2b;
   --illustration-background-gradient-start: #cf8664;
   --illustration-background-gradient-end: transparent;
+  --field-background-color: #00000044;
+  --field-border-color: var(--overall-border-color);
+  --field-text-color: var(--text-color);
+  --field-background-color-hover: #00000044;
+  --field-border-color-hover: color-mix(in srgb, var(--field-border-color) 80%, var(--text-color));
+  --field-text-color-hover: color-mix(in srgb, var(--field-text-color) 80%, var(--text-color));
+  --field-background-color-focus: #00000044;
+  --field-border-color-focus: var(--accent-color);
+  --field-text-color-focus: var(--accent-color);
+  --modal-background-color: color-mix(in srgb, var(--background-color-alt) 30%, black);
+  --modal-backdrop-color: color-mix(in srgb, var(--background-color-alt) 20%, transparent);
+  --shadow-color: 0deg 0% 4%;
+  --modal-shadow: 0 0 0 1px var(--overall-border-color),
+    0.4px 0.7px 0.9px hsl(var(--shadow-color) / 0.22),
+    1.1px 2px 2.6px -0.8px hsl(var(--shadow-color) / 0.22),
+    2.7px 4.8px 6.2px -1.7px hsl(var(--shadow-color) / 0.22),
+    6.5px 11.4px 14.8px -2.5px hsl(var(--shadow-color) / 0.22);
 }
 
 /// Common variables.
@@ -67,7 +109,7 @@
   --radius-lg: 0.72rem;
 
   --font-size-2xl: 2rem;
-  --font-size-xl: 1.4rem;
+  --font-size-xl: 1.325rem;
   --font-size-lg: 1.25rem;
   --font-size-md: 1.14rem;
   --font-size-sm: 1rem;

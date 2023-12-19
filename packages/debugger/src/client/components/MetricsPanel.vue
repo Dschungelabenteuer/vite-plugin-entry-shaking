@@ -25,6 +25,7 @@ watch(isOpen, (open) => {
       <header class="metrics__header">
         <IconButton
           ref="closeBtnRef"
+          size="large"
           aria-controls="metrics-panel"
           :aria-expanded="true"
           icon="tabler:arrow-bar-right"
@@ -34,7 +35,10 @@ watch(isOpen, (open) => {
         <h2>Metrics</h2>
       </header>
     </div>
-    <div class="metrics__backdrop" />
+    <div
+      class="metrics__backdrop"
+      @click="toggle"
+    />
   </div>
 </template>
 
@@ -51,7 +55,7 @@ watch(isOpen, (open) => {
 
   &__backdrop {
     z-index: 10;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.3);
     width: 100vw;
     height: 100vh;
     position: fixed;
@@ -94,6 +98,7 @@ watch(isOpen, (open) => {
     inset-inline-end: 0;
 
     &__backdrop {
+      pointer-events: all;
       opacity: 1;
     }
   }

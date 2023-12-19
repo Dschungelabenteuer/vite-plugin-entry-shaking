@@ -1,6 +1,6 @@
 import Home from './pages/Home.vue';
 import Logs from './pages/Logs.vue';
-import Entries from './pages/Targets.vue';
+import Entries from './pages/Entries.vue';
 import Transforms from './pages/Transforms.vue';
 
 export const routes = [
