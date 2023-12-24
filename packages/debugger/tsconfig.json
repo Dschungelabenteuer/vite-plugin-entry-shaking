@@ -8,6 +8,16 @@
     "strict": true,
     "noImplicitAny": true,
     "skipLibCheck": true,
-    "types": ["node",  "vite/client"]
+    "types": ["node",  "vite/client", "webworker"],
+    "paths": {
+      "#store": ["./src/client/store.ts"],
+      "#utils": ["./src/client/utils.ts"],
+      "@assets/*": ["./src/client/assets/*"],
+      "@component/*": ["./src/client/components/*"],
+      "@composable/*": ["./src/client/composables/*"],
+      "@views/*": ["./src/client/views/*"],
+      "@page/*": ["./src/client/pages/*"],
+      "@styles/*": ["./src/client/styles/*"]
+    }
   }
 }

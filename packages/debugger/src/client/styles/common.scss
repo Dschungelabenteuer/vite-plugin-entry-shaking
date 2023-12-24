@@ -1,8 +1,4 @@
-@import 'reset';
-@import 'mixins';
-@import 'variables';
-@import 'typefaces';
-@import 'virtual-scroller';
+@import './global';
 
 body {
   margin: 0;
@@ -15,23 +11,30 @@ body,
   @include contained;
 }
 
-* {
-  &::-webkit-scrollbar-track {
-    box-shadow: 0 0 0 1px var(--overall-border-color);
-    border-radius: var(--radius-md);
-    background-color: transparent;
-  }
+::selection {
+  color: var(--accent-color-contrast);
+  background: var(--accent-color);
+}
 
-  &::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-    background-color: transparent;
-  }
+::-webkit-scrollbar-track {
+  box-shadow: 0 0 0 var(--scrollbar-border-width) var(--overall-border-color);
+  border-radius: var(--radius-md);
+  background-color: transparent;
+}
 
-  &::-webkit-scrollbar-thumb {
-    border-radius: var(--radius-md);
-    background-color: var(--accent-color);
-  }
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-md);
+  background-color: var(--accent-color);
 }
 
 #wrapper {
@@ -43,5 +46,17 @@ body,
 h1 {
   color: var(--text-emphasize-color);
   font-size: var(--font-size-xl);
+  font-weight: 700;
+}
+
+h2 {
+  color: var(--text-emphasize-color);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+h3 {
+  color: var(--text-emphasize-color);
+  font-size: var(--font-size-sm);
   font-weight: 700;
 }

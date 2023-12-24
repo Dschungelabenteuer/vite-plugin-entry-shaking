@@ -1,11 +1,29 @@
 import { defineConfig } from 'vite';
+import { fileURLToPath } from 'url';
 import vue from '@vitejs/plugin-vue';
+import dev from './dev.plugin';
 
-// https://vitejs.dev/config/
+const outDir = '../../dist/client';
+
 export default defineConfig({
   base: './',
-  build: {
-    outDir: '../../dist/client',
+  build: { outDir },
+  plugins: [vue(), dev()],
+  resolve: {
+    alias: {
+      '#store': fileURLToPath(new URL('./store.ts', import.meta.url)),
+      '#utils': fileURLToPath(new URL('./utils.ts', import.meta.url)),
+      '@assets': fileURLToPath(new URL('./assets', import.meta.url)),
+      '@component': fileURLToPath(new URL('./components', import.meta.url)),
+      '@composable': fileURLToPath(new URL('./composables', import.meta.url)),
+      '@views': fileURLToPath(new URL('./views', import.meta.url)),
+      '@pages': fileURLToPath(new URL('./pages', import.meta.url)),
+      '@styles': fileURLToPath(new URL('./styles', import.meta.url)),
+    },
   },
-  plugins: [vue()],
+  css: {
+    preprocessorOptions: {
+      scss: { additionalData: `@import "@styles/global.scss";` },
+    },
+  },
 });

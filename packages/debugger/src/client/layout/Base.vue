@@ -1,25 +1,26 @@
 <script setup lang="ts">
 import { provide } from 'vue';
-import Header from '../components/Header.vue';
-import Footer from '../components/Footer.vue';
-import MetricsPanel from '../components/MetricsPanel.vue';
-import { useColorScheme } from '../composables/useColorScheme';
-import { useMetricsPanel } from '../composables/useMetricsPanel';
+
+import { useColorScheme } from '@composable/useColorScheme';
+import { useMetricsPanel } from '@composable/useMetricsPanel';
+import Header from './Header.vue';
+import Footer from './Footer.vue';
+import MetricsPanel from './MetricsPanel.vue';
 
 const { colorScheme, swapColorScheme } = useColorScheme();
 const metricsPanel = useMetricsPanel();
+const { isOpen } = metricsPanel;
 provide('metricsPanel', metricsPanel);
 provide('colorScheme', colorScheme);
 provide('swapColorScheme', swapColorScheme);
-const { isOpen } = metricsPanel;
 </script>
 
 <template>
   <div
-    class="base-wrapper"
+    class="theme-wrapper"
     :data-color-scheme="colorScheme"
   >
-    <div class="base-layout">
+    <div class="layout-wrapper">
       <Header />
       <main>
         <slot />
@@ -34,9 +35,7 @@ const { isOpen } = metricsPanel;
 </template>
 
 <style lang="scss">
-@import '../styles/mixins';
-
-.base-wrapper {
+.theme-wrapper {
   @include contained;
   display: flex;
   color: var(--text-color);
@@ -44,7 +43,7 @@ const { isOpen } = metricsPanel;
   background-image: var(--background-gradient);
 }
 
-.base-layout {
+.layout-wrapper {
   @include contained;
   display: grid;
   grid-template-columns: 1fr;

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { inject, nextTick, ref, watch } from 'vue';
-import IconButton from './IconButton.vue';
-import type { MetricsPanel } from '../composables/useMetricsPanel';
+import type { MetricsPanel } from '@composable/useMetricsPanel';
+import Button from '@component/Button.vue';
 
-const closeBtnRef = ref<InstanceType<typeof IconButton> | null>(null);
+const closeBtnRef = ref<InstanceType<typeof Button> | null>(null);
 const metricsPanel = inject<MetricsPanel>('metricsPanel')!;
 const { toggle, openBtnId, isOpen } = metricsPanel;
 
@@ -23,12 +23,13 @@ watch(isOpen, (open) => {
   >
     <div class="metrics__content">
       <header class="metrics__header">
-        <IconButton
+        <Button
           ref="closeBtnRef"
           size="large"
           aria-controls="metrics-panel"
           :aria-expanded="true"
-          icon="tabler:arrow-bar-right"
+          icon="arrow-bar-right"
+          :icon-only="true"
           label="Close metrics panel"
           @click="toggle"
         />
@@ -43,9 +44,6 @@ watch(isOpen, (open) => {
 </template>
 
 <style lang="scss">
-@import '../styles/mixins';
-@import '../styles/variables';
-
 .metrics {
   @include contained;
   max-width: 300px;
@@ -62,7 +60,7 @@ watch(isOpen, (open) => {
     top: 0;
     left: 0;
     pointer-events: none;
-    backdrop-filter: blur(6px);
+    backdrop-filter: var(--blur-lg);
     opacity: 0;
     transition: all ease var(--transition-duration-short);
   }
@@ -73,7 +71,7 @@ watch(isOpen, (open) => {
     border-inline-start: 1px solid var(--overall-border-color);
     color: var(--text-color);
     height: 100vh;
-    backdrop-filter: blur(12px);
+    backdrop-filter: var(--blur-xl);
   }
 
   &__header {

@@ -14,6 +14,9 @@ export class Context {
   /** Map of registered targets. */
   public targets: ExtendedTargets = new Map();
 
+  /** Map of transformed files. */
+  public transforms: Map<string, string> = new Map();
+
   /** Vite resolver. */
   public resolver: ResolveFn;
 

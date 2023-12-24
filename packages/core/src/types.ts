@@ -48,15 +48,13 @@ export type ImportParams<T = string> = {
   originalName?: string;
   /** Alias of the entity (as imported from the entry by consomming code). */
   alias?: string;
-  /** Determines whether this is a wildcard import. */
-  isWildcard?: true;
   /** Determines whether the export represents some code defined within the file. */
   selfDefined?: true;
 };
 
 /** Caught wildcard exports. */
 export type WildcardExports = {
-  /** Named wildcard exports (e.g. `import * as Something`). */
+  /** Named wildcard exports (e.g. `import * as Something` or `export * as Something`). */
   named: Map<string, EntryPath>;
   /** Direct wildcard exports (e.g. `export * from './somewhere'`). */
   direct: string[];

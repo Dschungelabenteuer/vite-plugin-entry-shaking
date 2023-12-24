@@ -14,7 +14,12 @@ export function createChannel(
   ws.on(_('getAll'), () => {
     ws.send(
       _('getAll'),
-      JSONMap.stringify({ logs: context.logger.logs, entries: context.entries, consumer }),
+      JSONMap.stringify({
+        entries: context.entries,
+        transforms: context.transforms,
+        logs: context.logger.logs,
+        consumer,
+      }),
     );
   });
 }

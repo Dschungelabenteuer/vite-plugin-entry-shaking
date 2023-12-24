@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Illustration from './Illustration.vue';
-import viteLogo from '../assets/vite.svg?raw';
-import { store } from '../store';
+import viteLogo from '@assets/vite.svg?raw';
+import Illustration from '@component/Illustration.vue';
+import { store } from '#store';
 </script>
 
 <template>
@@ -20,9 +20,6 @@ import { store } from '../store';
 </template>
 
 <style lang="scss">
-@import '../styles/mixins';
-@import '../styles/variables';
-
 .hero {
   --vite-logo-size: 24px;
   --name-margin: calc(var(--spacing-md) + var(--vite-logo-size));

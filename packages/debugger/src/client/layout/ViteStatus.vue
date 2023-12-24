@@ -8,27 +8,25 @@ const name = 'vite server';
 const status = computed(() => {
   switch (store.status) {
     case 'connected':
-      return { icon: 'tabler:circle-check', label: `Connected to ${name}` };
+      return { icon: 'circle-check', label: `Connected to ${name}` };
     case 'disconnected':
-      return { icon: 'tabler:circle-x', label: `Disconnected from ${name}` };
+      return { icon: 'circle-x', label: `Disconnected from ${name}` };
     case 'connecting':
-      return { icon: 'tabler:refresh', label: `Connecting to ${name}…` };
+      return { icon: 'refresh', label: `Connecting to ${name}…` };
     default:
-      return { icon: 'tabler:alert-triangle', label: 'Something is odd' };
+      return { icon: 'alert-triangle', label: 'Something is odd' };
   }
 });
 </script>
 
 <template>
   <div :class="['vite-status', store.status]">
-    <Icon :icon="status.icon" />
+    <Icon :icon="`tabler:${status.icon}`" />
     {{ status.label }}
   </div>
 </template>
 
 <style lang="scss">
-@import '../styles/mixins';
-
 .vite-status {
   @include flex;
 

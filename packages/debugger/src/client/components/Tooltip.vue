@@ -17,7 +17,15 @@ const tooltipClass = computed(() => [baseClass, props.isOpen ? 'open' : '']);
 </template>
 
 <style lang="scss">
-@import '../styles/mixins';
+@include color-scheme(light) {
+  --tooltip-background-color: var(--accent-color);
+  --tooltip-text-color: var(--accent-color-contrast);
+}
+
+@include color-scheme(dark) {
+  --tooltip-background-color: var(--accent-color);
+  --tooltip-text-color: var(--accent-color-contrast);
+}
 
 .tooltip-wrapper {
   z-index: 100;
@@ -28,18 +36,18 @@ const tooltipClass = computed(() => [baseClass, props.isOpen ? 'open' : '']);
   @include padding;
   width: max-content;
   margin: var(--spacing-md);
-  background: #00000055;
   border-radius: var(--radius-md);
   transform: translateY(calc(var(--spacing-sm) * -1));
-  transition: all ease var(--transition-duration-short);
+  transition: all var(--easing-backwards) var(--transition-duration-short);
   opacity: 0;
-  background: var(--accent-color);
-  color: var(--accent-color-contrast);
+  background: var(--tooltip-background-color);
+  color: var(--tooltip-text-color);
   font-weight: 600;
 
   &.open {
-    opacity: 0.8;
+    opacity: 0.875;
     transform: translateY(0);
+    transition: all var(--easing-forwards) var(--transition-duration-medium);
   }
 }
 </style>

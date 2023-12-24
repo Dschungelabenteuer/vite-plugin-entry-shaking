@@ -48,18 +48,23 @@
     "vite-plugin-entry-shaking": "workspace:*"
   },
   "dependencies": {
+    "diff-match-patch": "^1.0.5",
     "open": "^9.1.0",
     "sirv": "^2.0.3"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.3.1",
     "@floating-ui/vue": "^1.0.2",
     "@iconify/vue": "^4.1.1",
+    "@types/diff-match-patch": "^1.0.36",
     "@types/node": "^20.8.10",
     "@vitejs/plugin-vue": "^4.5.0",
     "@yungezeit/eslint-config-vue": "^0.0.13",
     "eslint": "^8.52.0",
     "eslint-config-prettier": "^9.0.0",
     "picocolors": "^1.0.0",
+    "shikiji": "^0.9.9",
+    "shikiji-transformers": "^0.9.9",
     "typescript": "^5.2.2",
     "unbuild": "^2.0.0",
     "vite": "^4.5.0",

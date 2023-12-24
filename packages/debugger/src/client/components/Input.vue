@@ -3,10 +3,15 @@ import { computed } from 'vue';
 import { Icon } from '@iconify/vue';
 
 type InputProps = {
+  /** Input ID. */
   id: string;
+  /** Input label. */
   label: string;
+  /** Should we hide the label? */
   hideLabel?: boolean;
+  /** Input placeholder. */
   placeholder?: string;
+  /** Input icon. */
   icon?: string;
 };
 
@@ -20,7 +25,7 @@ const classes = computed(() => ['input__wrapper', props.icon ? 'has-icon' : ''])
     <Icon
       v-if="icon"
       class="input__icon"
-      :icon="icon"
+      :icon="`tabler:${icon}`"
     />
     <label
       v-if="!hideLabel"
@@ -58,7 +63,7 @@ const classes = computed(() => ['input__wrapper', props.icon ? 'has-icon' : ''])
     box-shadow ease var(--transition-duration-short),
     color ease var(--transition-duration-short);
   background-color: var(--field-background-color);
-  box-shadow: 0 0 0 1px var(--field-border-color);
+  box-shadow: 0 0 0 1px var(--field-border-color-dimmed);
   color: var(--field-text-color);
 
   &:hover {

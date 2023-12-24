@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 import { Icon } from '@iconify/vue';
-import Badge from './Badge.vue';
-import { useNavigation } from '../composables/useNavigation';
-import type { MetricsPanel } from '../composables/useMetricsPanel';
-import IconButton from './IconButton.vue';
+
+import type { MetricsPanel } from '@composable/useMetricsPanel';
+import { useNavigation } from '@composable/useNavigation';
+import Button from '@component/Button.vue';
+import Badge from '@component/Badge.vue';
 
 const links = useNavigation();
 const metricsPanel = inject<MetricsPanel>('metricsPanel')!;
@@ -36,11 +37,12 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
         class="metrics-btn"
         :disabled="isOpen"
       >
-        <IconButton
+        <Button
           :id="openBtnId"
           aria-controls="metrics-panel"
           aria-expanded="false"
-          icon="tabler:arrow-bar-left"
+          icon="arrow-bar-left"
+          :icon-only="true"
           label="Show metrics"
           size="large"
           @click="toggle"
@@ -51,9 +53,6 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
 </template>
 
 <style lang="scss">
-@import '../styles/mixins';
-@import '../styles/variables';
-
 .navigation,
 .navigation *:not(.badge):not(.tooltip-wrapper) {
   height: 100%;

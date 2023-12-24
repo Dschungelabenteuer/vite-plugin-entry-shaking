@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
-import type { ColorScheme } from '../composables/useColorScheme';
-import IconButton from './IconButton.vue';
+import type { ColorScheme } from '@composable/useColorScheme';
+import Button from '@component/Button.vue';
 import ViteStatus from './ViteStatus.vue';
 
+const swapColorScheme = inject<() => void>('swapColorScheme')!;
 const colorScheme = inject<ColorScheme>('colorScheme')!;
-const swapColorScheme: () => void = inject('swapColorScheme')!;
-const colorSchemeIcon = computed(() => (colorScheme === 'dark' ? 'tabler:sun' : 'tabler:moon'));
+const colorSchemeIcon = computed(() => (colorScheme === 'dark' ? 'sun' : 'moon'));
 </script>
 
 <template>
@@ -15,8 +15,9 @@ const colorSchemeIcon = computed(() => (colorScheme === 'dark' ? 'tabler:sun' : 
       <ViteStatus />
     </div>
     <div id="color-scheme-switcher">
-      <IconButton
+      <Button
         :icon="colorSchemeIcon"
+        :icon-only="true"
         size="large"
         label="Toggle color scheme"
         @click="swapColorScheme"
@@ -26,8 +27,6 @@ const colorSchemeIcon = computed(() => (colorScheme === 'dark' ? 'tabler:sun' : 
 </template>
 
 <style lang="scss">
-@import '../styles/mixins';
-
 .footer {
   z-index: 100;
   @include flex(normal, center);

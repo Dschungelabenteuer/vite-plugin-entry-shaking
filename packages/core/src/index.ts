@@ -1,10 +1,17 @@
 import type { PluginOption } from 'vite';
-import type { PluginEntries, PluginOptions, EntryData } from './types';
-import type { Log } from './logger';
-import { mergeOptions } from './options';
-import { Context } from './context';
+import type { LogLevel, Log } from './logger';
+import type {
+  PluginEntries,
+  PluginOptions,
+  EntryData,
+  EntryExports,
+  WildcardExports,
+} from './types';
 
-export type { PluginEntries, EntryData, Context, Log };
+import { Context } from './context';
+import { mergeOptions } from './options';
+
+export type { LogLevel, Log, PluginEntries, EntryData, WildcardExports, EntryExports, Context };
 
 export const name = 'vite-plugin-entry-shaking';
 

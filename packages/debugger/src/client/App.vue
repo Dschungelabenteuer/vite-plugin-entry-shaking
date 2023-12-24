@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import BaseLayout from './layouts/BaseLayout.vue';
+import Base from './layout/Base.vue';
 </script>
 
 <template>
-  <BaseLayout>
+  <Base>
     <router-view />
-  </BaseLayout>
+  </Base>
 </template>

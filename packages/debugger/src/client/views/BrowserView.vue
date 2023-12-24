@@ -1,60 +1,72 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Icon } from '@iconify/vue';
-import Input from '../components/Input.vue';
-import IconButton from '../components/IconButton.vue';
-import Dialog from '../components/Dialog.vue';
+import Input from '@component/Input.vue';
+import Button from '@component/Button.vue';
+import Dialog from '@component/Dialog.vue';
 
-type BrowserLayoutProps = {
+type BrowserViewProps = {
+  /** Browser page name. */
   name: string;
+  /** Page icon. */
   pageIcon: string;
+  /** Label used for the "filter" button. */
   filterLabel?: string;
+  /** Label used for the "search" input. */
   searchLabel?: string;
+  /** Placeholder used for the "search" input. */
   searchPlaceholder?: string;
+  /** Total count of items. */
+  total?: number;
+  /** Count of matched items. */
+  matched?: number;
 };
 
-withDefaults(defineProps<BrowserLayoutProps>(), {
+withDefaults(defineProps<BrowserViewProps>(), {
   filterLabel: 'Change filters',
   searchLabel: 'Search',
   searchPlaceholder: 'Search…',
+  total: 0,
+  matched: 0,
 });
 
-const filterDialogRef = ref<InstanceType<typeof Dialog> | null>(null);
+const emit = defineEmits<{ search: [q: string] }>();
 
-const openFilters = () => {
-  if (filterDialogRef.value) {
-    filterDialogRef.value.dialogRef?.showModal();
-  }
+const onSearch = (e: InputEvent) => {
+  emit('search', (e.target as HTMLInputElement).value);
 };
 </script>
 
 <template>
-  <Dialog
-    ref="filterDialogRef"
-    title="filters"
-  />
-  <div class="titled-layout">
+  <Dialog title="filters" />
+  <div class="browser-view">
     <header class="page-header">
       <div class="header__meta">
-        <Icon :icon="pageIcon" />
+        <Icon :icon="`tabler:${pageIcon}`" />
         <h1>{{ name }}</h1>
+      </div>
+      <div class="header__counts">
+        <span v-if="total === matched">{{ total }} items</span>
+        <span v-else>{{ matched }} / {{ total }} items</span>
       </div>
       <div class="header__actions">
         <Input
           id="search"
-          icon="tabler:search"
+          icon="search"
           :label="searchLabel"
           :hide-label="true"
           :placeholder="searchPlaceholder"
+          @input="onSearch"
         />
-        <IconButton
-          ref="closeBtnRef"
+        <Button
           aria-controls="metrics-panel"
-          :aria-expanded="true"
-          icon="tabler:filter"
+          icon="filter"
+          :icon-only="true"
           :label="filterLabel"
-          @click="openFilters"
-        />
+        >
+          <template #popover>
+            <slot name="filters" />
+          </template>
+        </Button>
       </div>
       <slot name="header-after" />
     </header>
@@ -65,9 +77,15 @@ const openFilters = () => {
 </template>
 
 <style lang="scss">
-@import '../styles/mixins';
+@include color-scheme(light) {
+  --browser-background-color: #fbfdfe;
+}
 
-.titled-layout {
+@include color-scheme(dark) {
+  --browser-background-color: transparent;
+}
+
+.browser-view {
   --size-page-header: 3rem;
   --size-page-content: car(var(--size-page) - var(--size-page-header));
 
@@ -77,6 +95,7 @@ const openFilters = () => {
   height: var(--size-page);
   position: relative;
   background: var(--browser-background-color);
+  overflow: hidden;
 
   .page-header {
     @include flex-row(normal, center);
@@ -95,6 +114,14 @@ const openFilters = () => {
         margin-inline-end: var(--spacing-md);
         font-size: var(--font-size-lg);
       }
+    }
+
+    &__counts {
+      font-size: var(--font-size-2xs);
+      @include padding;
+      box-shadow: 0 0 0 1px var(--overall-border-color-stronger);
+      border-radius: var(--radius-md);
+      margin: var(--spacing-md);
     }
 
     &__actions {

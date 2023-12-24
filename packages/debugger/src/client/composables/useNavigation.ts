@@ -1,3 +1,5 @@
+import type { RouteRecordName } from 'vue-router';
+
 import { computed } from 'vue';
 import { store } from '../store';
 import { routes } from '../routes';
@@ -5,19 +7,19 @@ import { routes } from '../routes';
 export function useNavigation() {
   const links = computed(() =>
     routes
-      .filter(({ props }) => props.navItem)
+      .filter(({ meta }) => meta?.navItem)
       .map((route) => ({
         href: route.path,
         name: route.name,
-        icon: route.props.icon,
-        count: getLinkCount(route.name),
+        icon: route.meta?.icon,
+        count: getLinkCount(route.name ?? ''),
       })),
   );
 
   return links;
 }
 
-function getLinkCount(routeName: string): number | undefined {
+function getLinkCount(routeName: RouteRecordName): number | undefined {
   if (!store) return 0;
 
   switch (routeName) {

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Navigation from './Navigation.vue';
-import { store } from '../store';
 
 type HeaderProps = {
   showTitle?: boolean;
@@ -24,9 +23,6 @@ withDefaults(defineProps<HeaderProps>(), { showTitle: true, showNavigation: true
 </template>
 
 <style lang="scss">
-@import '../styles/mixins';
-@import '../styles/variables';
-
 .header {
   z-index: 10;
   @include flex(normal, center);

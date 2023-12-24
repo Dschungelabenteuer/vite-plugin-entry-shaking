@@ -1,3 +1,5 @@
+import type { Log, PluginEntries } from 'vite-plugin-entry-shaking';
+
 /** Information about the consuming package. */
 export interface ConsumerPackageInfo {
   /**
@@ -37,9 +39,31 @@ export interface ChannelStore {
   /** List of transforms. */
   transforms: any[];
   /** List of targets. */
-  entries: any;
+  entries: PluginEntries;
   /** List of logs. */
-  logs: any[];
+  logs: Log[];
   /** Channel status. */
   status: 'disconnected' | 'connected' | 'connecting';
+}
+
+/** Sort direction */
+export type SortDirection = 'asc' | 'desc';
+
+/** ID of file we want to compute diffs from. */
+export type DiffsFileId = string & { __brand: 'DiffsFileId' };
+
+/** Diffs request payload sent to Worker. */
+export interface DiffsRequestPayload {
+  id: DiffsFileId;
+  from: string;
+  to: string;
+}
+
+export type DiffPosition = { line: number; col: number };
+export type DiffPositions = { start: DiffPosition; end: DiffPosition };
+
+/** Diffs response payload received from Worker. */
+export interface DiffsResponsePayload {
+  id: DiffsFileId;
+  result: string;
 }
