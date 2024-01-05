@@ -1,1 +1,0 @@
-export const DefaultExportUnused = 'unused default export';

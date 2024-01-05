@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Icon } from '@iconify/vue';
+import { useClassNames } from '@composable/useClassNames';
+import Icon from './Icon.vue';
 
 type InputProps = {
   /** Input ID. */
@@ -15,17 +16,18 @@ type InputProps = {
   icon?: string;
 };
 
+const $class = useClassNames('input');
 const props = defineProps<InputProps>();
 
-const classes = computed(() => ['input__wrapper', props.icon ? 'has-icon' : '']);
+const classes = computed(() => [$class('wrapper'), props.icon ? 'has-icon' : '']);
 </script>
 
 <template>
   <div :class="classes">
     <Icon
       v-if="icon"
-      class="input__icon"
-      :icon="`tabler:${icon}`"
+      :class="$class('icon')"
+      :name="icon"
     />
     <label
       v-if="!hideLabel"
@@ -34,7 +36,7 @@ const classes = computed(() => ['input__wrapper', props.icon ? 'has-icon' : ''])
       {{ label }}
     </label>
     <input
-      class="input"
+      :class="$class()"
       :aria-label="!hideLabel ? undefined : label"
       type="text"
       :placeholder="placeholder"

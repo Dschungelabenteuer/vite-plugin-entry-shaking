@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useClassNames } from '@composable/useClassNames';
 import Navigation from './Navigation.vue';
 
 type HeaderProps = {
@@ -6,14 +7,18 @@ type HeaderProps = {
   showNavigation?: boolean;
 };
 
-withDefaults(defineProps<HeaderProps>(), { showTitle: true, showNavigation: true });
+const $class = useClassNames('header');
+const props = withDefaults(defineProps<HeaderProps>(), {
+  showTitle: true,
+  showNavigation: true,
+});
 </script>
 
 <template>
-  <header class="header">
+  <header :class="$class()">
     <router-link
       v-if="showTitle"
-      class="header__title"
+      :class="$class('title')"
       to="/"
     >
       VPES&nbsp;debugger

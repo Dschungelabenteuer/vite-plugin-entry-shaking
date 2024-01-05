@@ -18,8 +18,6 @@ export type LogProps = {
 
 const props = defineProps<LogProps>();
 
-const gridTemplateColumns = computed(() => props.columns.map((column) => column.width).join(' '));
-
 const logIcon = computed(() => {
   switch (props.level) {
     case 'info':
@@ -33,6 +31,7 @@ const logIcon = computed(() => {
   }
 });
 
+const gridTemplateColumns = computed(() => props.columns.map((column) => column.width).join(' '));
 const logClass = computed(() => ['log', props.level]);
 </script>
 

@@ -1,8 +1,13 @@
 import { onMounted, onUnmounted } from 'vue';
 
-import type { UseFloating, UseFloatingHandlers } from './useFloating';
-import { useFloating } from './useFloating';
+import type { UseFloating, UseFloatingHandlers } from '@composable/useFloating';
+import { useFloating } from '@composable/useFloating';
 
+/**
+ * Popover composable based on `useFloating`.
+ * @param reference Reference element the popover is attached to (e.g. a button).
+ * @param floatingEl Popover component that is attached to the reference element.
+ */
 export const usePopover: UseFloating = (reference, floating) => {
   const body = document.querySelector('body');
   const floatingUi = useFloating(reference, floating);

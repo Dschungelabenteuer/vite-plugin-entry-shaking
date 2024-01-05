@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { inject } from 'vue';
-import { Icon } from '@iconify/vue';
 
-import type { MetricsPanel } from '@composable/useMetricsPanel';
+import type { Panel } from '@composable/usePanel';
 import { useNavigation } from '@composable/useNavigation';
+import { useClassNames } from '@composable/useClassNames';
 import Button from '@component/Button.vue';
 import Badge from '@component/Badge.vue';
+import Icon from '@component/Icon.vue';
 
+const $class = useClassNames('navigation');
 const links = useNavigation();
-const metricsPanel = inject<MetricsPanel>('metricsPanel')!;
+const metricsPanel = inject<Panel>('metricsPanel')!;
 const { toggle, isOpen, openBtnId } = metricsPanel;
 </script>
 
 <template>
-  <nav class="navigation">
+  <nav :class="$class()">
     <ul>
       <li
         v-for="link in links"
@@ -22,13 +24,13 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
         <router-link :to="link.href">
           <Icon
             v-if="link.icon"
-            class="navigation__icon"
-            :icon="`tabler:${link.icon}`"
+            :class="$class('icon')"
+            :name="link.icon"
           />
           {{ link.name }}
           <Badge
             v-if="link.count !== undefined"
-            class="navigation__badge"
+            :class="$class('badge')"
             :content="String(link.count)"
           />
         </router-link>

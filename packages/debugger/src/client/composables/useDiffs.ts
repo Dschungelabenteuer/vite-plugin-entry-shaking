@@ -1,10 +1,12 @@
-import type { DiffsFileId, DiffsRequestPayload, DiffsResponsePayload } from '../../types';
+import type { DiffsFileId, DiffsRequestPayload, DiffsResponsePayload } from '#types';
 
 let worker: Worker;
 
 const queue = new Map();
 
+/** Composable used to compute and get diffs between two strings. */
 export function useDiffs() {
+  /** Loads a Web Worker dedicated to compute diffs off the main thread. */
   const prepare = async () => {
     if (!worker) {
       const { default: DiffsWorker } = await import('../workers/diffs?worker');
@@ -13,6 +15,12 @@ export function useDiffs() {
     }
   };
 
+  /**
+   * Asks the dedicated Web Worker to compare two strings.
+   * @param id ID of the file we want to compute diffs from.
+   * @param from Source content of the file.
+   * @param to Updated content of the file.
+   */
   const compare = async (id: DiffsFileId, from: string, to: string) => {
     const input: DiffsRequestPayload = { id, from, to };
     worker?.postMessage(input);
@@ -25,7 +33,11 @@ export function useDiffs() {
   return { prepare, compare };
 }
 
-function handleDiffsResponse(e: MessageEvent) {
+/**
+ * Handles the response of the dedicated Web Worker, once it finished comparing two strings.
+ * @param e Message event received from the Web Worker.
+ */
+function handleDiffsResponse(e: MessageEvent<{ id: string; result: string }>) {
   const { id, result } = e.data;
   const resolve = queue.get(id);
   resolve?.(result);

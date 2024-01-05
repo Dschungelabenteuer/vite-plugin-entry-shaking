@@ -54,6 +54,11 @@
   border-radius: calc(var(--radius-md) + 6px);
   border: 0;
 
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
   &:hover,
   &:focus,
   &:active {
@@ -66,6 +71,58 @@
       inset 0 0 0 1px var(--button-outline-color),
       inset 0 0 0 4px var(--background-color),
       inset 0 0 0 6px var(--accent-color);
+  }
+
+  &.bordered {
+    transition: ease var(--transition-duration-short);
+
+    &:not(:focus) {
+      box-shadow:
+        inset 0 0 0 1px var(--button-outline-color),
+        inset 0 0 0 0 transparent,
+        inset 0 0 0 0 transparent;
+    }
+
+    &:hover {
+      box-shadow:
+        inset 0 0 0 1px var(--button-outline-color-hover),
+        inset 0 0 0 0 transparent,
+        inset 0 0 0 0 transparent;
+    }
+  }
+
+  svg {
+    margin-inline-end: var(--spacing-md);
+  }
+
+  &.icon-only {
+    svg {
+      margin-inline-end: 0;
+    }
+  }
+
+  &.small {
+    @include button-small;
+  }
+
+  &.medium {
+    @include button-medium;
+  }
+
+  &.large {
+    @include button-large;
+  }
+
+  .shortcut {
+    margin-inline-start: var(--spacing-md);
+    margin-inline-end: 0;
+  }
+}
+
+@mixin button-small {
+  padding: calc(var(--spacing-sm) + 3px);
+  svg {
+    margin-inline-end: var(--spacing-sm);
   }
 }
 

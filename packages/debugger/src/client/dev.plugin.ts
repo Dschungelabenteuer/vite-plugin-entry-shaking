@@ -4,7 +4,7 @@ import { entries } from '../../mocks/entries';
 import { transforms } from '../../mocks/transforms';
 import { logs } from '../../mocks/logs';
 
-import { wsMessageName } from '../shared';
+import { READY, wsMessageName } from '../shared';
 import { JSONMap } from '../serializer';
 import type { ConsumerPackageInfo } from '../types';
 
@@ -19,8 +19,11 @@ function devPlugin() {
   return {
     name: 'vpes-client-dev-plugin',
     configureServer({ ws }: ViteDevServer) {
-      ws.on(_('getAll'), () => {
-        ws.send(_('getAll'), JSONMap.stringify({ entries, transforms, logs, consumer }));
+      ws.on(READY, () => {
+        ws.send(READY, JSONMap.stringify({ entries, logs, consumer }));
+        transforms.forEach((transform) => {
+          ws.send(_('registerTransform'), transform);
+        });
       });
     },
   };

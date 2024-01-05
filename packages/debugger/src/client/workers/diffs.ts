@@ -41,7 +41,7 @@ function concatDiffs(diffs: DiffDefinition[]) {
     }
   };
 
-  diffs.forEach((diff, diffIndex) => {
+  diffs.forEach((diff) => {
     const [op, text] = diff;
     if (text === '\n') {
       if (incrementalRemoval) addLine(Diff.DIFF_DELETE, incrementalRemoval);
@@ -86,7 +86,6 @@ function concatDiffs(diffs: DiffDefinition[]) {
       // If last item and unterminated line
       if (index === lastLineIndex) {
         const isEOL = !line.trim().length;
-        const isEOF = diffIndex === diffs.length - 1;
 
         // If there isn't any incremental addition or removal and is EOL, add the line.
         if (!incrementalAddition && !incrementalRemoval && isEOL) {
@@ -138,6 +137,5 @@ function concatDiffs(diffs: DiffDefinition[]) {
 
   const output = allLines.join('\n');
 
-  console.log('@@@@', allLines);
   return output;
 }

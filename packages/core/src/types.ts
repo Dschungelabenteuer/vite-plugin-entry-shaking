@@ -8,12 +8,30 @@ export interface PluginOptions {
   ignorePatterns?: any[];
   /** How deep should this plugin run static analysis when encountering wildcards? */
   maxWildcardDepth?: number | undefined;
+  /** Enable diagnostics ? */
+  enableDiagnostics?: boolean;
   /** Defines whether debug mode should be enabled. */
   debug?: boolean;
 }
 
 /** Final plugin options. */
 export type FinalPluginOptions = Required<PluginOptions>;
+
+/** Performance-related duration. */
+export interface PerformanceDuration {
+  /** Total duration. */
+  time: number;
+  /** Self duration. */
+  self: number;
+}
+
+/** Plugin metrics. */
+export interface PluginMetrics {
+  /** Time spent analyzing entries. */
+  analysis: PerformanceDuration;
+  /** Total process time of the plugin. */
+  process: number;
+}
 
 /** Target entry data. */
 export interface EntryData {
@@ -27,10 +45,37 @@ export interface EntryData {
   exports: EntryExports;
   /** Static analysis-wise depth at which the entry was registered. */
   depth: number;
+  /** Time spent analyzing the entry (self). */
+  self: number;
+  /** Time spent analyzing the entry (inclusive). */
+  time: number;
+}
+
+/** Target entry metrics (debug). */
+export interface EntryMetrics {
+  /** Time spent analyzing the entry. */
+  analysis: PerformanceDuration;
+}
+
+/** Transformed file data. */
+export interface TransformData {
+  /** Absolute path to transformed file. */
+  id: string;
+  /** Source content of the transformed file. */
+  source: string;
+  /** Transformed content of the transformed file. */
+  transformed: string;
+  /** Time spent transforming the file. */
+  time: number;
+  /** Transform's timestamp. */
+  timestamp: number;
 }
 
 /** Map of analyzed entries indexed by their absolute path. */
 export type PluginEntries = Map<EntryPath, EntryData>;
+
+/** Map of transformed files indexed by their absolute path. */
+export type PluginTransforms = Map<string, TransformData>;
 
 /** Named import. */
 export type ImportName = string;
@@ -62,6 +107,7 @@ export type WildcardExports = {
 
 /** Import inputs. */
 export type ImportInput = Omit<ImportParams, 'path'> & {
+  /** Imported entity name. */
   name: string;
 };
 
@@ -107,3 +153,8 @@ export interface ParsedImportStatement {
 
 /** Import statement string. */
 export type ImportStatement = `import ${string}`;
+
+/** Removes readonly from array. */
+export type RemoveReadonly<T extends readonly unknown[]> = T extends readonly (infer U)[]
+  ? U[]
+  : never;

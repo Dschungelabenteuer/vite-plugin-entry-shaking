@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useClassNames } from '@composable/useClassNames';
 
 type TooltipProps = { isOpen: boolean };
 
+const $class = useClassNames('tooltip');
 const props = defineProps<TooltipProps>();
-const baseClass = 'tooltip';
-const tooltipClass = computed(() => [baseClass, props.isOpen ? 'open' : '']);
+
+const stateClass = computed(() => (props.isOpen ? 'open' : ''));
+const tooltipClass = computed(() => [$class(), stateClass.value]);
 </script>
 
 <template>
-  <div class="tooltip-wrapper">
+  <div :class="$class('wrapper')">
     <div :class="tooltipClass">
       <slot />
     </div>
@@ -25,11 +28,6 @@ const tooltipClass = computed(() => [baseClass, props.isOpen ? 'open' : '']);
 @include color-scheme(dark) {
   --tooltip-background-color: var(--accent-color);
   --tooltip-text-color: var(--accent-color-contrast);
-}
-
-.tooltip-wrapper {
-  z-index: 100;
-  pointer-events: none;
 }
 
 .tooltip {
@@ -48,6 +46,11 @@ const tooltipClass = computed(() => [baseClass, props.isOpen ? 'open' : '']);
     opacity: 0.875;
     transform: translateY(0);
     transition: all var(--easing-forwards) var(--transition-duration-medium);
+  }
+
+  &__wrapper {
+    z-index: 100;
+    pointer-events: none;
   }
 }
 </style>

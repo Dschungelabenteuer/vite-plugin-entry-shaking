@@ -1,5 +1,6 @@
 import { reactive } from 'vue';
 
+import type { PluginMetrics } from 'vite-plugin-entry-shaking';
 import type { ChannelStore } from '../types';
 
 export const store = reactive<ChannelStore>({
@@ -7,7 +8,8 @@ export const store = reactive<ChannelStore>({
   version: undefined,
   rootDir: '',
   logs: [],
-  entries: [],
+  metrics: {} as PluginMetrics,
+  entries: new Map(),
   transforms: [],
   status: 'disconnected',
   consumer: { name: 'Debugger' },

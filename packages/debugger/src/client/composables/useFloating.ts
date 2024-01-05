@@ -21,6 +21,12 @@ export type UseFloating = <
   handlers?: UseFloatingHandlers;
 };
 
+/**
+ * General-purpose `floating-ui` wrapper composable.
+ * It exposed useful and self-explanatory control methods: `close`, `open` and `toggle`.
+ * @param reference Reference element the floating element is attached to (e.g. a button).
+ * @param floatingEl Floating element that is attached to the reference element.
+ */
 export const useFloating: UseFloating = (reference, floatingEl) => {
   const middleware = ref([flip(), shift()]);
   const isOpen = ref(false);

@@ -17,13 +17,18 @@ export async function transformIfNeeded(
   id: string,
   code: string,
 ): Promise<string | undefined> {
+  ctx.logger.debug(`Processing file: ${id}`, undefined);
   const isCandidate = methods.requiresTransform(ctx, id);
+  const { out, time } = await ctx.measure('Transforming file (if needed)', async () => {
+    if (!isCandidate) {
+      ctx.logger.debug(`Ignored by options: ${id}`, undefined);
+    } else {
+      return await methods.transformImportsIfNeeded(ctx, id, code);
+    }
+  });
 
-  if (!isCandidate) {
-    ctx.logger.info(`Ignored by options: ${id}`, undefined, true);
-  } else {
-    return await methods.transformImportsIfNeeded(ctx, id, code);
-  }
+  ctx.eventBus?.emit('increaseProcessTime', time);
+  return out;
 }
 
 /**
@@ -39,10 +44,31 @@ export async function transformImportsIfNeeded(
   code: string,
 ): Promise<string | undefined> {
   const [imports, exports] = parse(code);
+  const importedStr = `${imports.length} imports`;
+  const exportedStr = `${exports.length} exports`;
+  ctx.logger.debug(`es-module-lexer (${id}) returned ${importedStr} and ${exportedStr}`);
+
   const importsTarget = await methods.importsTargetEntry(ctx, id, imports);
   const { transformImports: transform } = methods;
-  if (importsTarget) return await transform(ctx, id, code, imports, exports);
-  ctx.logger.info(`Ignored by analysis: ${id}`, undefined, true);
+  if (!importsTarget) {
+    ctx.logger.debug(`Ignored by analysis: ${id}`, undefined);
+    return;
+  }
+
+  const { time, out } = await ctx.measure(
+    `Transforming file "${id}"`,
+    async () => await transform(ctx, id, code, imports, exports),
+  );
+
+  ctx.eventBus?.emit('registerTransform', {
+    id,
+    source: code,
+    transformed: out ?? code,
+    time,
+    timestamp: Date.now(),
+  });
+
+  return out;
 }
 
 /**
@@ -82,7 +108,6 @@ export async function transformImports(
       );
     }
   }
-  ctx.logger.info(`[MATCHED] ${id}`);
   const out = src.toString();
   return reexports.length ? [out, reexports].join('\n') : out;
 }

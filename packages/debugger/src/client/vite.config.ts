@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
 import { fileURLToPath } from 'url';
+import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import dev from './dev.plugin';
 
@@ -13,6 +13,7 @@ export default defineConfig({
     alias: {
       '#store': fileURLToPath(new URL('./store.ts', import.meta.url)),
       '#utils': fileURLToPath(new URL('./utils.ts', import.meta.url)),
+      '#types': fileURLToPath(new URL('./types.ts', import.meta.url)),
       '@assets': fileURLToPath(new URL('./assets', import.meta.url)),
       '@component': fileURLToPath(new URL('./components', import.meta.url)),
       '@composable': fileURLToPath(new URL('./composables', import.meta.url)),

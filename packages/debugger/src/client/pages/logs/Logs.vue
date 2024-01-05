@@ -1,71 +1,49 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, toRefs } from 'vue';
 import { useRoute } from 'vue-router';
 
+import { store } from '#store';
+import { useBrowserData } from '@composable/useBrowserData';
 import BrowserView from '@views/BrowserView.vue';
 import ScrollableView from '@views/ScrollableView.vue';
-import { store } from '#store';
 
-import type { SortDirection } from '../../../types';
-import type { LogProps } from './Log.vue';
 import Log from './Log.vue';
 import LogsFilters from './LogsFilters.vue';
 
 const route = useRoute();
-const sort = ref<SortDirection>('asc');
-const search = ref<string | undefined>(undefined);
-const filters = ref<string[]>(['debug', 'info', 'warn', 'error']);
-const items = computed(() => {
-  const logs = store.logs?.reduce(
-    (logList, log) => {
-      if (search.value && !log.content.includes(search.value)) return logList;
-      if (!filters.value?.includes(log.level)) return logList;
-      const index = logList.length + 1;
-      return [...logList, { ...log, id: index, index }];
+const ctxStore = toRefs(store);
+const { sort, columns, items, filters, matched, methods } = useBrowserData({
+  source: ctxStore.logs,
+  filters: (item, filtersObj) => {
+    console.info(item, filtersObj);
+    return true;
+  },
+  columns: {
+    level: {
+      label: '',
+      width: '2rem',
+      minWidth: '100px',
     },
-    [] as Omit<LogProps, 'columns'>[],
-  );
-
-  return sort.value === 'asc' ? logs : logs?.reverse();
+    timestamp: {
+      key: 'timestamp',
+      label: 'Time',
+      class: 'centered',
+      width: '5rem',
+      minWidth: '100px',
+      sortable: true,
+      ascLabel: 'Show newest first',
+      descLabel: 'Show oldest first',
+    },
+    content: {
+      label: 'Content',
+      width: '1fr',
+      searchable: true,
+    },
+  },
 });
 
 const total = computed(() => store.logs?.length);
-const matched = computed(() => items.value.length);
 const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.icon as string }));
-const columns = computed(() => [
-  {
-    key: 'level',
-    label: '',
-    width: '2rem',
-    minWidth: '100px',
-  },
-  {
-    key: 'timestamp',
-    label: 'Time',
-    class: 'centered',
-    width: '5rem',
-    minWidth: '100px',
-    sortable: true,
-  },
-  {
-    key: 'content',
-    label: 'Content',
-    width: '1fr',
-  },
-]);
-
-const onSortChange = () => {
-  sort.value = sort.value === 'asc' ? 'desc' : 'asc';
-};
-
-const onSearch = (q: string) => {
-  const searched = q.trim();
-  search.value = searched.length ? searched : undefined;
-};
-
-const onFilterChange = (filterList: string[]) => {
-  filters.value = filterList;
-};
 </script>
 
 <template>
@@ -73,18 +51,18 @@ const onFilterChange = (filterList: string[]) => {
     v-bind="page"
     :total="total"
     :matched="matched"
-    @search="onSearch"
+    @search="methods.onSearch"
   >
     <template #filters>
       <LogsFilters
         :filters="filters"
-        @filter="onFilterChange"
+        @filter="methods.onFilterChange"
       />
     </template>
 
     <ScrollableView
       v-bind="{ columns, items, minItemSize: 48, sort }"
-      @sort="onSortChange"
+      @sort="methods.onSortChange"
     >
       <template #default="{ item, index }">
         <Log

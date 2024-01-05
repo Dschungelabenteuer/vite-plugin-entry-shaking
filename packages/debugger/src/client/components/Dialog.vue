@@ -1,24 +1,73 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import Button from './Button.vue';
+import { ref, computed } from 'vue';
+import { useClassNames } from '@composable/useClassNames';
+import { useFocusTrap } from '@composable/useFocusTrap';
+import Button from '@component/Button.vue';
 
 type DialogProps = {
   /** Dialog title. */
   title?: string;
-  /** Is wide mode ? */
-  wide?: boolean;
+  /** Dialog width. */
+  width?: string;
+  /** Dialog height. */
+  height?: string;
 };
 
+type DialogEvents = {
+  /** Emitted when the dialog is closed. */
+  close: [];
+};
+
+const $class = useClassNames('dialog');
+const emit = defineEmits<DialogEvents>();
 const props = withDefaults(defineProps<DialogProps>(), {
   title: undefined,
+  width: 'auto',
+  height: 'auto',
 });
 
-const element = ref<HTMLDialogElement>();
-const body = document.querySelector('body');
-const classes = computed(() => ['dialog', props.wide ? 'wide' : '']);
-const close = () => element.value?.close();
+const element = ref<HTMLDialogElement | null>(null)!;
+const timeout = ref<ReturnType<typeof setTimeout>>();
+const classes = computed(() => [$class()]);
+const trap = useFocusTrap(element);
 
-defineExpose({ element });
+/** Closes the dialog. */
+const close = () => {
+  element.value?.close();
+};
+
+/** Triggered when dialog is clicked. */
+const handleClick = (event: Event) => {
+  const [topTarget] = event.composedPath();
+  if (topTarget === element.value) close();
+};
+
+/** Triggered when opening the dialog. */
+const handleOpen = () => {
+  // Clear any existing close animation's timeout.
+  if (timeout.value) clearTimeout(timeout.value);
+  // Refresh focus trap in case dialog content changed.
+  trap.refresh();
+};
+
+/** Triggered when closing the dialog. */
+const handleClose = () => {
+  const animationCustomProp = '--transition-duration-short';
+  const computedStyle = getComputedStyle(element.value!);
+  const duration = computedStyle.getPropertyValue(animationCustomProp);
+  const delay = duration.endsWith('ms')
+    ? Number(duration.slice(0, -2))
+    : Number(duration.slice(0, -1)) * 1000;
+  // Wait for the closing animation to finish before emitting the close event.
+  timeout.value = setTimeout(() => emit('close'), delay);
+};
+
+defineExpose({
+  element,
+  refreshFocusTrap: trap.refresh,
+  focusFirst: trap.focusFirst,
+  focusLast: trap.focusLast,
+});
 </script>
 
 <template>
@@ -26,12 +75,14 @@ defineExpose({ element });
     <dialog
       ref="element"
       :class="classes"
-      @click="close"
+      @click="handleClick"
+      @close="handleClose"
+      @open="handleOpen"
     >
-      <div class="dialog__header">
+      <div :class="$class('header')">
         <h2>{{ title }}</h2>
         <Button
-          class="dialog__close"
+          :class="$class('close')"
           autofocus
           label="Close"
           icon="x"
@@ -39,8 +90,11 @@ defineExpose({ element });
           @click="close"
         />
       </div>
-      <div class="dialog__content">
+      <div :class="$class('content')">
         <slot />
+      </div>
+      <div :class="$class('footer')">
+        <slot name="footer" />
       </div>
     </dialog>
   </Teleport>
@@ -53,7 +107,7 @@ defineExpose({ element });
 }
 
 @include color-scheme(dark) {
-  --dialog-background-color: color-mix(in srgb, var(--background-color-alt) 30%, black);
+  --dialog-background-color: color-mix(in srgb, var(--background-color-alt) 50%, rgb(9, 6, 19));
   --dialog-backdrop-color: color-mix(in srgb, var(--background-color-alt) 20%, transparent);
 }
 
@@ -61,13 +115,16 @@ defineExpose({ element });
   position: fixed;
   inset-block: 0;
   display: grid;
-  grid-template-rows: 3rem 1fr;
+  grid-template-rows: 3rem 1fr 3rem;
   pointer-events: none;
   transform: translateY(-0.8rem);
   transform-origin: top center;
   opacity: 0;
   transition: all var(--easing-backwards) var(--transition-duration-short);
   overflow: hidden;
+
+  height: v-bind(height);
+  width: v-bind(width);
 
   margin: auto;
   background-color: var(--dialog-background-color);
@@ -90,11 +147,6 @@ defineExpose({ element });
     transition: all var(--easing-forwards) var(--transition-duration-medium);
   }
 
-  &.wide {
-    max-height: 80vh;
-    max-width: 80vw;
-  }
-
   &::backdrop {
     backdrop-filter: var(--blur-lg);
     background: var(--dialog-backdrop-color);
@@ -113,6 +165,14 @@ defineExpose({ element });
       margin-block: 0;
       padding-block: 0;
     }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    padding: var(--spacing-md) var(--spacing-lg);
+    @include border-top;
   }
 
   &__close {

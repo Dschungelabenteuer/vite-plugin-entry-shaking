@@ -1,9 +1,10 @@
 import type { RouteRecordName } from 'vue-router';
-
 import { computed } from 'vue';
-import { store } from '../store';
+
+import { store } from '#store';
 import { routes } from '../routes';
 
+/** Returns navigation props based on application routes. */
 export function useNavigation() {
   const links = computed(() =>
     routes
@@ -11,7 +12,7 @@ export function useNavigation() {
       .map((route) => ({
         href: route.path,
         name: route.name,
-        icon: route.meta?.icon,
+        icon: route.meta?.icon as string,
         count: getLinkCount(route.name ?? ''),
       })),
   );
@@ -19,6 +20,10 @@ export function useNavigation() {
   return links;
 }
 
+/**
+ * Returns route-specific total item count (or `undefined` if irrelevant).
+ * @param routeName Name of the route as specified through route's config.
+ */
 function getLinkCount(routeName: RouteRecordName): number | undefined {
   if (!store) return 0;
 

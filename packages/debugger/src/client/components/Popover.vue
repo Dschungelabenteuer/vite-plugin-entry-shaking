@@ -1,20 +1,27 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useClassNames } from '@composable/useClassNames';
 
 type PopoverProps = { isOpen: boolean };
+type PopoverEvents = { close: [] };
 
+const $class = useClassNames('popover');
+const emit = defineEmits<PopoverEvents>();
 const props = defineProps<PopoverProps>();
-const emit = defineEmits<{ close: [] }>();
-const baseClass = 'popover';
-const popoverClass = computed(() => [baseClass, props.isOpen ? 'open' : '']);
+
+const stateClass = computed(() => (props.isOpen ? 'open' : ''));
+const popoverClass = computed(() => [$class(), stateClass.value]);
 </script>
 
 <template>
   <div
-    class="popover-wrapper"
+    :class="$class('wrapper')"
     @keyup.esc="emit('close')"
   >
-    <div :class="popoverClass">
+    <div
+      tabindex="-1"
+      :class="popoverClass"
+    >
       <slot />
     </div>
   </div>
@@ -30,9 +37,6 @@ const popoverClass = computed(() => [baseClass, props.isOpen ? 'open' : '']);
   --popover-background-color: #ccaaff18;
   --popover-border-color: #ccaaff22;
 }
-.popover-wrapper {
-  z-index: 90;
-}
 
 .popover {
   @include padding;
@@ -42,6 +46,7 @@ const popoverClass = computed(() => [baseClass, props.isOpen ? 'open' : '']);
   border-radius: var(--radius-md);
   transform: translateY(calc(var(--spacing-md) * -2));
   opacity: 0;
+  visibility: hidden;
   scale: 0.94;
   background: var(--popover-background-color);
   box-shadow:
@@ -53,11 +58,16 @@ const popoverClass = computed(() => [baseClass, props.isOpen ? 'open' : '']);
   transition: all var(--easing-backwards) var(--transition-duration-short);
 
   &.open {
+    visibility: visible;
     opacity: 0.94;
     scale: 1;
     transform: translateY(0);
     backdrop-filter: var(--blur-lg);
     transition: all var(--easing-forwards) var(--transition-duration-medium);
+  }
+
+  &__wrapper {
+    z-index: 90;
   }
 }
 </style>

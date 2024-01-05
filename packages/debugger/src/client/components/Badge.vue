@@ -1,14 +1,17 @@
 <script setup lang="ts">
+import { useClassNames } from '@composable/useClassNames';
+
 type BadgeProps = {
   /** Content of the badge. */
   content: string;
 };
 
-defineProps<BadgeProps>();
+const $class = useClassNames('badge');
+const props = defineProps<BadgeProps>();
 </script>
 
 <template>
-  <span class="badge">
+  <span :class="$class()">
     {{ content }}
   </span>
 </template>

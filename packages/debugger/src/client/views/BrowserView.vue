@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
+import { computed } from 'vue';
+import { useClassNames } from '@composable/useClassNames';
 import Input from '@component/Input.vue';
 import Button from '@component/Button.vue';
-import Dialog from '@component/Dialog.vue';
 
 type BrowserViewProps = {
   /** Browser page name. */
   name: string;
   /** Page icon. */
-  pageIcon: string;
+  pageIcon?: string;
   /** Label used for the "filter" button. */
   filterLabel?: string;
   /** Label used for the "search" input. */
@@ -19,9 +20,19 @@ type BrowserViewProps = {
   total?: number;
   /** Count of matched items. */
   matched?: number;
+  /** Condensed display? (reduces overall spacing). */
+  condensed?: boolean;
 };
 
-withDefaults(defineProps<BrowserViewProps>(), {
+type BrowserViewEvents = {
+  /** Emitted when the search input changes. */
+  search: [q: string];
+};
+
+const $class = useClassNames('browser-view');
+const emit = defineEmits<BrowserViewEvents>();
+const props = withDefaults(defineProps<BrowserViewProps>(), {
+  pageIcon: undefined,
   filterLabel: 'Change filters',
   searchLabel: 'Search',
   searchPlaceholder: 'Search…',
@@ -29,7 +40,7 @@ withDefaults(defineProps<BrowserViewProps>(), {
   matched: 0,
 });
 
-const emit = defineEmits<{ search: [q: string] }>();
+const classes = computed(() => [$class(), props.condensed ? 'condensed' : '']);
 
 const onSearch = (e: InputEvent) => {
   emit('search', (e.target as HTMLInputElement).value);
@@ -37,18 +48,20 @@ const onSearch = (e: InputEvent) => {
 </script>
 
 <template>
-  <Dialog title="filters" />
-  <div class="browser-view">
-    <header class="page-header">
-      <div class="header__meta">
-        <Icon :icon="`tabler:${pageIcon}`" />
+  <div :class="classes">
+    <header :class="$class('header')">
+      <div :class="$class('header-meta')">
+        <Icon
+          v-if="pageIcon"
+          :icon="`tabler:${pageIcon}`"
+        />
         <h1>{{ name }}</h1>
       </div>
-      <div class="header__counts">
+      <div :class="$class('header-counts')">
         <span v-if="total === matched">{{ total }} items</span>
         <span v-else>{{ matched }} / {{ total }} items</span>
       </div>
-      <div class="header__actions">
+      <div :class="$class('header-actions')">
         <Input
           id="search"
           icon="search"
@@ -70,7 +83,7 @@ const onSearch = (e: InputEvent) => {
       </div>
       <slot name="header-after" />
     </header>
-    <section class="page-content">
+    <section :class="$class('content')">
       <slot />
     </section>
   </div>
@@ -86,51 +99,60 @@ const onSearch = (e: InputEvent) => {
 }
 
 .browser-view {
+  --size-page-content: calc(100% - var(--spacing-xs));
+
   --size-page-header: 3rem;
-  --size-page-content: car(var(--size-page) - var(--size-page-header));
+  --padding-page-header: var(--spacing-lg) var(--spacing-md);
+  --font-size-page-header: var(--font-size-sm);
+
+  &.condensed {
+    --size-page-header: 2.75rem;
+    --padding-page-header: var(--spacing-md) var(--spacing-sm);
+    --font-size-page-header: var(--font-size-xs);
+  }
 
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: var(--size-page-header) 1fr;
   height: var(--size-page);
+  max-height: 100%;
   position: relative;
   background: var(--browser-background-color);
   overflow: hidden;
 
-  .page-header {
+  &__header {
     @include flex-row(normal, center);
     height: var(--size-page-header);
-    padding-inline: var(--spacing-lg) var(--spacing-md);
+    padding-inline: var(--padding-page-header);
 
     h1 {
-      font-size: var(--font-size-sm);
+      font-size: var(--font-size-page-header);
     }
-  }
 
-  .header {
-    &__meta {
+    &-meta {
       @include flex-row(normal, center);
+
       svg {
         margin-inline-end: var(--spacing-md);
         font-size: var(--font-size-lg);
       }
     }
 
-    &__counts {
-      font-size: var(--font-size-2xs);
+    &-counts {
       @include padding;
+      font-size: var(--font-size-2xs);
       box-shadow: 0 0 0 1px var(--overall-border-color-stronger);
       border-radius: var(--radius-md);
       margin: var(--spacing-md);
     }
 
-    &__actions {
+    &-actions {
       display: flex;
       margin-inline-start: auto;
     }
   }
 
-  .page-content {
+  &__content {
     height: var(--size-page-content);
     margin: var(--spacing-md);
     margin-block-start: 0;

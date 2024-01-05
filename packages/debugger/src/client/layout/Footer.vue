@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
+
 import type { ColorScheme } from '@composable/useColorScheme';
+import { useClassNames } from '@composable/useClassNames';
 import Button from '@component/Button.vue';
 import ViteStatus from './ViteStatus.vue';
+
+const $class = useClassNames('footer');
 
 const swapColorScheme = inject<() => void>('swapColorScheme')!;
 const colorScheme = inject<ColorScheme>('colorScheme')!;
@@ -10,10 +14,8 @@ const colorSchemeIcon = computed(() => (colorScheme === 'dark' ? 'sun' : 'moon')
 </script>
 
 <template>
-  <footer class="footer">
-    <div class="vite-status">
-      <ViteStatus />
-    </div>
+  <footer :class="$class()">
+    <ViteStatus />
     <div id="color-scheme-switcher">
       <Button
         :icon="colorSchemeIcon"
@@ -33,10 +35,6 @@ const colorSchemeIcon = computed(() => (colorScheme === 'dark' ? 'sun' : 'moon')
   @include border-top;
   padding-inline: var(--spacing-md);
   background: var(--overall-background-color);
-
-  #vite-status {
-    margin-inline-end: auto;
-  }
 
   #color-scheme-switcher {
     margin-inline-start: auto;

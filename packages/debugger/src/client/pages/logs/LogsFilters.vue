@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Checkbox from '@component/Checkbox.vue';
 import { ref } from 'vue';
+import Checkbox from '@component/Checkbox.vue';
 
 const props = defineProps<{ filters: string[] }>();
 const emit = defineEmits<{ filter: [filters: string[]] }>();

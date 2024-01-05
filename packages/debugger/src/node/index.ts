@@ -12,7 +12,12 @@ import { getConsumerPackageInfo } from './paths';
 
 const PATH_TO_CLIENT = resolve(dirname(fileURLToPath(import.meta.url)), '../dist/client');
 
-export async function attachDebugger(server: ViteDevServer, context: Context) {
+/**
+ * Attaches a debugger to a Vite dev server instance.
+ * @param server Vite dev server instance.
+ * @param ctx Plugin context.
+ */
+export async function attachDebugger(server: ViteDevServer, ctx: Context) {
   const { base } = server.config;
   const debuggerPath = `${base}__debugger`;
   const sirvConfig = { dev: true, single: true };
@@ -20,7 +25,7 @@ export async function attachDebugger(server: ViteDevServer, context: Context) {
   server.middlewares.use(debuggerPath, sirv(PATH_TO_CLIENT, sirvConfig));
 
   const consumer = await getConsumerPackageInfo();
-  createChannel(server, context, consumer);
+  createChannel(server, ctx, consumer);
   printUrls(server, debuggerPath, consumer);
 }
 
@@ -65,11 +70,13 @@ function printUrls(server: ViteDevServer, debuggerRoute: string, consumer: Consu
  * @param address Target address to open.
  */
 async function openBrowser(address: string) {
-  await import('open')
-    .then((r) => r.default(address, { newInstance: true }))
-    .catch(() => {
-      // Silent error, debugger should still be accessible from printed url.
-    });
+  setTimeout(async () => {
+    await import('open')
+      .then((r) => r.default(address, { newInstance: true }))
+      .catch(() => {
+        // Silent error, debugger should still be accessible from printed url.
+      });
+  });
 }
 
 export default attachDebugger;

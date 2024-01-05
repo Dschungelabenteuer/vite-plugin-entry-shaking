@@ -1,17 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Icon } from '@iconify/vue';
 
-import type { Transform } from 'vite-plugin-entry-shaking';
+import type { TransformData } from 'vite-plugin-entry-shaking';
+import Button from '@component/Button.vue';
 import type { Column } from '@views/ScrollableView.vue';
 
-export type TransformProps = {
-  /** Transform message content. */
-  content: Transform['content'];
-  /** Transform level. */
-  level: Transform['level'];
-  /** Transform time. */
-  timestamp?: Transform['timestamp'];
+export type TransformProps = TransformData & {
   /** Columns. */
   columns: Column[];
 };
@@ -19,28 +13,22 @@ export type TransformProps = {
 const props = defineProps<TransformProps>();
 
 const gridTemplateColumns = computed(() => props.columns.map((column) => column.width).join(' '));
-
-const transformIcon = computed(() => {
-  switch (props.level) {
-    case 'info':
-      return 'info-circle';
-    case 'warn':
-      return 'alert-triangle';
-    case 'error':
-      return 'alert-circle';
-    default:
-      return 'info-circle';
-  }
-});
-
-const transformClass = computed(() => ['transform', props.level]);
+const transformClass = computed(() => ['transform']);
 </script>
 
 <template>
   <div :class="transformClass">
-    <div class="transform__level"><Icon :icon="`tabler:${transformIcon}`" /></div>
+    <div class="transform__access">
+      <Button
+        label="Transform details"
+        icon="eye"
+        :icon-only="true"
+        :disable-tooltip="true"
+      />
+    </div>
     <div class="transform__time">{{ new Date(timestamp ?? 0).toLocaleTimeString() }}</div>
-    <div class="transform__content">{{ content }}</div>
+    <div class="transform__duration">{{ time }}ms</div>
+    <div class="transform__content">{{ id }}</div>
   </div>
 </template>
 
@@ -54,16 +42,6 @@ const transformClass = computed(() => ['transform', props.level]);
   white-space: nowrap;
   @include border-bottom;
 
-  &::before {
-    content: '';
-    position: absolute;
-    width: 3px;
-    height: 100%;
-    background-color: var(--overall-border-color);
-    left: 0;
-    top: 0;
-  }
-
   &::after {
     content: '';
     position: absolute;
@@ -75,15 +53,39 @@ const transformClass = computed(() => ['transform', props.level]);
     opacity: 0.16;
   }
 
-  &__level {
-    font-size: var(--font-size-lg);
-    text-align: center;
-    min-width: 1.325rem;
-    margin-inline: calc(var(--spacing-md) + 3px) var(--spacing-md);
-    position: relative;
+  &__access {
+    z-index: 10;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    left: 0;
+    backdrop-filter: blur(3px);
+
+    &::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: calc(100% + 3px);
+      background: var(--entry-fixed-action-background-tint);
+      background-position: left center;
+      background-attachment: fixed;
+      background-size: 100vw 100vh;
+      box-shadow: 1px 0 0 0 var(--scrollable-header-border-color);
+      left: 0;
+      top: -3px;
+      z-index: -1;
+      opacity: 0.82;
+    }
+
+    button {
+      font-size: var(--font-size-md);
+    }
   }
 
-  &__time {
+  &__time,
+  &__duration {
     font-family: monospace;
     font-size: var(--font-size-xs);
     text-align: center;

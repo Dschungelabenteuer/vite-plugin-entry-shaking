@@ -1,17 +1,30 @@
 import type { PluginOption } from 'vite';
 import type { LogLevel, Log } from './logger';
 import type {
+  PluginMetrics,
   PluginEntries,
   PluginOptions,
   EntryData,
+  TransformData,
   EntryExports,
   WildcardExports,
 } from './types';
 
 import { Context } from './context';
 import { mergeOptions } from './options';
+import { loadDebugger } from './utils';
 
-export type { LogLevel, Log, PluginEntries, EntryData, WildcardExports, EntryExports, Context };
+export type {
+  LogLevel,
+  Log,
+  PluginEntries,
+  PluginMetrics,
+  EntryData,
+  TransformData,
+  WildcardExports,
+  EntryExports,
+  Context,
+};
 
 export const name = 'vite-plugin-entry-shaking';
 
@@ -29,6 +42,7 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
     async configResolved(config) {
       context = new Context(options, config);
       await context.init();
+      console.error('initialized');
     },
 
     load(id) {
@@ -44,8 +58,9 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
     },
 
     async configureServer(server) {
+      console.error('configureServer');
       if (context.options.debug) {
-        const { attachDebugger } = await import('vite-plugin-entry-shaking-debugger');
+        const { attachDebugger } = await loadDebugger();
         attachDebugger(server, context);
       }
     },

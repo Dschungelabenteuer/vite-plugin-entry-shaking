@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { inject, nextTick, ref, watch } from 'vue';
-import type { MetricsPanel } from '@composable/useMetricsPanel';
+import { Icon } from '@iconify/vue';
+
+import type { Panel } from '@composable/usePanel';
 import Button from '@component/Button.vue';
+import PanelView from '@views/PanelView.vue';
 
 const closeBtnRef = ref<InstanceType<typeof Button> | null>(null);
-const metricsPanel = inject<MetricsPanel>('metricsPanel')!;
+const metricsPanel = inject<Panel>('metricsPanel')!;
 const { toggle, openBtnId, isOpen } = metricsPanel;
 
 watch(isOpen, (open) => {
@@ -16,88 +19,117 @@ watch(isOpen, (open) => {
 </script>
 
 <template>
-  <div
-    id="metrics-panel"
-    role="region"
-    class="metrics"
+  <PanelView
+    panel-id="metrics-panel"
+    title="Metrics"
+    close-panel-label="Close metrics panel"
   >
-    <div class="metrics__content">
-      <header class="metrics__header">
-        <Button
-          ref="closeBtnRef"
-          size="large"
-          aria-controls="metrics-panel"
-          :aria-expanded="true"
-          icon="arrow-bar-right"
-          :icon-only="true"
-          label="Close metrics panel"
-          @click="toggle"
-        />
-        <h2>Metrics</h2>
-      </header>
+    <div class="metrics">
+      <div class="time">
+        <div class="time__total">
+          <Icon icon="tabler:clock" />
+          <span class="label">Total process</span>
+          <span class="duration">310ms</span>
+        </div>
+        <div class="time__details">
+          <div class="entries">
+            <Icon icon="tabler:target" />
+            <span class="label">Entries analysis</span>
+            <span class="duration">310ms</span>
+          </div>
+          <div class="transforms">
+            <Icon icon="tabler:sparkles" />
+            <span class="label">Transforms</span>
+            <span class="duration">310ms</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="requests">
+        <div class="requests__total">
+          <Icon icon="tabler:clock" />
+          <span class="label">Total requests</span>
+          <span class="duration">72</span>
+        </div>
+        <div class="requests__details">
+          <div class="avoidable">
+            <Icon icon="tabler:target" />
+            <span class="label">Avoidable</span>
+            <span class="duration">32</span>
+          </div>
+          <div class="avoided">
+            <Icon icon="tabler:sparkles" />
+            <span class="label">Avoided</span>
+            <span class="duration">27</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div
-      class="metrics__backdrop"
-      @click="toggle"
-    />
-  </div>
+
+    <template #footer>
+      <Button
+        :bordered="true"
+        icon="upload"
+        disabled="Imports are only possible when running a detached instance."
+        label="Import"
+        @click="toggle"
+      />
+      <Button
+        :bordered="true"
+        icon="download"
+        label="Export"
+        @click="toggle"
+      />
+    </template>
+  </PanelView>
 </template>
 
 <style lang="scss">
 .metrics {
-  @include contained;
-  max-width: 300px;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: var(--size-header) 1fr var(--size-footer);
+  .time {
+    margin: var(--spacing-lg);
 
-  &__backdrop {
-    z-index: 10;
-    background: rgba(0, 0, 0, 0.3);
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    backdrop-filter: var(--blur-lg);
-    opacity: 0;
-    transition: all ease var(--transition-duration-short);
-  }
+    &__total,
+    &__details .entries,
+    &__details .transforms {
+      display: flex;
+      align-items: center;
 
-  &__content {
-    z-index: 20;
-    background: var(--overall-background-color);
-    border-inline-start: 1px solid var(--overall-border-color);
-    color: var(--text-color);
-    height: 100vh;
-    backdrop-filter: var(--blur-xl);
-  }
-
-  &__header {
-    box-shadow: 0 0 0 1px var(--overall-border-color);
-    display: flex;
-    padding-block: 1.5px;
-    align-items: center;
-
-    > .icon-button {
-      height: 100%;
+      .duration {
+        margin-inline-start: auto;
+        font-family: monospace;
+        font-size: var(--font-size-xs);
+      }
     }
 
-    h2 {
-      font-size: 1.14rem;
-      width: 100%;
-      padding-inline-start: var(--spacing-md);
+    svg {
+      margin-inline: var(--spacing-md);
     }
-  }
 
-  @media (max-width: $breakpoint-md) {
-    position: absolute;
-    inset-inline-end: 0;
+    &__total {
+      display: flex;
+      align-items: center;
+      font-size: var(--font-size-sm);
+      padding: var(--spacing-md);
+      font-size: var(--font-size-md);
+      color: var(--text-emphasize-color);
+    }
 
-    &__backdrop {
-      pointer-events: all;
-      opacity: 1;
+    &__details {
+      box-shadow: inset 0 0 0 1px var(--overall-border-color);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      background: var(--background-color-alt-subtle);
+      background-size: 100vw 100vh;
+      background-attachment: fixed;
+
+      .entries,
+      .transforms {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding-block: var(--spacing-md);
+      }
     }
   }
 }

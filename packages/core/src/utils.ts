@@ -6,4 +6,17 @@ export type ParallelCb<T> = (
 ) => Promise<any>;
 
 export const parallelize: Parallel = async (a, cb) => Promise.all(a.map(cb));
+export const diagnostic = (message: string) => `[diagnostic] ${message}`;
+
+export const loadEventBus = async () => await import('./event-bus');
+export const loadDebugger = async () => {
+  const debuggerPkgName = 'vite-plugin-entry-shaking-debugger';
+  try {
+    const debuggerPkg = await import(debuggerPkgName);
+    return debuggerPkg;
+  } catch {
+    throw new Error(`Using the \`debug\` option requires installing \`${debuggerPkgName}\``);
+  }
+};
+
 export default { parallelize };

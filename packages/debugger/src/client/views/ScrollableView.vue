@@ -1,14 +1,14 @@
-<script setup lang="ts">
-import Button from '@component/Button.vue';
+<script setup lang="ts" generic="T extends BrowserData">
 import { ref, computed, nextTick } from 'vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
+import type { BrowserData, SortableColumn } from '@composable/useBrowserData';
+import { useClassNames } from '@composable/useClassNames';
+import Button from '@component/Button.vue';
 import type { SortDirection } from '../../types';
 
 export type Column = {
   /** Column class. */
   class?: string;
-  /** Column key. */
-  key: string;
   /** Column name. */
   label: string;
   /** Column width. */
@@ -17,32 +17,62 @@ export type Column = {
   minWidth?: string;
   /** Is the column sortable? */
   sortable?: boolean;
+  /** Is the column searchable? */
+  searchable?: true;
+  /** Ascending sorting label. */
+  ascLabel?: string;
+  /** Descending sorting label. */
+  descLabel?: string;
+};
+
+export type KeyedColumn = Column & {
+  /** Column key. */
+  key: string;
 };
 
 type ScrollableViewProps = {
+  /** Title of the scrollable view (mostly for a11y). */
+  title: string;
   /** List of items. */
   items: any[];
   /** List columns. */
-  columns: Column[];
+  columns: KeyedColumn[];
   /** Vue-virtual-scroller's min-item size. */
   minItemSize: number;
-  /** Sort direction */
-  sort?: SortDirection;
+  /** Sort parameters. */
+  sort: {
+    /** Sort direction. */
+    direction?: SortDirection;
+    /** Sort parameters. */
+    column?: string;
+  };
+  /** Condensed display? (reduces overall spacing). */
+  condensed?: boolean;
 };
 
+type ScrollableViewEvents = {
+  /** Emitted when a column is sorted. */
+  sort: [column: SortableColumn<any>];
+};
+
+const $class = useClassNames('scroller');
+const emit = defineEmits<ScrollableViewEvents>();
 const props = defineProps<ScrollableViewProps>();
-const emit = defineEmits<{ sort: [columnKey: string] }>();
-const scrollerClass = 'scroller';
+
 const scrollerRef = ref<HTMLElement>();
+const classes = computed(() => [$class(), props.condensed ? 'condensed' : '']);
 const rowHeight = computed(() => `${props.minItemSize}px`);
+const headerHeight = computed(() => (props.condensed ? '40px' : rowHeight.value));
 const gridTemplateColumns = computed(() => props.columns.map((column) => column.width).join(' '));
-const sortLabel = computed(() =>
-  props.sort === 'asc' ? 'Sort from newest to oldest' : 'Sort from oldest to newest',
+const sortIcon = computed(() =>
+  props.sort.direction === 'asc' ? 'sort-ascending' : 'sort-descending',
 );
+
 const onResize = () => {
-  const scrollerEl = scrollerRef.value?.querySelector(`.${scrollerClass}`);
+  // @todo debounce?
+  const scrollerEl = scrollerRef.value?.querySelector(`.${$class()}`);
   const scrollerWrapper = scrollerRef.value?.querySelector(`.vue-recycle-scroller__item-wrapper`);
-  const scrollerHeader = scrollerRef.value?.querySelector(`.${scrollerClass}__header`);
+  const scrollerHeader = scrollerRef.value?.querySelector(`.${$class('header')}`);
   (scrollerWrapper as HTMLElement).style.width = `auto`;
   (scrollerHeader as HTMLElement).style.width = `auto`;
   if (props.items.length && scrollerEl && scrollerWrapper) {
@@ -52,32 +82,50 @@ const onResize = () => {
     });
   }
 };
+
+const handleKeydown = (e) => {
+  // @todo
+};
 </script>
 
 <template>
   <div
     ref="scrollerRef"
-    class="scroller__wrapper"
+    :class="$class('wrapper')"
   >
     <DynamicScroller
       :items="items"
       :min-item-size="minItemSize"
       :emit-update="true"
-      :class="scrollerClass"
+      :class="classes"
+      role="grid"
+      tabindex="0"
+      :aria-label="title"
+      :aria-rowcount="items.length"
+      :aria-colcount="columns.length"
       @resize="onResize"
+      @keydown="handleKeydown"
     >
       <template #before>
-        <div class="scroller__header">
+        <div
+          :class="$class('header')"
+          role="row"
+        >
           <div
-            v-for="column in columns"
+            v-for="(column, index) in columns"
             :key="column.key"
             :class="column.class"
+            role="columnheader"
+            :aria-colindex="index + 1"
+            :aria-rowindex="1"
           >
             <Button
               v-if="column.sortable"
               :label="column.label"
-              :aria-label="sortLabel"
-              :icon="sort === 'asc' ? 'arrow-down' : 'arrow-up'"
+              tabindex="-1"
+              :aria-label="sort.direction === 'asc' ? column.descLabel : column.ascLabel"
+              :class="{ 'inactive-sort': sort.column !== column.key }"
+              :icon="sort.column === column.key ? sortIcon : 'arrows-sort'"
               @click="emit('sort', column.key)"
             />
             <span v-else>
@@ -94,6 +142,8 @@ const onResize = () => {
           :size-dependencies="[item.message]"
           :data-index="index"
           :data-active="active"
+          :aria-rowindex="index + 2"
+          role="row"
         >
           <slot
             v-bind="{
@@ -128,10 +178,31 @@ const onResize = () => {
   height: 100%;
 }
 
+.scroller__wrapper:focus-within,
+.scroller__wrapper:focus-visible,
+.scroller__wrapper:focus {
+  box-shadow: none;
+  outline: 0;
+
+  &::before {
+    pointer-events: none;
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-shadow: inset 0 0 0 1px var(--accent-color);
+    left: 0;
+    top: 0;
+    border-radius: var(--radius-md);
+    z-index: 100;
+    opacity: 1;
+  }
+}
+
 .scroller__header {
   display: grid;
   width: calc(100% - var(--scrollbar-size) - var(--scrollbar-border-width));
-  height: v-bind(rowHeight);
+  height: v-bind(headerHeight);
   align-items: center;
   grid-template-columns: v-bind(gridTemplateColumns);
   z-index: 20;
@@ -139,6 +210,17 @@ const onResize = () => {
   background-color: var(--scrollable-header-background-color);
   backdrop-filter: var(--scrollable-header-background-blur);
   box-shadow: 0 0 0 1px var(--scrollable-header-border-color);
+
+  svg {
+    color: var(--accent-color);
+  }
+
+  .inactive-sort {
+    svg {
+      color: inherit;
+      opacity: 0.4;
+    }
+  }
 
   &::before {
     content: '';

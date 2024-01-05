@@ -2,13 +2,13 @@
 import { provide } from 'vue';
 
 import { useColorScheme } from '@composable/useColorScheme';
-import { useMetricsPanel } from '@composable/useMetricsPanel';
+import { usePanel } from '@composable/usePanel';
 import Header from './Header.vue';
 import Footer from './Footer.vue';
 import MetricsPanel from './MetricsPanel.vue';
 
 const { colorScheme, swapColorScheme } = useColorScheme();
-const metricsPanel = useMetricsPanel();
+const metricsPanel = usePanel('metrics');
 const { isOpen } = metricsPanel;
 provide('metricsPanel', metricsPanel);
 provide('colorScheme', colorScheme);

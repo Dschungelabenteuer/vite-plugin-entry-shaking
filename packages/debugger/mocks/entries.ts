@@ -1,8 +1,9 @@
 import { faker } from '@faker-js/faker';
 
 import type { Context, EntryData, EntryExports, WildcardExports } from 'vite-plugin-entry-shaking';
+import { getRandomProjectPath } from './utils';
 
-const mockedEntryCount = 34;
+const mockedEntryCount = 28;
 
 const from = `import Lol from 'lol';
 import { ref, Item } from 'vue';
@@ -26,8 +27,6 @@ const new1 = 1;
 const new2 = 2;
 `;
 
-const getRandomProjectPath = () => `~/path/to/project/src${faker.system.filePath()}`;
-
 function mockWildcardExports(): WildcardExports {
   const numberOfDirectExports = faker.number.int({ min: 0, max: 2 });
   const numberOfNamedExports = faker.number.int({ min: 0, max: 3 });
@@ -43,7 +42,7 @@ function mockWildcardExports(): WildcardExports {
 
 function mockExports(): EntryExports {
   return new Map(
-    new Array(faker.number.int({ min: 0, max: 3 })).fill(0).map(() => [
+    new Array(faker.number.int({ min: 2, max: 12 })).fill(0).map(() => [
       faker.lorem.word(),
       {
         path: getRandomProjectPath(),
@@ -58,6 +57,8 @@ function mockExports(): EntryExports {
 
 export const entries: Context['entries'] = new Map(
   new Array(mockedEntryCount).fill(0).map((): [string, EntryData] => {
+    const timeOne = faker.number.int({ min: 200, max: 500 });
+    const timeTwo = faker.number.int({ min: 200, max: 500 });
     const wildcardExports = mockWildcardExports();
     const exports = mockExports();
     const depth = faker.number.int({ min: 0, max: 1 });
@@ -69,6 +70,8 @@ export const entries: Context['entries'] = new Map(
         wildcardExports,
         depth,
         exports,
+        time: Math.max(timeOne, timeTwo),
+        self: Math.min(timeOne, timeTwo),
       },
     ];
   }),

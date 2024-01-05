@@ -27,9 +27,8 @@ export class Logger implements BaseLogger {
     private debugMode: boolean,
   ) {}
 
-  public debug = (content: string, options?: LogOptions, faded = false) => {
-    const msg = this.formatMessage(faded ? paint('gray', content) : content);
-    if (this.debugMode) this.baseLogger?.info?.(msg, options);
+  public debug = (content: string, options?: LogOptions) => {
+    if (this.debugMode) this.baseLogger?.info?.(content, options);
     this.logs.push({ content, level: 'debug', timestamp: Date.now() });
   };
 

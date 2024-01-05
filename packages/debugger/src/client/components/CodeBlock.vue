@@ -37,6 +37,7 @@ watchEffect(async () => {
 .shiki {
   border-radius: var(--radius-md);
   overflow: auto;
+  background: #1c151b !important;
 }
 .shiki code {
   padding: var(--spacing-lg);

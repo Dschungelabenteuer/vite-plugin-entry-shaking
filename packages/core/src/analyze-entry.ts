@@ -1,12 +1,21 @@
+import type { ExportSpecifier } from 'es-module-lexer';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { init, parse } from 'es-module-lexer';
 
 import type { Context } from './context';
-import type { EntryExports, EntryImports, EntryPath, ImportParams, WildcardExports } from './types';
+import type {
+  EntryExports,
+  EntryImports,
+  EntryPath,
+  ImportParams,
+  RemoveReadonly,
+  WildcardExports,
+} from './types';
+
 import EntryCleaner from './cleanup-entry';
 import Parsers from './parse';
-import Utils from './utils';
+import Utils, { diagnostic } from './utils';
 
 /**
  * Analyzes target entry files.
@@ -14,13 +23,18 @@ import Utils from './utils';
  * @param ctx _reference_ Plugin's entry analysis context.
  */
 async function analyzeEntries(ctx: Context) {
-  const targets = [...ctx.targets.entries()];
-  await Utils.parallelize(targets, async ([path, depth]) => {
-    const absolutePath = (await ctx.resolver(path)) ?? path;
-    await methods.analyzeEntry(ctx, absolutePath, depth);
+  const { time, self, out } = await ctx.measure('Analysis of target entry files', async () => {
+    const targets = [...ctx.targets.entries()];
+    await Utils.parallelize(targets, async ([path, depth]) => {
+      const absolutePath = (await ctx.resolver(path)) ?? path;
+      await methods.analyzeEntry(ctx, absolutePath, depth);
+    });
+    return ctx.entries;
   });
 
-  return ctx.entries;
+  ctx.metrics.analysis = { time, self };
+  ctx.metrics.process = time;
+  return out;
 }
 
 /**
@@ -33,9 +47,11 @@ async function analyzeEntries(ctx: Context) {
 async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number) {
   if (ctx.entries.has(entryPath)) return;
 
-  await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e) => {
+  return await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e) => {
+    const message = `Could not analyze entry file "${entryPath}"`;
     console.error(e);
-    throw new Error(`Could not analyze entry file "${entryPath}"`);
+    ctx.logger.error(message);
+    throw new Error(message);
   });
 }
 
@@ -49,49 +65,66 @@ async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number) {
  * @param depth Static analysis' context depth.
  */
 async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number) {
-  await init;
   const exportsMap: EntryExports = new Map([]);
   const wildcardExports: WildcardExports = { named: new Map([]), direct: [] };
-  const defaultImport: ImportParams = { path: entryPath, importDefault: true };
-  const analyzedImports: EntryImports = new Map([['default', defaultImport]]);
-  const rawEntry = readFileSync(resolve(entryPath), 'utf-8');
-  const [imports, exports] = parse(rawEntry);
+  let source: string = '';
+  let exps: ExportSpecifier[] = [];
+  let inclusiveTime = 0;
 
-  // First analyze the imported entities of the entry.
-  for (const { n: path, ss: startPosition, se: endPosition } of imports) {
-    await methods.analyzeEntryImport(
-      ctx,
-      rawEntry,
-      wildcardExports,
-      analyzedImports,
-      entryPath,
-      path as string,
-      startPosition,
-      endPosition,
-      depth,
-    );
-  }
+  const { time } = await ctx.measure(`Analysis of entry "${entryPath}"`, async () => {
+    await init;
+    source = readFileSync(resolve(entryPath), 'utf-8');
+    const defaultImport: ImportParams = { path: entryPath, importDefault: true };
+    const analyzedImports: EntryImports = new Map([['default', defaultImport]]);
+    const [imports, exportList] = parse(source);
+    exps = exportList as RemoveReadonly<ExportSpecifier[]>;
 
-  // Then analyze the exports with the gathered data.
-  exports.forEach(({ n: namedExport, ln: localName }) => {
-    methods.analyzeEntryExport(
-      entryPath,
-      exportsMap,
-      wildcardExports,
-      analyzedImports,
-      namedExport,
-      localName,
-    );
+    // First analyze the imported entities of the entry.
+    for (const { n: path, ss: startPosition, se: endPosition } of imports) {
+      inclusiveTime += await methods.analyzeEntryImport(
+        ctx,
+        source,
+        wildcardExports,
+        analyzedImports,
+        entryPath,
+        path as string,
+        startPosition,
+        endPosition,
+        depth,
+      );
+    }
+
+    // Then analyze the exports with the gathered data.
+    exps.forEach(({ n: namedExport, ln: localName }) => {
+      methods.analyzeEntryExport(
+        entryPath,
+        exportsMap,
+        wildcardExports,
+        analyzedImports,
+        namedExport,
+        localName,
+      );
+    });
   });
 
+  const updatedSource = EntryCleaner.cleanupEntry(source, exportsMap, exps);
+  const charactersDiff = source.length - updatedSource.length;
+  const self = time - inclusiveTime;
+
   // Finally export entry's analysis output.
+  ctx.logger.debug(`Cleaned-up entry "${entryPath}" (-${charactersDiff} chars)`);
+  ctx.metrics.process += time;
   ctx.entries.set(entryPath, {
     exports: exportsMap,
     wildcardExports,
-    source: rawEntry,
-    updatedSource: EntryCleaner.cleanupEntry(rawEntry, exportsMap, exports),
+    source,
+    updatedSource,
     depth,
+    time,
+    self,
   });
+
+  return time;
 }
 
 /**
@@ -116,7 +149,8 @@ async function analyzeEntryImport(
   startPosition: number,
   endPosition: number,
   depth: number,
-): Promise<void> {
+) {
+  let inclusiveTime = 0;
   const statement = rawEntry.slice(startPosition, endPosition);
   const { namedImports, defaultImports, wildcardImport } = Parsers.parseImportStatement(statement);
 
@@ -125,7 +159,8 @@ async function analyzeEntryImport(
   });
 
   if (wildcardImport) {
-    await methods.registerWildcardImportIfNeeded(ctx, path, entryPath, depth);
+    const out = await methods.registerWildcardImportIfNeeded(ctx, path, entryPath, depth);
+    inclusiveTime += out ?? 0;
     const { alias } = Parsers.parseImportParams(wildcardImport);
     if (alias) {
       wildcardExports.named.set(alias, path);
@@ -142,6 +177,8 @@ async function analyzeEntryImport(
       originalName: name,
     });
   });
+
+  return inclusiveTime;
 }
 
 /**
@@ -200,8 +237,29 @@ async function registerWildcardImportIfNeeded(
 ) {
   const importsEntry = ctx.targets.get(path) === 0;
   const maxDepthReached = depth >= (ctx.options.maxWildcardDepth ?? 0);
-  if (!importsEntry && maxDepthReached) return;
-  await methods.registerWildcardImport(ctx, path, importedFrom, depth + 1);
+
+  if (maxDepthReached) {
+    if (importsEntry) {
+      ctx.logger.debug(
+        `Max depth reached, but ${importedFrom} wildcard-imports from another entry ${path}, all good!`,
+      );
+    } else {
+      const level = ctx.options.enableDiagnostics ? 'warn' : 'debug';
+      const base = `Max depth reached at path ${importedFrom}, skipping wildcard import analysis of ${path}…`;
+      const message = ctx.options.enableDiagnostics
+        ? diagnostic(
+            `${base} This means that if you were to import one of the entities exported by ${path} from ${importedFrom},` +
+              ` it would load the cleaned-up entry file which still includes the unmutated wildcard import, resulting in` +
+              ` all subsequent modules being loaded by Vite. Consider either adding ${path} to the "targets" option or a` +
+              ` bit of refactoring to minimize usage of wildcards.`,
+          )
+        : base;
+      ctx.logger[level](message);
+      return 0;
+    }
+  }
+
+  return await methods.registerWildcardImport(ctx, path, importedFrom, depth + 1);
 }
 
 /**
@@ -221,7 +279,7 @@ async function registerWildcardImport(
   const resolvedPath = await ctx.resolver(path, importedFrom);
   if (!resolvedPath || ctx.targets.has(resolvedPath)) return;
   ctx.targets.set(resolvedPath, depth);
-  await methods.analyzeEntry(ctx, resolvedPath, depth);
+  return await methods.analyzeEntry(ctx, resolvedPath, depth);
 }
 
 const methods = {

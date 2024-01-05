@@ -1,4 +1,4 @@
-import type { Log, PluginEntries } from 'vite-plugin-entry-shaking';
+import type { Log, PluginEntries, PluginMetrics, TransformData } from 'vite-plugin-entry-shaking';
 
 /** Information about the consuming package. */
 export interface ConsumerPackageInfo {
@@ -36,8 +36,10 @@ export interface ChannelStore {
   rootDir: string;
   /** Information about the consuming package. */
   consumer: ConsumerPackageInfo;
+  /** Plugin metrics. */
+  metrics: PluginMetrics;
   /** List of transforms. */
-  transforms: any[];
+  transforms: TransformData[];
   /** List of targets. */
   entries: PluginEntries;
   /** List of logs. */
@@ -54,16 +56,36 @@ export type DiffsFileId = string & { __brand: 'DiffsFileId' };
 
 /** Diffs request payload sent to Worker. */
 export interface DiffsRequestPayload {
+  /** Absolute path to the file. */
   id: DiffsFileId;
+  /** Original source content. */
   from: string;
+  /** Updated source content. */
   to: string;
 }
 
-export type DiffPosition = { line: number; col: number };
-export type DiffPositions = { start: DiffPosition; end: DiffPosition };
-
 /** Diffs response payload received from Worker. */
 export interface DiffsResponsePayload {
+  /** Absolute path to the file. */
   id: DiffsFileId;
+  /** All diffs content (source code with diff lines). */
   result: string;
+}
+
+/**
+ * Plugin channel messages.
+ * This defines the types of all accepted messages between client and Vite server
+ * through a common context instance.
+ * */
+export interface ChannelMessages {
+  /**
+   * Increases plugin's process time by `time`ms.
+   * @param time Time (in ms) to add to the process time.
+   */
+  increaseProcessTime: (time: number) => void;
+  /**
+   * Registers a transformed file and its metrics.
+   * @param transform Transformed file data.
+   */
+  registerTransform: (transform: any) => void;
 }

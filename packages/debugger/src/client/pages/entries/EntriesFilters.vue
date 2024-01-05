@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import Checkbox from '@component/Checkbox.vue';
 import { ref } from 'vue';
+import { useClassNames } from '@composable/useClassNames';
+import Checkbox from '@component/Checkbox.vue';
 
-const props = defineProps<{ filters: string[] }>();
+const $class = useClassNames('entries-filter');
 const emit = defineEmits<{ filter: [filters: string[]] }>();
+const props = defineProps<{ filters: string[] }>();
+
 const modelValue = ref<string[]>(props.filters);
 const updateFilters = (filterList: string[]) => {
   emit('filter', filterList);
@@ -11,7 +14,7 @@ const updateFilters = (filterList: string[]) => {
 </script>
 
 <template>
-  <div class="entries-filter">
+  <div :class="$class()">
     <h3>Filter log levels</h3>
     <Checkbox
       id="entry-levels-filter"

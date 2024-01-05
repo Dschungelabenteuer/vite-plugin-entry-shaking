@@ -8,10 +8,11 @@
     "strict": true,
     "noImplicitAny": true,
     "skipLibCheck": true,
-    "types": ["node",  "vite/client", "webworker"],
+    "types": ["node",  "vite/client"],
     "paths": {
       "#store": ["./src/client/store.ts"],
       "#utils": ["./src/client/utils.ts"],
+      "#types": ["./src/types.ts"],
       "@assets/*": ["./src/client/assets/*"],
       "@component/*": ["./src/client/components/*"],
       "@composable/*": ["./src/client/composables/*"],

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import viteLogo from '@assets/vite.svg?raw';
-import Illustration from '@component/Illustration.vue';
+
 import { store } from '#store';
+import Illustration from '@component/Illustration.vue';
 </script>
 
 <template>

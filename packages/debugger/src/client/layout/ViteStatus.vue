@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { Icon } from '@iconify/vue';
-import { store } from '../store';
+import { store } from '#store';
+import { useClassNames } from '@composable/useClassNames';
+import Icon from '@component/Icon.vue';
 
 const name = 'vite server';
 
+const $class = useClassNames('vite-status');
+const classes = computed(() => [$class(), store.status]);
 const status = computed(() => {
   switch (store.status) {
     case 'connected':
@@ -20,8 +23,8 @@ const status = computed(() => {
 </script>
 
 <template>
-  <div :class="['vite-status', store.status]">
-    <Icon :icon="`tabler:${status.icon}`" />
+  <div :class="classes">
+    <Icon :name="status.icon" />
     {{ status.label }}
   </div>
 </template>
@@ -34,17 +37,18 @@ const status = computed(() => {
     margin-inline: var(--spacing-md);
   }
 
-  .connected {
+  &.connected {
     color: var(--status-color-success);
   }
 
-  .disconnected {
+  &.disconnected {
     color: var(--status-color-error);
   }
 
-  .connecting {
+  &.connecting {
     svg {
       animation: spin 800ms infinite linear;
+
       @media (prefers-reduced-motion: reduce) {
         animation: spin 6s infinite linear;
       }

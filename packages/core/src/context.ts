@@ -1,10 +1,19 @@
 import type { ResolveFn, ResolvedConfig } from 'vite';
-import type { ExtendedTargets, PluginEntries, PluginOptions } from './types';
+import type { EventBus } from './event-bus';
+import type {
+  ExtendedTargets,
+  PluginEntries,
+  PluginMetrics,
+  PluginOptions,
+  PerformanceDuration,
+} from './types';
+
 import { Logger } from './logger';
 
 import EntryAnalyzer from './analyze-entry';
 import { parseId } from './urls';
 import { transformIfNeeded } from './transform';
+import { loadEventBus } from './utils';
 
 /** Plugin's context. */
 export class Context {
@@ -14,17 +23,20 @@ export class Context {
   /** Map of registered targets. */
   public targets: ExtendedTargets = new Map();
 
-  /** Map of transformed files. */
-  public transforms: Map<string, string> = new Map();
+  /** Plugin's logger. */
+  public logger: Logger;
 
   /** Vite resolver. */
   public resolver: ResolveFn;
 
-  /** Plugin's logger. */
-  public logger: Logger;
+  /** Plugin's Event Bus. */
+  public eventBus?: EventBus;
 
-  /** Plugin's debugger. */
-  public debugger: any;
+  /** Plugin's metrics. */
+  public metrics: PluginMetrics = {
+    analysis: { time: 0, self: 0 },
+    process: 0,
+  };
 
   constructor(
     public options: Required<PluginOptions>,
@@ -37,9 +49,31 @@ export class Context {
   }
 
   public async init() {
-    this.entries = await EntryAnalyzer.analyzeEntries(this);
-    this.logger.info(`- List of merged options: ${JSON.stringify(this.options)}`);
-    this.logger.info(`- List of parsed entries: ${JSON.stringify([...this.entries.keys()])}`);
+    this.entries = (await EntryAnalyzer.analyzeEntries(this)) ?? new Map();
+    this.logger.debug(`- List of merged options: ${JSON.stringify(this.options)}`);
+    this.logger.debug(`- List of parsed entries: ${JSON.stringify([...this.entries.keys()])}`);
+    if (this.options.debug) {
+      const { EventBus } = await loadEventBus();
+      this.eventBus = new EventBus();
+    }
+  }
+
+  public async measure<
+    Title extends string,
+    Callback extends (...args: any[]) => any,
+    Silent extends boolean,
+    Return = Callback extends (...args: any[]) => infer R ? R : any,
+  >(
+    title: Title,
+    callback: Callback,
+    silent?: Silent,
+  ): Promise<PerformanceDuration & { out?: Awaited<Return> }> {
+    if (!silent) this.logger.debug(`${title} started`);
+    const now = Date.now();
+    const out = await callback();
+    const time = Date.now() - now;
+    if (!silent) this.logger.debug(`${title} ended, it took ${time}ms`);
+    return { out, time, self: time };
   }
 
   public loadFile(id: string) {
@@ -61,7 +95,7 @@ export class Context {
   public async updateFile(id: string) {
     const entryFile = this.entries.get(id);
     if (entryFile) {
-      /** @todo log HMR re-triggering analysis */
+      this.logger.info(`HMR requires new analysis of ${id}`);
       await EntryAnalyzer.doAnalyzeEntry(this, id, entryFile.depth);
     }
   }

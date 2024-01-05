@@ -2,44 +2,40 @@
 import { computed } from 'vue';
 
 import type { EntryData } from 'vite-plugin-entry-shaking';
-import type { Column } from '@views/ScrollableView.vue';
+import { useClassNames } from '@composable/useClassNames';
 import Button from '@component/Button.vue';
+import type { Column } from '@views/ScrollableView.vue';
 
 export type EntryProps = EntryData & {
-  /** Path to entry. */
+  /** Entry file path. */
   path: string;
   /** Columns. */
   columns: Column[];
 };
 
+const $class = useClassNames('entry');
+const emit = defineEmits<{ view: [path: string] }>();
 const props = defineProps<EntryProps>();
 
 const gridTemplateColumns = computed(() => props.columns.map((column) => column.width).join(' '));
-
-const entryClass = computed(() => ['entry']);
 </script>
 
 <template>
-  <div :class="entryClass">
-    <div class="entry__access">
+  <div :class="$class()">
+    <div :class="$class('access')">
       <Button
         label="Details"
         icon="eye"
         :icon-only="true"
         :disable-tooltip="true"
+        @click="emit('view', path)"
       />
     </div>
-    <div class="entry__path">
+    <div :class="$class('time')">{{ time }}ms</div>
+    <div :class="$class('self')">{{ time }}ms</div>
+    <div :class="$class('path')">
       <span>{{ path }}</span>
     </div>
-    <div class="entry__referer">
-      <span>{{ path }}</span>
-    </div>
-    <div class="entry__exports-count">{{ exports.size }}</div>
-    <div class="entry__wildcards-count">
-      Aliased: {{ wildcardExports?.named.size }} Direct: {{ wildcardExports?.direct.length }}
-    </div>
-    <div class="entry__actions">aaa</div>
   </div>
 </template>
 
@@ -92,8 +88,7 @@ const entryClass = computed(() => ['entry']);
     }
   }
 
-  &__path,
-  &__referer {
+  &__path {
     font-family: monospace;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -104,12 +99,11 @@ const entryClass = computed(() => ['entry']);
     }
   }
 
-  &__level {
-    font-size: var(--font-size-lg);
+  &__time,
+  &__self {
+    font-family: monospace;
+    font-size: var(--font-size-xs);
     text-align: center;
-    min-width: 1.325rem;
-    margin-inline: calc(var(--spacing-md) + 3px) var(--spacing-md);
-    position: relative;
   }
 }
 </style>

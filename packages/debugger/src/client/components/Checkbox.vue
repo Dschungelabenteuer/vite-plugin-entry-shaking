@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue';
 import { ref } from 'vue';
+import { useClassNames } from '@composable/useClassNames';
+import Icon from '@component/Icon.vue';
 
 type Option = {
   /** Option label. */
@@ -20,21 +21,28 @@ type CheckboxProps = {
   modelValue: string[];
 };
 
+type ChekcboxEvents = {
+  /** Emitted when the model value changes. */
+  'update:modelValue': [value: string[]];
+};
+
+const $class = useClassNames('checkbox');
+const emit = defineEmits<ChekcboxEvents>();
 const props = defineProps<CheckboxProps>();
-defineEmits<{ 'update:modelValue': [value: string[]] }>();
+
 const checked = ref<string[]>(props.modelValue);
 </script>
 
 <template>
-  <div class="checkbox__container">
+  <div :class="$class('container')">
     <div
       v-for="option in options"
       :key="`${id}-${option.value}`"
-      class="checkbox__option"
+      :class="$class('option')"
     >
       <Icon
-        class="checkbox__mark"
-        icon="tabler:check"
+        :class="$class('mark')"
+        name="check"
       />
       <input
         :id="`${id}-${option.value}`"

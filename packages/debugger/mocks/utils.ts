@@ -1,3 +1,5 @@
+import { faker } from '@faker-js/faker';
+
 export function getChronologicalTime(count: number, index: number) {
   const today = new Date();
   const yesterday = new Date(today.getTime() - 86400000);
@@ -8,3 +10,5 @@ export function getChronologicalTime(count: number, index: number) {
   const out = start + Math.round(step * (index + 1));
   return out;
 }
+
+export const getRandomProjectPath = () => `~/path/to/project/src${faker.system.filePath()}`;

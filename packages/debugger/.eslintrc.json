@@ -1,3 +1,17 @@
 {
-  "extends": ["@yungezeit/vue", "prettier"]
+  "extends": ["@yungezeit/vue", "prettier"],
+  "rules": {
+    "import/order": ["error", {
+      "pathGroups": [
+        { "pattern": "#types", "group": "external" },
+        { "pattern": "#utils", "group": "external" },
+        { "pattern": "#store", "group": "external" },
+        { "pattern": "@composable/**", "group": "parent", "position": "before" },
+        { "pattern": "@component/**", "group": "parent", "position": "before" },
+        { "pattern": "@views/**", "group": "parent", "position": "before" },
+        { "pattern": "@pages/**", "group": "parent", "position": "before" }
+      ],
+      "pathGroupsExcludedImportTypes": ["#types"]
+    }]
+  }
 }

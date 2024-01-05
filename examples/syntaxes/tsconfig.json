@@ -20,7 +20,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@lib/*": ["./src/lib/*"]
+      "@mocks/*": ["../../packages/core/tests/__mocks__/*"],
+      "@test-modules/*": ["../../packages/core/tests/__mocks__/modules/*"],
+      "@test-cases/*": ["../../packages/core/tests/cases/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
