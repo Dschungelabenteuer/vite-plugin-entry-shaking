@@ -3,6 +3,7 @@ import { ref, computed, nextTick } from 'vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
 import type { BrowserData, SortableColumn } from '@composable/useBrowserData';
 import { useClassNames } from '@composable/useClassNames';
+import { useGridNavigation } from '@composable/useGridNavigation';
 import Button from '@component/Button.vue';
 import type { SortDirection } from '../../types';
 
@@ -30,14 +31,14 @@ export type KeyedColumn = Column & {
   key: string;
 };
 
-type ScrollableViewProps = {
-  /** Title of the scrollable view (mostly for a11y). */
+type GridViewProps = {
+  /** Title of the grid view (mostly for a11y). */
   title: string;
   /** List of items. */
   items: any[];
   /** List columns. */
   columns: KeyedColumn[];
-  /** Vue-virtual-scroller's min-item size. */
+  /** Vue-virtual-grid's min-item size. */
   minItemSize: number;
   /** Sort parameters. */
   sort: {
@@ -50,66 +51,69 @@ type ScrollableViewProps = {
   condensed?: boolean;
 };
 
-type ScrollableViewEvents = {
+type GridViewEvents = {
   /** Emitted when a column is sorted. */
   sort: [column: SortableColumn<any>];
 };
 
-const $class = useClassNames('scroller');
-const emit = defineEmits<ScrollableViewEvents>();
-const props = defineProps<ScrollableViewProps>();
+const $class = useClassNames('grid');
+const emit = defineEmits<GridViewEvents>();
+const props = defineProps<GridViewProps>();
 
-const scrollerRef = ref<HTMLElement>();
+const gridRef = ref<HTMLElement>();
 const classes = computed(() => [$class(), props.condensed ? 'condensed' : '']);
 const rowHeight = computed(() => `${props.minItemSize}px`);
+const colCount = computed(() => props.columns.length);
+const rowCount = computed(() => props.items.length);
+const headerRowProps = computed(() => ({ item: undefined, index: -1, active: false }));
 const headerHeight = computed(() => (props.condensed ? '40px' : rowHeight.value));
-const gridTemplateColumns = computed(() => props.columns.map((column) => column.width).join(' '));
+const gridTemplateCols = computed(() => props.columns.map((col) => col.width).join(' '));
 const sortIcon = computed(() =>
   props.sort.direction === 'asc' ? 'sort-ascending' : 'sort-descending',
 );
 
 const onResize = () => {
   // @todo debounce?
-  const scrollerEl = scrollerRef.value?.querySelector(`.${$class()}`);
-  const scrollerWrapper = scrollerRef.value?.querySelector(`.vue-recycle-scroller__item-wrapper`);
-  const scrollerHeader = scrollerRef.value?.querySelector(`.${$class('header')}`);
-  (scrollerWrapper as HTMLElement).style.width = `auto`;
-  (scrollerHeader as HTMLElement).style.width = `auto`;
-  if (props.items.length && scrollerEl && scrollerWrapper) {
+  const gridEl = gridRef.value?.querySelector(`.${$class()}`);
+  const gridWrapper = gridRef.value?.querySelector(`.vue-recycle-scroller__item-wrapper`);
+  const gridHeader = gridRef.value?.querySelector(`.${$class('header')}`);
+  (gridWrapper as HTMLElement).style.width = `auto`;
+  (gridHeader as HTMLElement).style.width = `auto`;
+  if (props.items.length && gridEl && gridWrapper) {
     nextTick(() => {
-      (scrollerWrapper as HTMLElement).style.width = `${scrollerEl.scrollWidth}px`;
-      (scrollerHeader as HTMLElement).style.width = `${scrollerEl.scrollWidth}px`;
+      (gridWrapper as HTMLElement).style.width = `${gridEl.scrollWidth}px`;
+      (gridHeader as HTMLElement).style.width = `${gridEl.scrollWidth}px`;
     });
   }
 };
 
-const handleKeydown = (e) => {
-  // @todo
-};
+const grid = useGridNavigation(gridRef, colCount, rowCount);
 </script>
 
 <template>
   <div
-    ref="scrollerRef"
+    ref="gridRef"
     :class="$class('wrapper')"
+    role="grid"
+    tabindex="0"
+    :aria-label="title"
+    :aria-rowcount="items.length"
+    :aria-colcount="columns.length"
+    @keydown="grid.handleShortcut"
   >
     <DynamicScroller
       :items="items"
       :min-item-size="minItemSize"
       :emit-update="true"
       :class="classes"
-      role="grid"
-      tabindex="0"
-      :aria-label="title"
-      :aria-rowcount="items.length"
-      :aria-colcount="columns.length"
       @resize="onResize"
-      @keydown="handleKeydown"
     >
       <template #before>
         <div
+          v-bind="headerRowProps"
           :class="$class('header')"
           role="row"
+          :aria-rowindex="1"
         >
           <div
             v-for="(column, index) in columns"
@@ -117,7 +121,6 @@ const handleKeydown = (e) => {
             :class="column.class"
             role="columnheader"
             :aria-colindex="index + 1"
-            :aria-rowindex="1"
           >
             <Button
               v-if="column.sortable"
@@ -135,23 +138,17 @@ const handleKeydown = (e) => {
         </div>
       </template>
 
-      <template #default="{ item, index, active }">
+      <template #default="rowProps">
         <DynamicScrollerItem
-          :item="item"
-          :active="active"
-          :size-dependencies="[item.message]"
-          :data-index="index"
-          :data-active="active"
-          :aria-rowindex="index + 2"
+          :item="rowProps.item"
+          :active="rowProps.active"
+          :size-dependencies="[rowProps.item.message]"
+          :data-index="rowProps.index"
+          :data-active="rowProps.active"
+          :aria-rowindex="rowProps.index + 2"
           role="row"
         >
-          <slot
-            v-bind="{
-              item,
-              index,
-              active,
-            }"
-          />
+          <slot v-bind="rowProps" />
         </DynamicScrollerItem>
       </template>
     </DynamicScroller>
@@ -160,27 +157,27 @@ const handleKeydown = (e) => {
 
 <style lang="scss">
 @include color-scheme(light) {
-  --scrollable-header-background-color: #ffffffaa;
-  --scrollable-header-background-tint: transparent;
-  --scrollable-header-border-color: var(--overall-border-color);
-  --scrollable-header-background-blur: var(--blur-lg);
+  --grid-header-background-color: #ffffffaa;
+  --grid-header-background-tint: transparent;
+  --grid-header-border-color: var(--overall-border-color);
+  --grid-header-background-blur: var(--blur-lg);
 }
 
 @include color-scheme(dark) {
-  --scrollable-header-background-color: var(--overall-background-color);
-  --scrollable-header-background-tint: var(--background-gradient);
-  --scrollable-header-border-color: var(--overall-border-color);
-  --scrollable-header-background-blur: var(--blur-md);
+  --grid-header-background-color: var(--overall-background-color);
+  --grid-header-background-tint: var(--background-gradient);
+  --grid-header-border-color: var(--overall-border-color);
+  --grid-header-background-blur: var(--blur-md);
 }
 
-.scroller,
-.scroller__wrapper {
+.grid,
+.grid__wrapper {
   height: 100%;
 }
 
-.scroller__wrapper:focus-within,
-.scroller__wrapper:focus-visible,
-.scroller__wrapper:focus {
+.grid__wrapper:focus-within,
+.grid__wrapper:focus-visible,
+.grid__wrapper:focus {
   box-shadow: none;
   outline: 0;
 
@@ -199,17 +196,18 @@ const handleKeydown = (e) => {
   }
 }
 
-.scroller__header {
+.grid__header {
   display: grid;
-  width: calc(100% - var(--scrollbar-size) - var(--scrollbar-border-width));
+  width: calc(100% - var(--scrollbar-border-width));
   height: v-bind(headerHeight);
   align-items: center;
-  grid-template-columns: v-bind(gridTemplateColumns);
+  grid-template-columns: v-bind(gridTemplateCols);
+  grid-template-rows: v-bind(rowHeight);
   z-index: 20;
   border-top-left-radius: var(--radius-md);
-  background-color: var(--scrollable-header-background-color);
-  backdrop-filter: var(--scrollable-header-background-blur);
-  box-shadow: 0 0 0 1px var(--scrollable-header-border-color);
+  background-color: var(--grid-header-background-color);
+  backdrop-filter: var(--grid-header-background-blur);
+  box-shadow: 0 0 0 1px var(--grid-header-border-color);
 
   svg {
     color: var(--accent-color);
@@ -227,17 +225,13 @@ const handleKeydown = (e) => {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: var(--scrollable-header-background-tint);
+    background: var(--grid-header-background-tint);
     background-attachment: fixed;
     background-size: 100vw 100vh;
     left: 0;
     top: 0;
     z-index: -1;
     opacity: 0.72;
-  }
-
-  div.centered {
-    text-align: center;
   }
 
   .button {
@@ -247,11 +241,11 @@ const handleKeydown = (e) => {
   }
 }
 
-.scroller {
+.grid {
   overflow: auto;
 }
 
-.scroller__wrapper {
+.grid__wrapper {
   position: relative;
   overflow: hidden;
 }

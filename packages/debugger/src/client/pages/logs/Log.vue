@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { Icon } from '@iconify/vue';
 
 import type { Log } from 'vite-plugin-entry-shaking';
-import type { Column } from '@views/ScrollableView.vue';
+import type { Column } from '@views/GridView.vue';
 
 export type LogProps = {
   /** Log message content. */

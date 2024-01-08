@@ -8,7 +8,7 @@ import { useBrowserData } from '@composable/useBrowserData';
 import Button from '@component/Button.vue';
 import Dialog from '@component/Dialog.vue';
 import BrowserView from '@views/BrowserView.vue';
-import ScrollableView from '@views/ScrollableView.vue';
+import GridView from '@views/GridView.vue';
 
 import Entry from './Entry.vue';
 import EntriesFilters from './EntriesFilters.vue';
@@ -85,7 +85,7 @@ const handleEntryView = (path: string) => {
       />
     </template>
 
-    <ScrollableView
+    <GridView
       v-bind="{ title, columns, items, minItemSize: 48, sort }"
       @sort="methods.onSortChange"
     >
@@ -97,7 +97,7 @@ const handleEntryView = (path: string) => {
           @view="handleEntryView"
         />
       </template>
-    </ScrollableView>
+    </GridView>
   </BrowserView>
 
   <Dialog

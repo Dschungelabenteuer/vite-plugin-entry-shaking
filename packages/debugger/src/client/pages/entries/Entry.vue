@@ -4,7 +4,7 @@ import { computed } from 'vue';
 import type { EntryData } from 'vite-plugin-entry-shaking';
 import { useClassNames } from '@composable/useClassNames';
 import Button from '@component/Button.vue';
-import type { Column } from '@views/ScrollableView.vue';
+import type { Column } from '@views/GridView.vue';
 
 export type EntryProps = EntryData & {
   /** Entry file path. */
@@ -76,7 +76,7 @@ const gridTemplateColumns = computed(() => props.columns.map((column) => column.
       background-position: left center;
       background-attachment: fixed;
       background-size: 100vw 100vh;
-      box-shadow: 1px 0 0 0 var(--scrollable-header-border-color);
+      box-shadow: 1px 0 0 0 var(--grid-header-border-color);
       left: 0;
       top: -3px;
       z-index: -1;

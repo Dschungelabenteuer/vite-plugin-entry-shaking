@@ -2,7 +2,7 @@ import type { Ref, UnwrapRef } from 'vue';
 import { computed, ref } from 'vue';
 
 import type { SortDirection } from '#types';
-import type { Column, KeyedColumn } from '@views/ScrollableView.vue';
+import type { Column, KeyedColumn } from '@views/GridView.vue';
 
 export interface BrowserData<T extends Ref<any[]> = Ref<any[]>> {
   title: string;

@@ -5,14 +5,15 @@ import { useRoute } from 'vue-router';
 import { store } from '#store';
 import { useBrowserData } from '@composable/useBrowserData';
 import BrowserView from '@views/BrowserView.vue';
-import ScrollableView from '@views/ScrollableView.vue';
+import GridView from '@views/GridView.vue';
 
 import Log from './Log.vue';
 import LogsFilters from './LogsFilters.vue';
 
 const route = useRoute();
 const ctxStore = toRefs(store);
-const { sort, columns, items, filters, matched, methods } = useBrowserData({
+const { title, sort, columns, items, filters, matched, methods } = useBrowserData({
+  title: 'List of logs',
   source: ctxStore.logs,
   filters: (item, filtersObj) => {
     console.info(item, filtersObj);
@@ -25,7 +26,6 @@ const { sort, columns, items, filters, matched, methods } = useBrowserData({
       minWidth: '100px',
     },
     timestamp: {
-      key: 'timestamp',
       label: 'Time',
       class: 'centered',
       width: '5rem',
@@ -60,8 +60,8 @@ const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.
       />
     </template>
 
-    <ScrollableView
-      v-bind="{ columns, items, minItemSize: 48, sort }"
+    <GridView
+      v-bind="{ title, columns, items, minItemSize: 48, sort }"
       @sort="methods.onSortChange"
     >
       <template #default="{ item, index }">
@@ -71,6 +71,6 @@ const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.
           v-bind="item"
         />
       </template>
-    </ScrollableView>
+    </GridView>
   </BrowserView>
 </template>

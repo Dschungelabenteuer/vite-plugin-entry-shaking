@@ -4,7 +4,7 @@ import { computed, inject } from 'vue';
 import { useBrowserData } from '@composable/useBrowserData';
 import { useClassNames } from '@composable/useClassNames';
 import BrowserView from '@views/BrowserView.vue';
-import ScrollableView from '@views/ScrollableView.vue';
+import GridView from '@views/GridView.vue';
 import type { EntryDetailsProps } from '../EntryDetails.vue';
 
 const $class = useClassNames('entry-exports');
@@ -16,7 +16,8 @@ const source = computed(() =>
   })),
 );
 
-const { sort, columns, items, filters, matched, methods } = useBrowserData({
+const { title, sort, columns, items, filters, matched, methods } = useBrowserData({
+  title: 'List of exports',
   source,
   filters: () => true,
   columns: {
@@ -66,28 +67,28 @@ const page = computed(() => ({ name: 'Exports' }));
   >
     <template #filters> </template>
 
-    <ScrollableView
-      v-bind="{ columns, items, minItemSize: 48, sort }"
+    <GridView
+      v-bind="{ title, columns, items, minItemSize: 48, sort }"
       :condensed="true"
       @sort="methods.onSortChange"
     >
-      <template #default="{ item, index }">
+      <template #default="{ item }">
         {{ item }}
       </template>
-    </ScrollableView>
+    </GridView>
   </BrowserView>
 </template>
 
 <style lang="scss">
 @include color-scheme(light) {
-  --entry-exports-scrollable-header-background-tint: transparent;
+  --entry-exports-grid-header-background-tint: transparent;
 }
 
 @include color-scheme(dark) {
-  --entry-exports-scrollable-header-background-tint: #1c151b;
+  --entry-exports-grid-header-background-tint: #1c151b;
 }
 
 .entry-exports {
-  --scrollable-header-background-tint: var(--entry-exports-scrollable-header-background-tint);
+  --grid-header-background-tint: var(--entry-exports-grid-header-background-tint);
 }
 </style>

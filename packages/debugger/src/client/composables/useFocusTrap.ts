@@ -64,7 +64,6 @@ export function useFocusTrap<Reference extends Ref<HTMLElement | null>>(element:
       // eslint-disable-next-line prefer-destructuring
       firstFocusable = focusableEls[0];
       lastFocusable = focusableEls[focusableEls.length - 1];
-      console.log({ firstFocusable, lastFocusable });
     }
   };
 
