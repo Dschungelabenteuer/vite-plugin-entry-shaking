@@ -6,8 +6,9 @@
         { "pattern": "#types", "group": "external" },
         { "pattern": "#utils", "group": "external" },
         { "pattern": "#store", "group": "external" },
-        { "pattern": "@composable/**", "group": "parent", "position": "before" },
         { "pattern": "@component/**", "group": "parent", "position": "before" },
+        { "pattern": "@composable/**", "group": "parent", "position": "before" },
+        { "pattern": "@helpers/**", "group": "parent", "position": "before" },
         { "pattern": "@views/**", "group": "parent", "position": "before" },
         { "pattern": "@pages/**", "group": "parent", "position": "before" }
       ],

@@ -89,3 +89,8 @@ export interface ChannelMessages {
    */
   registerTransform: (transform: any) => void;
 }
+
+/** Returns known keys of a given object type/interface. */
+export type KnownKeys<T> = {
+  -readonly [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K];
+};

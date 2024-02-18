@@ -1,7 +1,8 @@
 /* eslint-disable no-return-assign */
 import type { Ref } from 'vue';
 import { ref } from 'vue';
-import { useFloating as useFloatingUi, autoUpdate, flip, shift } from '@floating-ui/vue';
+import type { UseFloatingOptions } from '@floating-ui/vue';
+import { useFloating as useFloatingUi, autoUpdate, flip, shift, offset } from '@floating-ui/vue';
 
 type CSSStyles = Record<string, any>;
 export type UseFloatingHandlers = Partial<Record<UseFloatingHandler, () => void>>;
@@ -12,12 +13,19 @@ export type UseFloating = <
 >(
   reference: Reference,
   floatingEl: Floating,
+  options?: UseFloatingOptions,
 ) => {
+  /** Is the floating element shown? */
   isOpen: Ref<boolean>;
+  /** Shows the floating element. */
   open: () => void;
+  /** Hides the floating element. */
   close: () => void;
+  /** Toggles floating element's visibility. */
   toggle: () => void;
+  /** Floating styles. */
   styles: Ref<CSSStyles>;
+  /** Floating handlers. */
   handlers?: UseFloatingHandlers;
 };
 
@@ -26,13 +34,15 @@ export type UseFloating = <
  * It exposed useful and self-explanatory control methods: `close`, `open` and `toggle`.
  * @param reference Reference element the floating element is attached to (e.g. a button).
  * @param floatingEl Floating element that is attached to the reference element.
+ * @param options Floating-ui options.
  */
-export const useFloating: UseFloating = (reference, floatingEl) => {
-  const middleware = ref([flip(), shift()]);
+export const useFloating: UseFloating = (reference, floatingEl, options) => {
+  const middleware = ref([flip(), shift(), offset({ crossAxis: -20 })]);
   const isOpen = ref(false);
   const { floatingStyles: styles } = useFloatingUi(reference, floatingEl, {
     whileElementsMounted: autoUpdate,
     middleware,
+    ...options,
   });
 
   const open = () => (isOpen.value = true);

@@ -1,4 +1,4 @@
-import { NamedExportOne as AliasedNamedExportOne, NamedExportTwo as AliasedNamedExportTwo  } from '@test-modules/named-exports';
+import { NamedExportOne as AliasedNamedExportOne, NamedExportTwo as AliasedNamedExportTwo } from '@test-modules/named-exports';
 export { AliasedNamedExportOne, AliasedNamedExportTwo };
 export { NamedExportOne as NamedExportOneDupe, NamedExportTwo as NamedExportTwoDupe } from '@test-modules/named-exports';
 

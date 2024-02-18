@@ -3,23 +3,25 @@ import { computed } from 'vue';
 import { Icon } from '@iconify/vue';
 
 import type { Log } from 'vite-plugin-entry-shaking';
-import type { Column } from '@views/GridView.vue';
+import { useClassNames } from '@composable/useClassNames';
+import type { GridRowProps } from '@views/GridView.vue';
 
-export type LogProps = {
+export type LogProps = GridRowProps<{
   /** Log message content. */
   content: Log['content'];
   /** Log level. */
   level: Log['level'];
   /** Log time. */
   timestamp?: Log['timestamp'];
-  /** Columns. */
-  columns: Column[];
-};
+}>;
 
+const $class = useClassNames('log');
 const props = defineProps<LogProps>();
 
 const logIcon = computed(() => {
-  switch (props.level) {
+  switch (props.item.level) {
+    case 'success':
+      return 'circle-check';
     case 'info':
       return 'info-circle';
     case 'warn':
@@ -30,31 +32,19 @@ const logIcon = computed(() => {
       return 'info-circle';
   }
 });
-
-const gridTemplateColumns = computed(() => props.columns.map((column) => column.width).join(' '));
-const logClass = computed(() => ['log', props.level]);
 </script>
 
 <template>
-  <div :class="logClass">
-    <div class="log__level"><Icon :icon="`tabler:${logIcon}`" /></div>
-    <div class="log__time">{{ new Date(timestamp ?? 0).toLocaleTimeString() }}</div>
-    <div class="log__content">{{ content }}</div>
-  </div>
+  <div :class="$class('level')"><Icon :icon="`tabler:${logIcon}`" /></div>
+  <div :class="$class('time')">{{ new Date(item.timestamp ?? 0).toLocaleTimeString() }}</div>
+  <div :class="$class('content')">{{ item.content }}</div>
 </template>
 
 <style lang="scss">
 .log {
-  display: grid;
-  grid-template-columns: v-bind(gridTemplateColumns);
-  align-items: center;
-  height: 2.75rem;
-  padding-block: var(--spacing-sm);
-  white-space: nowrap;
-  @include border-bottom;
-
   &::before {
     content: '';
+    pointer-events: none;
     position: absolute;
     width: 3px;
     height: 100%;
@@ -65,6 +55,7 @@ const logClass = computed(() => ['log', props.level]);
 
   &::after {
     content: '';
+    pointer-events: none;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -107,15 +98,19 @@ const logClass = computed(() => ['log', props.level]);
   }
 
   @include log-status-color(info);
-  @include log-status-color(success);
+  @include log-status-color(success, true);
   @include log-status-color(warn, true);
   @include log-status-color(error, true, true);
 
   &__level {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: var(--font-size-lg);
     text-align: center;
-    min-width: 1.325rem;
-    margin-inline: calc(var(--spacing-md) + 3px) var(--spacing-md);
+    height: 2.5rem;
+    width: 2.5rem;
+    margin-inline: var(--spacing-sm);
     position: relative;
   }
 

@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { computed, useAttrs, ref, h } from 'vue';
+import type { Placement } from '@floating-ui/vue';
+import { computed, useAttrs, ref } from 'vue';
+
 import { randomId } from '#utils';
-import { usePopover } from '@composable/usePopover';
-import { useTooltip } from '@composable/useTooltip';
-import { useClassNames } from '@composable/useClassNames';
+import Kbd from '@component/Kbd.vue';
 import Icon from '@component/Icon.vue';
+import Badge from '@component/Badge.vue';
 import Tooltip from '@component/Tooltip.vue';
 import Popover from '@component/Popover.vue';
-import Shortcut from '@component/Shortcut.vue';
+import { useClassNames } from '@composable/useClassNames';
+import { useTooltip } from '@composable/useTooltip';
+import { usePopover } from '@composable/usePopover';
 
 /** Stringified boolean type. */
 type Booleanish = 'true' | 'false';
@@ -23,12 +26,18 @@ type ButtonProps = {
   iconOnly?: boolean;
   /** Should the button be bordered. */
   bordered?: boolean;
-  /** Should we disabled auto-tooltip when using `iconOnly`? */
-  disableTooltip?: boolean;
   /** If specified, reason why the button is disabled. */
   disabled?: string;
   /** If specified, adds a shortcut hint to button action. */
   shortcut?: string;
+  /** Badge to add to the button. */
+  badge?: string;
+  /** Prefered placement of the tooltip. */
+  floatingPlacement?: Placement;
+  /** Should we disable tooltip position's autoupdate? */
+  autoupdateFloatingPosition?: boolean;
+  /** Should we disable auto-tooltip when using `iconOnly`? */
+  disableTooltip?: boolean;
 };
 
 type ButtonEvents = {
@@ -64,6 +73,9 @@ const props = withDefaults(defineProps<ButtonProps>(), {
   size: 'medium',
   disabled: undefined,
   shortcut: undefined,
+  badge: undefined,
+  floatingPlacement: 'top',
+  autoupdateFloatingPosition: true,
 });
 
 // Attributes.
@@ -87,7 +99,12 @@ const classes = computed(() => [
 const reference = ref<HTMLButtonElement | null>(null);
 const tooltipRef = ref<InstanceType<typeof Tooltip> | null>(null);
 const popoverRef = ref<InstanceType<typeof Popover> | null>(null);
-const tooltip = useTooltip(reference, tooltipRef);
+const tooltipOptions = computed(() => ({
+  placement: props.floatingPlacement,
+  ...(!props.autoupdateFloatingPosition ? { whileElementsMounted: undefined } : {}),
+}));
+
+const tooltip = useTooltip(reference, tooltipRef, tooltipOptions.value);
 const popover = usePopover(reference, popoverRef);
 
 // Destructure so that refs get unwrapped in template.
@@ -141,9 +158,16 @@ defineExpose({ reference });
       {{ label }}
     </template>
 
-    <Shortcut
+    <Badge
+      v-if="badge !== undefined"
+      :class="$class('badge')"
+      :content="badge"
+    />
+
+    <Kbd
       v-if="shortcut"
       :content="shortcut"
+      :dimmed="true"
     />
   </button>
 

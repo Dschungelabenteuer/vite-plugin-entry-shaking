@@ -1,0 +1,33 @@
+{
+  "title": "Examples schema",
+  "description": "JSON Schema used to ensure cases' example.json files are valid",
+  "$defs": {
+    "arrayOfStrings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "examples": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_]+$": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "oneOf": [
+                { "type": "string" },
+                { "$ref": "#/$defs/arrayOfStrings" }
+              ]
+            },
+            "content": { "type": "string" },
+            "print": { "$ref": "#/$defs/arrayOfStrings" }
+          },
+          "required": ["content", "print"]
+        }
+      }
+    }
+  },
+  "required": ["examples"]
+}

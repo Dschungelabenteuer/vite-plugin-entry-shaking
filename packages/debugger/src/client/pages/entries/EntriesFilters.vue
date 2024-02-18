@@ -1,37 +1,32 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useClassNames } from '@composable/useClassNames';
 import Checkbox from '@component/Checkbox.vue';
+import { useClassNames } from '@composable/useClassNames';
 
-const $class = useClassNames('entries-filter');
-const emit = defineEmits<{ filter: [filters: string[]] }>();
-const props = defineProps<{ filters: string[] }>();
-
-const modelValue = ref<string[]>(props.filters);
-const updateFilters = (filterList: string[]) => {
-  emit('filter', filterList);
-};
+const $class = useClassNames('entries-filters');
+const model = defineModel<('implicit' | 'explicit')[]>();
 </script>
 
 <template>
   <div :class="$class()">
-    <h3>Filter log levels</h3>
+    <h3>Filter entries</h3>
     <Checkbox
-      id="entry-levels-filter"
-      :model-value="modelValue"
+      id="entries-filters"
+      v-model="model"
       :options="[
-        { label: 'Debug', value: 'debug' },
-        { label: 'Info', value: 'info' },
-        { label: 'Warning', value: 'warn' },
-        { label: 'Error', value: 'error' },
+        {
+          label: 'Implicit entries',
+          value: 'implicit',
+        },
+        {
+          label: 'Explicit entries',
+          value: 'explicit',
+        },
       ]"
-      @update:model-value="updateFilters"
     />
   </div>
 </template>
 
 <style>
-.entries-filter {
-  margin: var(--spacing-md);
+.entries-filters {
 }
 </style>

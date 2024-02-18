@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { Component, DefineComponent } from 'vue';
 import { computed, nextTick, ref } from 'vue';
-import { useClassNames } from '@composable/useClassNames';
-import { getFocusableChildren } from '@composable/useFocusTrap';
 import Button from '@component/Button.vue';
+import { useClassNames } from '@composable/useClassNames';
 
 export type VerticalTab = {
   /** Tab ID. */
@@ -12,6 +11,8 @@ export type VerticalTab = {
   label: string;
   /** Tab icon. */
   icon: string;
+  /** Tab item count. */
+  count?: number;
   /** Tab content component. */
   component: Component | DefineComponent;
 };
@@ -77,6 +78,7 @@ const handleTab = (e: KeyboardEvent) => {
         :icon="tab.icon"
         :icon-only="iconOnly"
         :tabindex="activeIndex === index ? 0 : -1"
+        :badge="tab.count ? String(tab.count) : undefined"
         :aria-controls="getTabPanelId(tab.id)"
         :aria-selected="activeIndex === index"
         role="tab"

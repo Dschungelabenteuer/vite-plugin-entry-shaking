@@ -1,11 +1,31 @@
-<script setup lang="ts" generic="T extends BrowserData">
+<script setup lang="ts" generic="Cols extends Record<string, Column>, Items extends any[]">
 import { ref, computed, nextTick } from 'vue';
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller';
-import type { BrowserData, SortableColumn } from '@composable/useBrowserData';
-import { useClassNames } from '@composable/useClassNames';
-import { useGridNavigation } from '@composable/useGridNavigation';
+
+import { useMediaQuery } from '@vueuse/core';
 import Button from '@component/Button.vue';
+
+import type { SortableColumn } from '@composable/useBrowserData';
+import { useClassNames } from '@composable/useClassNames';
+import { useGridNavigation, Row } from '@composable/useDataGrid';
+
+import type { ShortcutGroup } from '@helpers/ShortcutsHelper.vue';
+import ShortcutsHelper from '@helpers/ShortcutsHelper.vue';
+
 import type { SortDirection } from '../../types';
+
+export type GridRowProps<T = any> = {
+  /** Item data. */
+  item: T;
+  /** Item index. */
+  index: number;
+  /** Is the item active in virtual scroll? */
+  active: boolean;
+  /** Column count. */
+  colCount: number;
+  /** Item with size. */
+  itemWithSize: T;
+};
 
 export type Column = {
   /** Column class. */
@@ -26,51 +46,94 @@ export type Column = {
   descLabel?: string;
 };
 
-export type KeyedColumn = Column & {
-  /** Column key. */
-  key: string;
+type GridSortOptions = {
+  /** Sort direction. */
+  direction?: SortDirection;
+  /** Sort parameters. */
+  column?: keyof Cols;
 };
 
 type GridViewProps = {
+  /** Grid key */
+  id: string;
   /** Title of the grid view (mostly for a11y). */
   title: string;
   /** List of items. */
-  items: any[];
+  items: Items;
+  /** Class applied to all rows. */
+  rowClass?: string | ((item: Items[number]) => string);
+  /** Condensed display? (reduces overall spacing). */
+  condensed?: boolean;
   /** List columns. */
-  columns: KeyedColumn[];
+  columns: Cols;
   /** Vue-virtual-grid's min-item size. */
   minItemSize: number;
   /** Sort parameters. */
-  sort: {
-    /** Sort direction. */
-    direction?: SortDirection;
-    /** Sort parameters. */
-    column?: string;
-  };
-  /** Condensed display? (reduces overall spacing). */
-  condensed?: boolean;
+  sort: GridSortOptions;
 };
 
 type GridViewEvents = {
   /** Emitted when a column is sorted. */
   sort: [column: SortableColumn<any>];
+  /** Emitted when trying to view details of a given row. */
+  view: [itemPath: string];
+};
+
+type GridViewSlots = {
+  /** Row content. */
+  row(props: GridRowProps<Items[number]>): any;
 };
 
 const $class = useClassNames('grid');
 const emit = defineEmits<GridViewEvents>();
 const props = defineProps<GridViewProps>();
+const slots = defineSlots<GridViewSlots>();
+const ASC_ICON = 'sort-ascending';
+const DESC_ICON = 'sort-descending';
+const shortcuts = computed<ShortcutGroup[]>(() => [
+  {
+    // Basic navigation.
+    items: [
+      { key: 'ArrowUp', label: 'Previous row', disabled: grid.firstRowReached.value },
+      { key: 'ArrowDown', label: 'Next row', disabled: grid.lastRowReached.value },
+      { key: 'ArrowLeft', label: 'Previous column', disabled: grid.firstColReached.value },
+      { key: 'ArrowRight', label: 'Next column', disabled: grid.lastColReached.value },
+    ],
+  },
+  {
+    // Quick navigation.
+    items: [
+      { key: 'PageUp', label: 'First visible row', disabled: grid.firstRowReached.value },
+      { key: 'PageDown', label: 'Last visible row', disabled: grid.lastRowReached.value },
+      { key: 'Home', label: 'First row', disabled: grid.firstRowReached.value },
+      { key: 'End', label: 'Last row', disabled: grid.lastRowReached.value },
+    ],
+  },
+  {
+    // Controls.
+    items: [
+      { key: ['CTRL', 'F'], label: 'Search' },
+      { key: ['CTRL', 'O'], label: 'Change filters' },
+      { key: ['CTRL', 'Enter'], label: 'Open item' },
+      { key: 'H', label: 'Toggle shortcut list' },
+    ],
+  },
+]);
 
 const gridRef = ref<HTMLElement>();
 const classes = computed(() => [$class(), props.condensed ? 'condensed' : '']);
-const rowHeight = computed(() => `${props.minItemSize}px`);
-const colCount = computed(() => props.columns.length);
-const rowCount = computed(() => props.items.length);
+const cols = computed(() => Object.entries(props.columns).map(([key, col]) => ({ key, ...col })));
+const gridTemplateCols = computed(() => cols.value.map((col) => col.width).join(' '));
 const headerRowProps = computed(() => ({ item: undefined, index: -1, active: false }));
 const headerHeight = computed(() => (props.condensed ? '40px' : rowHeight.value));
-const gridTemplateCols = computed(() => props.columns.map((col) => col.width).join(' '));
-const sortIcon = computed(() =>
-  props.sort.direction === 'asc' ? 'sort-ascending' : 'sort-descending',
-);
+const rowHeight = computed(() => `${props.minItemSize}px`);
+const rowCount = computed(() => props.items.length);
+const colCount = computed(() => cols.value.length);
+const sortIcon = computed(() => (props.sort.direction === 'asc' ? ASC_ICON : DESC_ICON));
+const showHelper = useMediaQuery('(min-width: 756px)');
+
+const getRowClass = (item: Items[number]) =>
+  typeof props.rowClass === 'function' ? props.rowClass(item) : props.rowClass;
 
 const onResize = () => {
   // @todo debounce?
@@ -87,6 +150,13 @@ const onResize = () => {
   }
 };
 
+const prepareRowProps = (rowProps: GridRowProps<Items[number]>) => ({
+  ...rowProps,
+  colCount: colCount.value,
+  index: rowProps.index ?? 0,
+});
+
+const list = computed(() => props.items);
 const grid = useGridNavigation(gridRef, colCount, rowCount);
 </script>
 
@@ -97,26 +167,25 @@ const grid = useGridNavigation(gridRef, colCount, rowCount);
     role="grid"
     tabindex="0"
     :aria-label="title"
-    :aria-rowcount="items.length"
-    :aria-colcount="columns.length"
+    :aria-rowcount="rowCount"
+    :aria-colcount="colCount"
     @keydown="grid.handleShortcut"
   >
     <DynamicScroller
-      :items="items"
+      :items="list"
       :min-item-size="minItemSize"
-      :emit-update="true"
       :class="classes"
       @resize="onResize"
     >
       <template #before>
         <div
           v-bind="headerRowProps"
-          :class="$class('header')"
+          :class="[$class('header'), $class('row')]"
           role="row"
           :aria-rowindex="1"
         >
           <div
-            v-for="(column, index) in columns"
+            v-for="(column, index) in cols"
             :key="column.key"
             :class="column.class"
             role="columnheader"
@@ -148,12 +217,43 @@ const grid = useGridNavigation(gridRef, colCount, rowCount);
           :aria-rowindex="rowProps.index + 2"
           role="row"
         >
-          <slot v-bind="rowProps" />
+          <Row
+            :class="getRowClass(rowProps.item)"
+            :row-index="rowProps.index"
+            :columns="cols"
+            @cell-click="grid.handleCellClick"
+          >
+            <slot
+              name="row"
+              v-bind="prepareRowProps(rowProps)"
+            />
+          </Row>
         </DynamicScrollerItem>
       </template>
     </DynamicScroller>
   </div>
+  <ShortcutsHelper
+    v-if="showHelper"
+    id="grid-shortcuts"
+    message="Use arrow keys to browse data"
+    :shortcuts="shortcuts"
+    :show-list="grid.isShortcutListOpen.value"
+    :show-tooltip="grid.isGridFocused.value && grid.activeRow.value === 0"
+    @close-list="() => (grid.isShortcutListOpen.value = false)"
+  />
 </template>
+
+<style lang="scss" scoped>
+.grid__header {
+  height: v-bind(headerHeight);
+  grid-template-columns: v-bind(gridTemplateCols);
+}
+
+:deep(.grid__row) {
+  grid-template-columns: v-bind(gridTemplateCols);
+  height: 2.75rem;
+}
+</style>
 
 <style lang="scss">
 @include color-scheme(light) {
@@ -170,9 +270,16 @@ const grid = useGridNavigation(gridRef, colCount, rowCount);
   --grid-header-background-blur: var(--blur-md);
 }
 
-.grid,
+.grid {
+  height: 100%;
+  overflow: auto;
+}
+
 .grid__wrapper {
   height: 100%;
+  position: relative;
+  overflow: hidden;
+  position: relative;
 }
 
 .grid__wrapper:focus-within,
@@ -196,14 +303,44 @@ const grid = useGridNavigation(gridRef, colCount, rowCount);
   }
 }
 
+.grid__row {
+  display: grid;
+  align-items: center;
+  padding-block: var(--spacing-sm);
+  min-width: max-content;
+  @include border-bottom;
+
+  [aria-colindex] {
+    display: flex;
+    align-items: center;
+    height: 100%;
+
+    &.centered {
+      justify-content: center;
+    }
+
+    &:not(.centered):not(.no-padding) {
+      padding-inline: var(--spacing-lg);
+    }
+  }
+
+  [aria-colindex]:focus,
+  [aria-colindex]:focus-visible {
+    border-radius: calc(var(--radius-md) + 6px);
+    outline: 0;
+    box-shadow:
+      inset 0 0 0 1px var(--button-outline-color),
+      inset 0 0 0 4px var(--background-color),
+      inset 0 0 0 6px var(--accent-color);
+  }
+}
+
 .grid__header {
   display: grid;
   width: calc(100% - var(--scrollbar-border-width));
-  height: v-bind(headerHeight);
   align-items: center;
-  grid-template-columns: v-bind(gridTemplateCols);
-  grid-template-rows: v-bind(rowHeight);
   z-index: 20;
+  padding-block: 0;
   border-top-left-radius: var(--radius-md);
   background-color: var(--grid-header-background-color);
   backdrop-filter: var(--grid-header-background-blur);
@@ -239,15 +376,6 @@ const grid = useGridNavigation(gridRef, colCount, rowCount);
     font-size: inherit;
     font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   }
-}
-
-.grid {
-  overflow: auto;
-}
-
-.grid__wrapper {
-  position: relative;
-  overflow: hidden;
 }
 
 .vue-recycle-scroller {

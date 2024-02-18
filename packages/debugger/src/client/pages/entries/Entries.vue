@@ -4,9 +4,9 @@ import { useRoute } from 'vue-router';
 
 import type { EntryData } from 'vite-plugin-entry-shaking';
 import { store } from '#store';
-import { useBrowserData } from '@composable/useBrowserData';
 import Button from '@component/Button.vue';
 import Dialog from '@component/Dialog.vue';
+import { useBrowserData } from '@composable/useBrowserData';
 import BrowserView from '@views/BrowserView.vue';
 import GridView from '@views/GridView.vue';
 
@@ -24,14 +24,18 @@ const source = computed(() =>
   })),
 );
 
-const { title, sort, columns, items, filters, matched, methods } = useBrowserData({
+const defaultFilters: ('implicit' | 'explicit')[] = ['implicit', 'explicit'];
+const { id, title, sort, columns, items, filters, matched, methods } = useBrowserData({
+  id: 'entries',
   title: 'List of entries',
   source,
-  filters: () => true,
+  filterFn: () => true,
+  defaultFilters,
   columns: {
     icon: {
       label: '',
       width: '2.5rem',
+      class: 'no-padding',
       minWidth: '100px',
     },
     time: {
@@ -40,8 +44,8 @@ const { title, sort, columns, items, filters, matched, methods } = useBrowserDat
       width: '8.5rem',
       minWidth: '100px',
       sortable: true,
-      ascLabel: 'Show slowest first',
-      descLabel: 'Show fastest first',
+      ascLabel: 'Total time: show slowest first',
+      descLabel: 'Total time: show fastest first',
     },
     self: {
       label: 'Time (self)',
@@ -49,10 +53,16 @@ const { title, sort, columns, items, filters, matched, methods } = useBrowserDat
       width: '8.5rem',
       minWidth: '100px',
       sortable: true,
-      ascLabel: 'Show slowest first',
-      descLabel: 'Show fastest first',
+      ascLabel: 'Self time: show slowest first',
+      descLabel: 'Self time: show fastest first',
     },
-    id: {
+    isImplicit: {
+      label: '',
+      width: '2rem',
+      class: 'centered',
+      minWidth: '100px',
+    },
+    path: {
       label: 'File',
       width: '1fr',
       searchable: true,
@@ -60,6 +70,8 @@ const { title, sort, columns, items, filters, matched, methods } = useBrowserDat
   },
 });
 
+const rowClass = 'entry';
+const minItemSize = 48;
 const total = computed(() => store.entries?.size);
 const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.icon as string }));
 const activeEntry = ref<EntryData | undefined>(undefined);
@@ -79,21 +91,23 @@ const handleEntryView = (path: string) => {
     @search="methods.onSearch"
   >
     <template #filters>
-      <EntriesFilters
-        :filters="filters"
-        @filter="methods.onFilterChange"
-      />
+      <EntriesFilters v-model="filters" />
     </template>
 
     <GridView
-      v-bind="{ title, columns, items, minItemSize: 48, sort }"
+      :id="id"
+      :items="items"
+      :title="title"
+      :columns="columns"
+      :sort="sort"
+      :row-class="rowClass"
+      :min-item-size="minItemSize"
       @sort="methods.onSortChange"
     >
-      <template #default="{ item, index }">
+      <template #row="rowProps">
         <Entry
-          :key="`entry-${index}`"
-          :columns="columns"
-          v-bind="item"
+          :key="`entry-${rowProps.index}`"
+          v-bind="rowProps"
           @view="handleEntryView"
         />
       </template>
@@ -103,7 +117,7 @@ const handleEntryView = (path: string) => {
   <Dialog
     ref="dialogRef"
     title="Entry data"
-    width="680px"
+    width="760px"
     height="500px"
     @close="activeEntry = undefined"
   >

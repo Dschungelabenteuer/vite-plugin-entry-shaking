@@ -50,11 +50,10 @@ export class Context {
 
   public async init() {
     this.entries = (await EntryAnalyzer.analyzeEntries(this)) ?? new Map();
-    this.logger.debug(`- List of merged options: ${JSON.stringify(this.options)}`);
-    this.logger.debug(`- List of parsed entries: ${JSON.stringify([...this.entries.keys()])}`);
     if (this.options.debug) {
       const { EventBus } = await loadEventBus();
       this.eventBus = new EventBus();
+      this.logger.getOnTheEventBus(this.eventBus);
     }
   }
 
@@ -69,10 +68,10 @@ export class Context {
     silent?: Silent,
   ): Promise<PerformanceDuration & { out?: Awaited<Return> }> {
     if (!silent) this.logger.debug(`${title} started`);
-    const now = Date.now();
+    const startTime = performance.now();
     const out = await callback();
-    const time = Date.now() - now;
-    if (!silent) this.logger.debug(`${title} ended, it took ${time}ms`);
+    const time = performance.now() - startTime;
+    if (!silent) this.logger.debug(`${title} ended, it took ${time.toFixed(2)}ms`);
     return { out, time, self: time };
   }
 

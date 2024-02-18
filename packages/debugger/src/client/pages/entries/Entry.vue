@@ -1,41 +1,49 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-
 import type { EntryData } from 'vite-plugin-entry-shaking';
-import { useClassNames } from '@composable/useClassNames';
 import Button from '@component/Button.vue';
-import type { Column } from '@views/GridView.vue';
+import Icon from '@component/Icon.vue';
+import { useClassNames } from '@composable/useClassNames';
+import type { GridRowProps } from '@views/GridView.vue';
 
-export type EntryProps = EntryData & {
-  /** Entry file path. */
-  path: string;
-  /** Columns. */
-  columns: Column[];
+type EntryProps = GridRowProps<
+  EntryData & {
+    /** Entry file path. */
+    path: string;
+  }
+>;
+
+type EntryEvents = {
+  /** Emitted when the user clicks on the "view" button. */
+  view: [path: string];
 };
 
 const $class = useClassNames('entry');
-const emit = defineEmits<{ view: [path: string] }>();
+const emit = defineEmits<EntryEvents>();
 const props = defineProps<EntryProps>();
-
-const gridTemplateColumns = computed(() => props.columns.map((column) => column.width).join(' '));
 </script>
 
 <template>
-  <div :class="$class()">
-    <div :class="$class('access')">
-      <Button
-        label="Details"
-        icon="eye"
-        :icon-only="true"
-        :disable-tooltip="true"
-        @click="emit('view', path)"
+  <div :class="$class('access')">
+    <Button
+      label="Details"
+      icon="eye"
+      :disable-tooltip="true"
+      :icon-only="true"
+      @click="emit('view', item.path)"
+    />
+  </div>
+  <div :class="$class('time')">{{ item.time }}ms</div>
+  <div :class="$class('self')">{{ item.self }}ms</div>
+  <div :class="$class('is-implicit')">
+    <div v-show="item.isImplicit">
+      <Icon
+        name="ghost-3"
+        :tooltip="item.isImplicit ? 'Implicit entry' : undefined"
       />
     </div>
-    <div :class="$class('time')">{{ time }}ms</div>
-    <div :class="$class('self')">{{ time }}ms</div>
-    <div :class="$class('path')">
-      <span>{{ path }}</span>
-    </div>
+  </div>
+  <div :class="$class('path')">
+    <span>{{ item.path }}</span>
   </div>
 </template>
 
@@ -49,13 +57,7 @@ const gridTemplateColumns = computed(() => props.columns.map((column) => column.
 }
 
 .entry {
-  display: grid;
-  grid-template-columns: v-bind(gridTemplateColumns);
-  align-items: center;
-  height: 2.75rem;
-  padding-block: var(--spacing-sm);
   white-space: nowrap;
-  @include border-bottom;
 
   &__access {
     z-index: 10;
@@ -94,9 +96,6 @@ const gridTemplateColumns = computed(() => props.columns.map((column) => column.
     text-overflow: ellipsis;
     font-size: var(--font-size-sm);
     padding-inline: var(--spacing-lg);
-    span {
-      direction: ltr;
-    }
   }
 
   &__time,

@@ -162,7 +162,7 @@ wildcard-imported modules, which could lead to
 [performance issues](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues/34#issuecomment-1815494589).
 Wildcard imports/exports of other entries do not have incidence on performances since these are
 analyzed anyway; they should work out of the box. However, wildcard-importing a non-target module
-may introduce some bloat. Especially if the module itsself exports wildcard-imported modules, etc.
+may introduce some bloat. Especially if the module itself exports wildcard-imported modules, etc.
 
 Therefore, by default, this plugin only analyzes and tree-shakes wildcard-imports of modules that
 are defined as targets. However, this may be overidden through the `maxWildcardDepth` option (which
@@ -219,8 +219,8 @@ slower than simply importing them.
 
 ### 2. Transforming served files
 
-Once all of the targets were analyzed, Vite server is ready to go and starts as you would expect.
-Now, whenever a file matching the `extensions` option (that was not ignored through the
+Once all of the targets are analyzed, Vite server is ready to go and starts as you would expect.
+Now, whenever a file matching the `extensions` option (and that was not ignored through the
 `ignorePatterns` option) gets served by Vite, it gets transformed by the plugin to rewrite imports
 from targets to their source modules. It only transform files when they import at least one entity
 from any target. Here's what basically happens when transforming a file, for each target import
@@ -265,7 +265,7 @@ entity. There are several possible scenarios:
     `context.wildcards.direct` array. These paths should be registered as implicit targets and
     analyzed beforehand.
 
-  If nothing was resolved, then the import statement won't be transported to preserve original
+  If nothing was resolved, then the import statement won't be transformed to preserve original
   behaviour.
 
 #### Rewrite import statement

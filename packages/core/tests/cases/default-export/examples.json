@@ -1,0 +1,34 @@
+{
+  "$schema": "../examples.schema.json",
+  "examples": {
+    "import-default-export-of-target": {
+      "description": [
+        "`DefaultImport` is the default export of the entry"
+      ],
+      "content": "import DefaultImport from \"./entries/has-default-export\";",
+      "print": ["DefaultImport"]
+    },
+    "import-reexported-default": {
+      "description": [
+        "`DefaultImport` is the default export of a module which is directly re-exported from the entry"
+      ],
+      "content": "import { DefaultImport } from \"./entries/with-default-direct-reexport\";",
+      "print": ["DefaultImport"]
+    },
+    "import-imported-and-exported-default": {
+      "description": [
+        "`DefaultImport` is the default export of a module which is first imported then re-exported by the entry"
+      ],
+      "content": "import { DefaultImport } from \"./entries/with-default-import-reexport\";",
+      "print": ["DefaultImport"]
+    },
+    "import-destructured-default": {
+      "description": [
+        "`DefaultImport` is the default export of a module which is first imported using",
+        "`import { default as DefaultImport }` then re-exported by the entry"
+      ],
+      "content": "import { DefaultImport } from \"./entries/with-destructured-default-import\";",
+      "print": ["DefaultImport"]
+    }
+  }
+}

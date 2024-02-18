@@ -1,34 +1,31 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import type { LogLevel } from 'vite-plugin-entry-shaking';
 import Checkbox from '@component/Checkbox.vue';
+import { useClassNames } from '@composable/useClassNames';
 
-const props = defineProps<{ filters: string[] }>();
-const emit = defineEmits<{ filter: [filters: string[]] }>();
-const modelValue = ref<string[]>(props.filters);
-const updateFilters = (filterList: string[]) => {
-  emit('filter', filterList);
-};
+const $class = useClassNames('exports-filters');
+const model = defineModel<LogLevel[]>();
 </script>
 
 <template>
-  <div class="logs-filter">
+  <div :class="$class()">
     <h3>Filter log levels</h3>
     <Checkbox
-      id="log-levels-filter"
-      :model-value="modelValue"
+      id="logs-filters"
+      v-model="model"
       :options="[
         { label: 'Debug', value: 'debug' },
         { label: 'Info', value: 'info' },
         { label: 'Warning', value: 'warn' },
         { label: 'Error', value: 'error' },
+        { label: 'Success', value: 'success' },
       ]"
-      @update:model-value="updateFilters"
     />
   </div>
 </template>
 
 <style>
-.logs-filter {
+.logs-filters {
   margin: var(--spacing-md);
 }
 </style>

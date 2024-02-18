@@ -22,7 +22,7 @@ function devPlugin() {
       ws.on(READY, () => {
         ws.send(READY, JSONMap.stringify({ entries, logs, consumer }));
         transforms.forEach((transform) => {
-          ws.send(_('registerTransform'), transform);
+          ws.send(_('registerTransform'), JSONMap.stringify(transform));
         });
       });
     },

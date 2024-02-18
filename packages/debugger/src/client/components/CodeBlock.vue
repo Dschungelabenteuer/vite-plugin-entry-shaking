@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { ShikijiTransformer } from 'shikiji';
+import type { ShikiTransformer } from 'shiki';
 import { watchEffect, ref } from 'vue';
-import { codeToHtml } from 'shikiji';
+import { codeToHtml } from 'shiki';
 
 type CodeBlockProps = {
   /** Source code. */
@@ -9,7 +9,7 @@ type CodeBlockProps = {
   /** Code language. */
   lang?: 'ts' | 'javascript';
   /** Shikiji transformers. */
-  transformers?: ShikijiTransformer[];
+  transformers?: ShikiTransformer[];
 };
 
 const props = withDefaults(defineProps<CodeBlockProps>(), {

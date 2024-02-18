@@ -42,7 +42,6 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
     async configResolved(config) {
       context = new Context(options, config);
       await context.init();
-      console.error('initialized');
     },
 
     load(id) {
@@ -58,7 +57,6 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
     },
 
     async configureServer(server) {
-      console.error('configureServer');
       if (context.options.debug) {
         const { attachDebugger } = await loadDebugger();
         attachDebugger(server, context);

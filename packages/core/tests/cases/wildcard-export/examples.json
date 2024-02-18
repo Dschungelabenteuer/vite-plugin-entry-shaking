@@ -1,0 +1,52 @@
+{
+  "$schema": "../examples.schema.json",
+  "examples": {
+    "entry-depth-of-one": {
+      "description": [
+        "`NamedExportOne` is imported from an entry. In this entry file,",
+        "`NamedExportOne` is re-exported via wildcard from another module",
+        "which is listed as a target."
+      ],
+      "content": "import { NamedExportOne } from \"./entries/wildcard\";",
+      "print": ["NamedExportOne"]
+    },
+    "entry-depth-of-two": {
+      "description": [
+        "`NamedExportOne` is imported from an entry. In this entry file,",
+        "`NamedExportOne` is re-exported via wildcard from another module.",
+        "In that module, `NamedExportOne` is also re-exported via wildcard from a third module.",
+        "In this example, all modules are listed as targets."
+      ],
+      "content": "import { NamedExportOne } from \"./entries/wildcard-one\";",
+      "print": ["NamedExportOne"]
+    },
+    "nonentry-depth-of-one": {
+      "description": [
+        "`NamedExportOne` is imported from an entry. In this entry file,",
+        "`NamedExportOne` is re-exported via wildcard from another module",
+        "which is not listed as a target"
+      ],
+      "content": "import { NamedExportOne } from \"./entries/nonentry-depth-of-one\";",
+      "print": ["NamedExportOne"],
+      "requiresModules" : { "modules/nonentry-depth-of-one-one": "export const NamedExportOne = 'NamedExportOne';" },
+      "requiresEntries": { "entries/nonentry-depth-of-one": "export * from '../modules/nonentry-depth-of-one-one';" }
+    },
+    "nonentry-depth-of-two": {
+      "description": [
+        "`NamedExportOne` is imported from an entry. In this entry file,",
+        "`NamedExportOne` is re-exported via wildcard from another module.",
+        "In that module, `NamedExportOne` is also re-exported via wildcard from a third module.",
+        "In this example, two last modules not listed as targets."
+      ],
+      "content": "import { NamedExportOne } from \"./entries/nonentry-depth-of-two\";",
+      "print": ["NamedExportOne"],
+      "requiresModules" : {
+        "modules/nonentry-depth-of-two-one": "export * from './nonentry-depth-of-two-two';",
+        "modules/nonentry-depth-of-two-two": "export const NamedExportOne = 'NamedExportOne';"
+      },
+      "requiresEntries": {
+        "entries/nonentry-depth-of-two": "export * from '../modules/nonentry-depth-of-two-one';"
+      }
+    }
+  }
+}

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 
-import type { Panel } from '@composable/usePanel';
-import { useNavigation } from '@composable/useNavigation';
-import { useClassNames } from '@composable/useClassNames';
 import Button from '@component/Button.vue';
 import Badge from '@component/Badge.vue';
 import Icon from '@component/Icon.vue';
+import type { Panel } from '@composable/usePanel';
+import { useNavigation } from '@composable/useNavigation';
+import { useClassNames } from '@composable/useClassNames';
 
 const $class = useClassNames('navigation');
 const links = useNavigation();
@@ -45,7 +45,7 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
           aria-expanded="false"
           icon="arrow-bar-left"
           :icon-only="true"
-          label="Show metrics"
+          label="Open metrics panel"
           size="large"
           @click="toggle"
         />
@@ -55,11 +55,6 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
 </template>
 
 <style lang="scss">
-.navigation,
-.navigation *:not(.badge):not(.tooltip-wrapper) {
-  height: 100%;
-}
-
 .navigation {
   ul {
     @include flex;

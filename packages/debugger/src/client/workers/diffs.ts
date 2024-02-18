@@ -4,6 +4,9 @@ import type { DiffsRequestPayload, DiffsResponsePayload } from '../../types';
 type DiffAction = -1 | 0 | 1;
 type DiffDefinition = [DiffAction, string];
 
+const equalsOrDeletes = [Diff.DIFF_DELETE, Diff.DIFF_EQUAL] as [DiffAction, DiffAction];
+const equalsOrInserts = [Diff.DIFF_INSERT, Diff.DIFF_EQUAL] as [DiffAction, DiffAction];
+
 self.onmessage = (message: MessageEvent) => {
   const { id, from, to } = message.data as DiffsRequestPayload;
   const diffs = getDiffs(from, to) as DiffDefinition[];
@@ -46,7 +49,7 @@ function concatDiffs(diffs: DiffDefinition[]) {
     if (text === '\n') {
       if (incrementalRemoval) addLine(Diff.DIFF_DELETE, incrementalRemoval);
       if (incrementalAddition) addLine(Diff.DIFF_INSERT, incrementalAddition);
-      return addLine(op, '.');
+      return addLine(op, '');
     }
     const lines = text.split('\n');
     const lastLineIndex = lines.length - 1;
@@ -71,19 +74,19 @@ function concatDiffs(diffs: DiffDefinition[]) {
           addLine(op, line);
         }
         // If there is an incremental removal, add the line and clear.
-        if (incrementalRemoval && [Diff.DIFF_DELETE, Diff.DIFF_EQUAL].includes(op)) {
+        if (incrementalRemoval && equalsOrDeletes.includes(op)) {
           addLine(Diff.DIFF_DELETE, incrementalRemoval + line);
           incrementalRemoval = undefined;
         }
         // If there is an incremental addition, add the line and clear.
-        if (incrementalAddition && [Diff.DIFF_INSERT, Diff.DIFF_EQUAL].includes(op)) {
+        if (incrementalAddition && equalsOrInserts.includes(op)) {
           addLine(Diff.DIFF_INSERT, incrementalAddition + line);
           incrementalAddition = undefined;
         }
         return;
       }
 
-      // If last item and unterminated line
+      // If last item and unterminated line.
       if (index === lastLineIndex) {
         const isEOL = !line.trim().length;
 
@@ -94,12 +97,12 @@ function concatDiffs(diffs: DiffDefinition[]) {
 
         if (isEOL) {
           // If there is an incremental removal and is EOLadd the line and clear.
-          if (incrementalRemoval && [Diff.DIFF_DELETE, Diff.DIFF_EQUAL].includes(op)) {
+          if (incrementalRemoval && equalsOrDeletes.includes(op)) {
             addLine(op, incrementalRemoval + line);
             incrementalRemoval = undefined;
           }
           // If there is an incremental addition and is EOL add the line and clear.
-          if (incrementalAddition && [Diff.DIFF_INSERT, Diff.DIFF_EQUAL].includes(op)) {
+          if (incrementalAddition && equalsOrInserts.includes(op)) {
             addLine(op, incrementalAddition + line);
             incrementalAddition = undefined;
           }

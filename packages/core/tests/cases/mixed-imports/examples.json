@@ -1,0 +1,13 @@
+{
+  "$schema": "../examples.schema.json",
+  "examples": {
+    "single": {
+      "description": [
+        "`MixedDefault` is default-imported from another module and",
+        "`MixedImportNamed` is an entity imported from that same module."
+      ],
+      "content": "import { MixedDefault, MixedImportNamed } from \"./entries/mixed\";",
+      "print": ["MixedDefault", "MixedImportNamed"]
+    }
+  }
+}

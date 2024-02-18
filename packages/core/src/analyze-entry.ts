@@ -31,10 +31,10 @@ async function analyzeEntries(ctx: Context) {
     });
     return ctx.entries;
   });
-
+  ctx.logger.success(`Entries analysis complete`);
   ctx.metrics.analysis = { time, self };
   ctx.metrics.process = time;
-  return out;
+  return out!;
 }
 
 /**
@@ -241,11 +241,11 @@ async function registerWildcardImportIfNeeded(
   if (maxDepthReached) {
     if (importsEntry) {
       ctx.logger.debug(
-        `Max depth reached, but ${importedFrom} wildcard-imports from another entry ${path}, all good!`,
+        `Max depth reached, but ${importedFrom} wildcard-imports from another entry "${path}", all good!`,
       );
     } else {
       const level = ctx.options.enableDiagnostics ? 'warn' : 'debug';
-      const base = `Max depth reached at path ${importedFrom}, skipping wildcard import analysis of ${path}…`;
+      const base = `Max depth reached at path "${importedFrom}", skipping wildcard import analysis of "${path}"…`;
       const message = ctx.options.enableDiagnostics
         ? diagnostic(
             `${base} This means that if you were to import one of the entities exported by ${path} from ${importedFrom},` +
@@ -278,6 +278,7 @@ async function registerWildcardImport(
 ) {
   const resolvedPath = await ctx.resolver(path, importedFrom);
   if (!resolvedPath || ctx.targets.has(resolvedPath)) return;
+  ctx.logger.info(`Adding implicit target "${path}" because of a wildcard at "${importedFrom}"`);
   ctx.targets.set(resolvedPath, depth);
   return await methods.analyzeEntry(ctx, resolvedPath, depth);
 }

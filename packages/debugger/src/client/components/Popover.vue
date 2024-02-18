@@ -34,13 +34,14 @@ const popoverClass = computed(() => [$class(), stateClass.value]);
 }
 
 @include color-scheme(dark) {
-  --popover-background-color: #ccaaff18;
+  --popover-background-color: #1a1318cc;
   --popover-border-color: #ccaaff22;
 }
 
 .popover {
   @include padding;
-  width: max-content;
+  width: 100%;
+  min-width: max-content;
   margin-block: var(--spacing-sm);
   margin-inline: var(--spacing-md);
   border-radius: var(--radius-md);
@@ -56,8 +57,10 @@ const popoverClass = computed(() => [$class(), stateClass.value]);
     2.7px 4.8px 6.2px -1.7px hsl(var(--shadow-color) / 0.22),
     6.5px 11.4px 14.8px -2.5px hsl(var(--shadow-color) / 0.22);
   transition: all var(--easing-backwards) var(--transition-duration-short);
+  pointer-events: none;
 
   &.open {
+    pointer-events: all;
     visibility: visible;
     opacity: 0.94;
     scale: 1;
@@ -68,6 +71,7 @@ const popoverClass = computed(() => [$class(), stateClass.value]);
 
   &__wrapper {
     z-index: 90;
+    pointer-events: none;
   }
 }
 </style>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import { computed } from 'vue';
-import { useClassNames } from '@composable/useClassNames';
 import Input from '@component/Input.vue';
 import Button from '@component/Button.vue';
+import { useClassNames } from '@composable/useClassNames';
 
 type BrowserViewProps = {
   /** Browser page name. */
@@ -71,8 +71,10 @@ const onSearch = (e: InputEvent) => {
           @input="onSearch"
         />
         <Button
+          v-if="$slots.filters"
           aria-controls="metrics-panel"
           icon="filter"
+          :floating-placement="'bottom-end'"
           :icon-only="true"
           :label="filterLabel"
         >

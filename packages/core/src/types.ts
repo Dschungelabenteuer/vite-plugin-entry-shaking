@@ -46,9 +46,11 @@ export interface EntryData {
   /** Static analysis-wise depth at which the entry was registered. */
   depth: number;
   /** Time spent analyzing the entry (self). */
-  self: number;
+  self?: number;
   /** Time spent analyzing the entry (inclusive). */
-  time: number;
+  time?: number;
+  /** Was the entry implicitly added to targets (through wildcards)? */
+  isImplicit?: boolean;
 }
 
 /** Target entry metrics (debug). */

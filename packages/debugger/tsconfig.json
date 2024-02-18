@@ -16,6 +16,7 @@
       "@assets/*": ["./src/client/assets/*"],
       "@component/*": ["./src/client/components/*"],
       "@composable/*": ["./src/client/composables/*"],
+      "@helpers/*": ["./src/client/helpers/*"],
       "@views/*": ["./src/client/views/*"],
       "@page/*": ["./src/client/pages/*"],
       "@styles/*": ["./src/client/styles/*"]

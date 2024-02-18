@@ -8,19 +8,23 @@ import BrowserView from '@views/BrowserView.vue';
 import GridView from '@views/GridView.vue';
 
 import Transform from './Transform.vue';
-import TransformsFilters from './TransformsFilters.vue';
 
 const route = useRoute();
 const ctxStore = toRefs(store);
-const { title, sort, columns, items, filters, matched, methods } = useBrowserData({
+
+const defaultFilters: string[] = [];
+const { id, title, sort, columns, items, filters, matched, methods } = useBrowserData({
+  id: 'transforms',
   title: 'List of transforms',
   source: ctxStore.transforms,
-  filters: () => true,
+  filterFn: (item, f) => true,
+  defaultFilters,
   columns: {
     icon: {
       label: '',
       width: '2.5rem',
       minWidth: '100px',
+      class: 'no-padding',
     },
     timestamp: {
       label: 'Time',
@@ -48,6 +52,8 @@ const { title, sort, columns, items, filters, matched, methods } = useBrowserDat
   },
 });
 
+const rowClass = 'transform';
+const minItemSize = 48;
 const total = computed(() => store.transforms?.length);
 const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.icon as string }));
 </script>
@@ -59,22 +65,24 @@ const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.
     :matched="matched"
     @search="methods.onSearch"
   >
-    <template #filters>
-      <TransformsFilters
-        :filters="filters"
-        @filter="methods.onFilterChange"
-      />
-    </template>
+    <!-- <template #filters>
+      <TransformsFilters v-model="filters" />
+    </template> -->
 
     <GridView
-      v-bind="{ title, columns, items, minItemSize: 48, sort }"
+      :id="id"
+      :items="items"
+      :title="title"
+      :columns="columns"
+      :sort="sort"
+      :row-class="rowClass"
+      :min-item-size="minItemSize"
       @sort="methods.onSortChange"
     >
-      <template #default="{ item, index }">
+      <template #row="rowProps">
         <Transform
-          :key="`transform-${index}`"
-          :columns="columns"
-          v-bind="item"
+          :key="`transform-${rowProps.index}`"
+          v-bind="rowProps"
         />
       </template>
     </GridView>

@@ -3,8 +3,8 @@ import { computed, provide, reactive } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
 
 import type { EntryData } from 'vite-plugin-entry-shaking';
-import { useClassNames } from '@composable/useClassNames';
 import Icon from '@component/Icon.vue';
+import { useClassNames } from '@composable/useClassNames';
 import type { VerticalTab } from '@views/VerticalTabsView.vue';
 import VerticalTabsView from '@views/VerticalTabsView.vue';
 import EntryMetrics from './details/EntryMetrics.vue';
@@ -47,12 +47,16 @@ const tabs = computed<VerticalTab[]>(() => [
     id: 'exports',
     label: 'Exports',
     icon: 'package-export',
+    count: props.entry?.exports.size,
     component: EntryExports,
   },
   {
     id: 'wildcards',
     label: 'Wildcards',
     icon: 'asterisk',
+    count:
+      (props.entry?.wildcardExports?.direct.length ?? 0) +
+      (props.entry?.wildcardExports?.named.size ?? 0),
     component: EntryWildcards,
   },
 ]);
@@ -67,7 +71,7 @@ const tabs = computed<VerticalTab[]>(() => [
     <VerticalTabsView
       id="entry-details"
       label="Entry details"
-      width="160px"
+      width="200px"
       min-content-width="400px"
       :icon-only="iconOnly"
       :tabs="tabs"

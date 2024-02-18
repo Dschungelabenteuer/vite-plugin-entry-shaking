@@ -33,7 +33,7 @@ describe('analyzeEntry', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementation(() => Promise.resolve());
+    vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementation(() => Promise.resolve(0));
   });
 
   it('should directly return void if entry was already parsed', async () => {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { inject } from 'vue';
-import { useClassNames } from '@composable/useClassNames';
 import DiffViewer from '@component/DiffViewer.vue';
+import { useClassNames } from '@composable/useClassNames';
 import type { EntryDetailsProps } from '../EntryDetails.vue';
 
 const $class = useClassNames('entry-diffs');

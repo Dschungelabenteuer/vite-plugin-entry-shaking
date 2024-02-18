@@ -1,47 +1,31 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-
 import type { TransformData } from 'vite-plugin-entry-shaking';
 import Button from '@component/Button.vue';
-import type { Column } from '@views/GridView.vue';
+import { useClassNames } from '@composable/useClassNames';
+import type { GridRowProps } from '@views/GridView.vue';
 
-export type TransformProps = TransformData & {
-  /** Columns. */
-  columns: Column[];
-};
+export type TransformProps = GridRowProps<TransformData>;
 
+const $class = useClassNames('transform');
 const props = defineProps<TransformProps>();
-
-const gridTemplateColumns = computed(() => props.columns.map((column) => column.width).join(' '));
-const transformClass = computed(() => ['transform']);
 </script>
 
 <template>
-  <div :class="transformClass">
-    <div class="transform__access">
-      <Button
-        label="Transform details"
-        icon="eye"
-        :icon-only="true"
-        :disable-tooltip="true"
-      />
-    </div>
-    <div class="transform__time">{{ new Date(timestamp ?? 0).toLocaleTimeString() }}</div>
-    <div class="transform__duration">{{ time }}ms</div>
-    <div class="transform__content">{{ id }}</div>
+  <div :class="$class('access')">
+    <Button
+      label="Transform details"
+      icon="eye"
+      :icon-only="true"
+      :disable-tooltip="true"
+    />
   </div>
+  <div :class="$class('time')">{{ new Date(item.timestamp ?? 0).toLocaleTimeString() }}</div>
+  <div :class="$class('duration')">{{ item.time }}ms</div>
+  <div :class="$class('path')">{{ item.id }}</div>
 </template>
 
 <style lang="scss">
 .transform {
-  display: grid;
-  grid-template-columns: v-bind(gridTemplateColumns);
-  align-items: center;
-  height: 2.75rem;
-  padding-block: var(--spacing-sm);
-  white-space: nowrap;
-  @include border-bottom;
-
   &::after {
     content: '';
     position: absolute;
@@ -89,6 +73,14 @@ const transformClass = computed(() => ['transform']);
     font-family: monospace;
     font-size: var(--font-size-xs);
     text-align: center;
+  }
+
+  &__path {
+    font-family: monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: var(--font-size-sm);
+    padding-inline: var(--spacing-lg);
   }
 }
 </style>

@@ -36,6 +36,12 @@ const installPrompt = {
 
 (async () => {
   const { name } = await prompts(namePrompt);
+
+  if (['syntaxes', '_template_'].includes(name)) {
+    console.log(`❌ Name ${name} is reserved`);
+    process.exit();
+  }
+
   if (!name) {
     console.log('❌ Example generation aborted');
     process.exit();

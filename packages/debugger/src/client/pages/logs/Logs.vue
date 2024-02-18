@@ -3,6 +3,7 @@ import { computed, toRefs } from 'vue';
 import { useRoute } from 'vue-router';
 
 import { store } from '#store';
+import type { LogLevel } from 'vite-plugin-entry-shaking';
 import { useBrowserData } from '@composable/useBrowserData';
 import BrowserView from '@views/BrowserView.vue';
 import GridView from '@views/GridView.vue';
@@ -12,18 +13,19 @@ import LogsFilters from './LogsFilters.vue';
 
 const route = useRoute();
 const ctxStore = toRefs(store);
-const { title, sort, columns, items, filters, matched, methods } = useBrowserData({
+const defaultFilters: LogLevel[] = ['debug', 'info', 'warn', 'error', 'success'];
+const { id, title, sort, columns, items, filters, matched, methods } = useBrowserData({
+  id: 'logs',
   title: 'List of logs',
   source: ctxStore.logs,
-  filters: (item, filtersObj) => {
-    console.info(item, filtersObj);
-    return true;
-  },
+  filterFn: (item, levels) => levels.includes(item.level),
+  defaultFilters,
   columns: {
     level: {
       label: '',
-      width: '2rem',
+      width: '2.5rem',
       minWidth: '100px',
+      class: 'centered',
     },
     timestamp: {
       label: 'Time',
@@ -41,7 +43,8 @@ const { title, sort, columns, items, filters, matched, methods } = useBrowserDat
     },
   },
 });
-
+const rowClass = (props: (typeof items.value)[number]) => `log ${props.level}`;
+const minItemSize = 48;
 const total = computed(() => store.logs?.length);
 const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.icon as string }));
 </script>
@@ -54,21 +57,23 @@ const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.
     @search="methods.onSearch"
   >
     <template #filters>
-      <LogsFilters
-        :filters="filters"
-        @filter="methods.onFilterChange"
-      />
+      <LogsFilters v-model="filters" />
     </template>
 
     <GridView
-      v-bind="{ title, columns, items, minItemSize: 48, sort }"
+      :id="id"
+      :items="items"
+      :title="title"
+      :columns="columns"
+      :sort="sort"
+      :row-class="rowClass"
+      :min-item-size="minItemSize"
       @sort="methods.onSortChange"
     >
-      <template #default="{ item, index }">
+      <template #row="rowProps">
         <Log
-          :key="`log-${index}`"
-          :columns="columns"
-          v-bind="item"
+          :key="`log-${rowProps.index}`"
+          v-bind="rowProps"
         />
       </template>
     </GridView>

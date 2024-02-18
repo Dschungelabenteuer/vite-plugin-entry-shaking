@@ -21,6 +21,7 @@ const aliasA = _a('a');
 const defaultOptions: FinalPluginOptions = {
   extensions: ['ext'],
   maxWildcardDepth: 0,
+  enableDiagnostics: false,
   ignorePatterns: [/node_modules/],
   debug: false,
   targets: [],

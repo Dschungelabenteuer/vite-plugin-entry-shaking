@@ -1,13 +1,14 @@
-import type { ViteDevServer } from 'vite';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import type { ViteDevServer } from 'vite';
 import sirv from 'sirv';
 import colors from 'picocolors';
 
 import type { Context } from 'vite-plugin-entry-shaking';
+import type { ConsumerPackageInfo } from '../types';
 import { PLUGIN_NAME, VERSION } from '../constants';
 import { createChannel } from './channel';
-import type { ConsumerPackageInfo } from '../types';
 import { getConsumerPackageInfo } from './paths';
 
 const PATH_TO_CLIENT = resolve(dirname(fileURLToPath(import.meta.url)), '../dist/client');

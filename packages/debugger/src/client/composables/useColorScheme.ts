@@ -9,11 +9,15 @@ export function useColorScheme() {
   const resolvedScheme = (localStorage.getItem('colorScheme') as ColorScheme) || defaultScheme;
   const colorScheme = ref<ColorScheme>(resolvedScheme);
 
-  /** Swap between both light/dark themes. */
   const swapColorScheme = () => {
     colorScheme.value = colorScheme.value === 'light' ? 'dark' : 'light';
     localStorage.setItem('colorScheme', colorScheme.value);
   };
 
-  return { colorScheme, swapColorScheme };
+  return {
+    /** Active color scheme. */
+    colorScheme,
+    /** Swap between both light/dark themes. */
+    swapColorScheme,
+  };
 }

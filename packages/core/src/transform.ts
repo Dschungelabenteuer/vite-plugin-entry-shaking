@@ -17,15 +17,19 @@ export async function transformIfNeeded(
   id: string,
   code: string,
 ): Promise<string | undefined> {
-  ctx.logger.debug(`Processing file: ${id}`, undefined);
+  ctx.logger.debug(`Processing file "${id}"`, undefined);
   const isCandidate = methods.requiresTransform(ctx, id);
-  const { out, time } = await ctx.measure('Transforming file (if needed)', async () => {
-    if (!isCandidate) {
-      ctx.logger.debug(`Ignored by options: ${id}`, undefined);
-    } else {
-      return await methods.transformImportsIfNeeded(ctx, id, code);
-    }
-  });
+  const { out, time } = await ctx.measure(
+    'Transforming file if needed',
+    async () => {
+      if (!isCandidate) {
+        ctx.logger.debug(`Ignored by options: ${id}`, undefined);
+      } else {
+        return await methods.transformImportsIfNeeded(ctx, id, code);
+      }
+    },
+    true,
+  );
 
   ctx.eventBus?.emit('increaseProcessTime', time);
   return out;
@@ -46,12 +50,15 @@ export async function transformImportsIfNeeded(
   const [imports, exports] = parse(code);
   const importedStr = `${imports.length} imports`;
   const exportedStr = `${exports.length} exports`;
-  ctx.logger.debug(`es-module-lexer (${id}) returned ${importedStr} and ${exportedStr}`);
+  ctx.logger.debug(`es-module-lexer returned ${importedStr} and ${exportedStr} for "${id}"`);
 
   const importsTarget = await methods.importsTargetEntry(ctx, id, imports);
   const { transformImports: transform } = methods;
   if (!importsTarget) {
-    ctx.logger.debug(`Ignored by analysis: ${id}`, undefined);
+    ctx.logger.debug(
+      `Did not transform "${id}" because it does not import any registered target`,
+      undefined,
+    );
     return;
   }
 

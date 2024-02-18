@@ -9,6 +9,6 @@ export const logs: Context['logger']['logs'] = new Array(mockedLogCount)
   .fill(0)
   .map((_, index) => ({
     content: faker.lorem.sentence(),
-    level: faker.helpers.arrayElement(['info', 'warn', 'error', 'debug']),
+    level: faker.helpers.arrayElement(['info', 'warn', 'error', 'debug', 'success']),
     timestamp: getChronologicalTime(mockedLogCount, index),
   }));

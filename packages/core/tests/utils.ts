@@ -103,7 +103,7 @@ export const getTestResolver = async () =>
 
 /** Returns the updated target content. */
 export const getCaseTarget = (res: Awaited<ReturnType<typeof runCase>>, target: string) =>
-  res.entries.get(target)?.updatedSource.trim();
+  res.entries?.get(target)?.updatedSource.trim();
 
 /** Prepares some target case data. */
 export const setupCase = (target: CaseTarget, middleTarget?: CaseTarget) => ({
@@ -119,6 +119,7 @@ export const setupCase = (target: CaseTarget, middleTarget?: CaseTarget) => ({
 export async function runCase(main: string, options: PluginOptions) {
   const finalOptions: Required<PluginOptions> = {
     ...options,
+    enableDiagnostics: options.enableDiagnostics ?? false,
     maxWildcardDepth: options.maxWildcardDepth ?? 0,
     ignorePatterns: options.ignorePatterns ?? [],
     debug: false,

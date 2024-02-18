@@ -1,14 +1,15 @@
 import type { Ref } from 'vue';
-import { onMounted, onUnmounted } from 'vue';
+import { watchEffect, onUnmounted } from 'vue';
 
 /** Focusable elements' selector. */
 const selector = [
-  'button',
-  '[href]',
-  'input',
-  'select',
-  'textarea',
-  '[tabindex]:not([tabindex="-1"])',
+  `[href]`,
+  `[tabindex="0"]`,
+  `button:not(:disabled)`,
+  `input:not(:disabled)`,
+  `select:not(:disabled)`,
+  `textarea:not(:disabled)`,
+  `[tabindex]:not([tabindex="-1"]):not(:disabled)`,
 ].join(',');
 
 /** Focusable element's HTMLElement type. */
@@ -52,7 +53,7 @@ export function useFocusTrap<Reference extends Ref<HTMLElement | null>>(element:
   }) as EventListener;
 
   const listener: ListenerParams = ['keydown', keyHandler];
-  const clear = () => element.value?.removeEventListener(...listener);
+  const clear = () => element.value?.removeEventListener?.(...listener);
   const focusFirst = () => firstFocusable?.focus();
   const focusLast = () => lastFocusable?.focus();
 
@@ -67,7 +68,7 @@ export function useFocusTrap<Reference extends Ref<HTMLElement | null>>(element:
     }
   };
 
-  onMounted(() => {
+  watchEffect(() => {
     if (element.value) {
       refresh();
       element.value?.addEventListener(...listener);
@@ -77,5 +78,14 @@ export function useFocusTrap<Reference extends Ref<HTMLElement | null>>(element:
 
   onUnmounted(clear);
 
-  return { clear, refresh, focusFirst, focusLast };
+  return {
+    /** Clears focus trap. */
+    clear,
+    /** Updates focus trap's first and last focusable elements. */
+    refresh,
+    /** Focuses first focusable element of trapped element. */
+    focusFirst,
+    /** Focuses last focusable element of trapped element. */
+    focusLast,
+  };
 }

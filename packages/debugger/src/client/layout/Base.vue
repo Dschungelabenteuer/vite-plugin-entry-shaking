@@ -20,7 +20,10 @@ provide('swapColorScheme', swapColorScheme);
     class="theme-wrapper"
     :data-color-scheme="colorScheme"
   >
-    <div class="layout-wrapper">
+    <div
+      class="layout-wrapper"
+      tabindex="0"
+    >
       <Header />
       <main>
         <slot />

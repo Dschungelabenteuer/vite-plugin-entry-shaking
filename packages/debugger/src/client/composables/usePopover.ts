@@ -7,13 +7,12 @@ import { useFloating } from '@composable/useFloating';
  * Popover composable based on `useFloating`.
  * @param reference Reference element the popover is attached to (e.g. a button).
  * @param floatingEl Popover component that is attached to the reference element.
+ * @param options Floating-ui options.
  */
-export const usePopover: UseFloating = (reference, floating) => {
+export const usePopover: UseFloating = (reference, floating, options) => {
   const body = document.querySelector('body');
-  const floatingUi = useFloating(reference, floating);
-  const handlers: UseFloatingHandlers = {
-    click: floatingUi.toggle,
-  };
+  const floatingUi = useFloating(reference, floating, options);
+  const handlers: UseFloatingHandlers = { click: floatingUi.toggle };
 
   const handleClickOutside = (event: Event) => {
     const pathStack = event.composedPath();

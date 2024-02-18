@@ -2,5 +2,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.validate": ["javascript", "javascriptreact", "yaml", "json", "jsonc", "json5"]
+  "eslint.validate": ["javascript", "javascriptreact", "yaml", "json", "jsonc", "json5"],
+  "html.format.wrapAttributes": "force-expand-multiline"
 }

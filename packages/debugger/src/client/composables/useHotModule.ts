@@ -21,7 +21,10 @@ export async function useHotModule(): Promise<ViteHotContext> {
 
   watchServerStatus(hot);
   getInitialState(hot);
-  getInEventBus(hot, {
+  getOnEventBus(hot, {
+    registerLog: (log) => {
+      store.logs.push(log);
+    },
     increaseProcessTime: (a) => {
       store.metrics.process += a;
     },
@@ -53,11 +56,11 @@ function getInitialState(hotContext: ViteHotContext) {
  * Gets in plugin's event bus and handles received events.
  * @param hotContext Vite's hot context.
  */
-function getInEventBus(hotContext: ViteHotContext, handlers: DebuggerEventHandlers) {
+function getOnEventBus(hotContext: ViteHotContext, handlers: DebuggerEventHandlers) {
   const events = Object.keys(handlers) as (keyof DebuggerEvents)[];
   events.forEach((event) => {
-    hotContext.on(wsMessageName(event), (...args) => {
-      handlers[event]?.(...(args as any));
+    hotContext.on(wsMessageName(event), (payload) => {
+      handlers[event]?.(JSONMap.parse(payload));
     });
   });
 }

@@ -1,7 +1,7 @@
-import { normalizePath } from 'vite';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFile } from 'node:fs/promises';
+import { normalizePath } from 'vite';
 import type { ConsumerPackageInfo } from '../types';
 
 const CURR_DIR = dirname(fileURLToPath(import.meta.url));

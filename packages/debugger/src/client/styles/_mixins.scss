@@ -95,6 +95,10 @@
     margin-inline-end: var(--spacing-md);
   }
 
+  .kbd {
+    margin-inline-start: var(--spacing-md);
+  }
+
   &.icon-only {
     svg {
       margin-inline-end: 0;
@@ -121,8 +125,10 @@
 
 @mixin button-small {
   padding: calc(var(--spacing-sm) + 3px);
-  svg {
-    margin-inline-end: var(--spacing-sm);
+  :not(.icon-only) {
+    svg {
+      margin-inline-end: var(--spacing-sm);
+    }
   }
 }
 

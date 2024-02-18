@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import Button from '@component/Button.vue';
 import { useClassNames } from '@composable/useClassNames';
 import { useFocusTrap } from '@composable/useFocusTrap';
-import Button from '@component/Button.vue';
 
 type DialogProps = {
   /** Dialog title. */

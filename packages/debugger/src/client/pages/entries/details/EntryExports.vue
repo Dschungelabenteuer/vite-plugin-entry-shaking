@@ -5,53 +5,65 @@ import { useBrowserData } from '@composable/useBrowserData';
 import { useClassNames } from '@composable/useClassNames';
 import BrowserView from '@views/BrowserView.vue';
 import GridView from '@views/GridView.vue';
+
 import type { EntryDetailsProps } from '../EntryDetails.vue';
+import EntryExport from './EntryExport.vue';
+import EntryExportsFilters from './EntryExportsFilters.vue';
 
 const $class = useClassNames('entry-exports');
 const entryDetails = inject<EntryDetailsProps>('entry-details')!;
 const source = computed(() =>
-  [...(entryDetails.entry?.exports.entries() ?? new Map())].map(([name, exp]) => ({
+  [...(entryDetails.entry?.exports.entries() ?? new Map())].map(([name, exp], index) => ({
     ...exp,
     name,
+    id: name,
   })),
 );
 
-const { title, sort, columns, items, filters, matched, methods } = useBrowserData({
+const defaultFilters: ('defaultImport' | 'selfDefined')[] = ['defaultImport', 'selfDefined'];
+const { id, title, sort, columns, items, filters, matched, methods } = useBrowserData({
+  id: 'entry-exports',
   title: 'List of exports',
   source,
-  filters: () => true,
+  filterFn: (item, f) => true,
+  defaultFilters,
   columns: {
-    icon: {
+    flags: {
       label: '',
-      width: '2.5rem',
+      width: '2rem',
+      class: 'centered',
       minWidth: '100px',
     },
-    time: {
-      label: 'Time (total)',
+    alias: {
+      label: 'Alias',
       class: 'centered',
       width: '8.5rem',
       minWidth: '100px',
-      sortable: true,
-      ascLabel: 'Show slowest first',
-      descLabel: 'Show fastest first',
+      searchable: true,
     },
-    self: {
-      label: 'Time (self)',
+    name: {
+      label: 'Name',
       class: 'centered',
       width: '8.5rem',
       minWidth: '100px',
-      sortable: true,
-      ascLabel: 'Show slowest first',
-      descLabel: 'Show fastest first',
+      searchable: true,
+    },
+    originalName: {
+      label: 'Original name',
+      class: 'centered',
+      width: '8.5rem',
+      minWidth: '100px',
+      searchable: true,
     },
     id: {
       label: 'File',
       width: '1fr',
-      searchable: true,
     },
   },
 });
 
+const rowClass = 'entry';
+const minItemSize = 48;
 const total = computed(() => entryDetails.entry?.exports.size);
 const page = computed(() => ({ name: 'Exports' }));
 </script>
@@ -65,15 +77,26 @@ const page = computed(() => ({ name: 'Exports' }));
     :condensed="true"
     @search="methods.onSearch"
   >
-    <template #filters> </template>
+    <template #filters>
+      <EntryExportsFilters v-model="filters" />
+    </template>
 
     <GridView
-      v-bind="{ title, columns, items, minItemSize: 48, sort }"
+      :id="id"
+      :items="items"
+      :title="title"
+      :columns="columns"
+      :sort="sort"
+      :row-class="rowClass"
+      :min-item-size="minItemSize"
       :condensed="true"
       @sort="methods.onSortChange"
     >
-      <template #default="{ item }">
-        {{ item }}
+      <template #row="rowProps">
+        <EntryExport
+          :key="`export-${rowProps.index}`"
+          v-bind="rowProps"
+        />
       </template>
     </GridView>
   </BrowserView>

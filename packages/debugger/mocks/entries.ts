@@ -42,16 +42,20 @@ function mockWildcardExports(): WildcardExports {
 
 function mockExports(): EntryExports {
   return new Map(
-    new Array(faker.number.int({ min: 2, max: 12 })).fill(0).map(() => [
-      faker.lorem.word(),
-      {
-        path: getRandomProjectPath(),
-        importDefault: false,
-        originalName: 'originalstring',
-        alias: 'aliasstring',
-        selfDefined: true,
-      },
-    ]),
+    new Array(faker.number.int({ min: 2, max: 12 })).fill(0).map(() => {
+      const importDefault = faker.datatype.boolean({ probability: 0.34 });
+      const selfDefined = importDefault ? false : faker.datatype.boolean({ probability: 0.12 });
+      return [
+        faker.lorem.word(),
+        {
+          path: getRandomProjectPath(),
+          importDefault,
+          originalName: 'originalstring',
+          alias: 'aliasstring',
+          selfDefined,
+        },
+      ];
+    }),
   );
 }
 
@@ -70,6 +74,7 @@ export const entries: Context['entries'] = new Map(
         wildcardExports,
         depth,
         exports,
+        isImplicit: faker.datatype.boolean({ probability: 0.12 }),
         time: Math.max(timeOne, timeTwo),
         self: Math.min(timeOne, timeTwo),
       },

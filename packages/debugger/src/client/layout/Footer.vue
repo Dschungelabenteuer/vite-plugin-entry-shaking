@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
 
+import Button from '@component/Button.vue';
 import type { ColorScheme } from '@composable/useColorScheme';
 import { useClassNames } from '@composable/useClassNames';
-import Button from '@component/Button.vue';
 import ViteStatus from './ViteStatus.vue';
 
 const $class = useClassNames('footer');

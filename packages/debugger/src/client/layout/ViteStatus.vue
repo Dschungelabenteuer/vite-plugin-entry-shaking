@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { store } from '#store';
-import { useClassNames } from '@composable/useClassNames';
 import Icon from '@component/Icon.vue';
+import { useClassNames } from '@composable/useClassNames';
 
 const name = 'vite server';
 

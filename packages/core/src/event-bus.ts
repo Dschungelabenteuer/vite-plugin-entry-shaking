@@ -1,12 +1,18 @@
 import EventEmitter from 'events';
 import type { TransformData } from './types';
+import type { Log } from './logger';
 
 export type DebuggerEvents = {
   increaseProcessTime: [number];
   registerTransform: [TransformData];
+  registerLog: [Log];
 };
 
-const events: (keyof DebuggerEvents)[] = ['increaseProcessTime', 'registerTransform'];
+const events: (keyof DebuggerEvents)[] = [
+  'increaseProcessTime',
+  'registerTransform',
+  'registerLog',
+];
 
 export class EventBus {
   private emitter = new EventEmitter();

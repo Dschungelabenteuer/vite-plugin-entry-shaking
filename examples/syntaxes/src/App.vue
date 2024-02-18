@@ -1,29 +1,75 @@
 <script setup lang="ts">
-const modules = import.meta.glob('./cases/*.ts');
+import summary from './data/summary.json';
 
-const cases: string[] = [
-  'wildcard-import-reexport',
-];
+type GroupData = Record<string, ExampleData>;
 
-const loadCase = async (casePath: string) => {
-  const mod = modules[`./cases/${casePath}.ts`];
-  await mod();
-  console.info('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+type ExampleData = {
+  exampleName: string;
+  examplePath: string;
+  exampleDescription: string;
+};
+
+const groups = summary as [string, GroupData][];
+const openExample = async (path: string) => {
+  const [_, __, newPath] = path.split(/src(\\|\/)/);
+  const relPath = `./${newPath}`;
+  await import(/* @vite-ignore */ relPath);
 };
 </script>
 
 <template>
-  <div>
+  <div class="wrapper">
     <h1>Syntax cases</h1>
-    <ul>
-      <li
-        v-for="casePath in cases"
-        :key="`${casePath}-index`"
+    <div
+      v-for="[groupName, groupCases] in groups"
+      :key="groupName"
+      class="group"
+    >
+      <h2>{{ groupName }}</h2>
+      <div
+        v-for="{ exampleName, examplePath, exampleDescription } in Object.values(groupCases)"
+        :key="`${groupName}-${exampleName}`"
+        class="case"
       >
-        <button @click="() => loadCase(casePath)">
-          coucou
-        </button>
-      </li>
-    </ul>
+        <div>
+          <h3>{{ exampleName }}</h3>
+          <p>{{ exampleDescription }}</p>
+          <button @click="() => openExample(examplePath)">
+            Load file
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+<style>
+body {
+  font-family:sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f6f8;
+}
+
+.wrapper {
+  max-width: 800px;
+  margin-inline: auto;
+  padding: 1rem;
+}
+
+.case {
+  display: flex;
+  width: 100%;;
+  align-self: center;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  background-color: #fff;
+  margin-block: 1rem;
+}
+
+.case > div:nth-child(2) {
+  align-self: center;
+  justify-self: flex-end;
+}
+</style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useClassNames } from '@composable/useClassNames';
 import Icon from '@component/Icon.vue';
+import { useClassNames } from '@composable/useClassNames';
 
 type Option = {
   /** Option label. */
@@ -21,16 +21,9 @@ type CheckboxProps = {
   modelValue: string[];
 };
 
-type ChekcboxEvents = {
-  /** Emitted when the model value changes. */
-  'update:modelValue': [value: string[]];
-};
-
 const $class = useClassNames('checkbox');
-const emit = defineEmits<ChekcboxEvents>();
 const props = defineProps<CheckboxProps>();
-
-const checked = ref<string[]>(props.modelValue);
+const model = defineModel<string[]>();
 </script>
 
 <template>
@@ -46,11 +39,10 @@ const checked = ref<string[]>(props.modelValue);
       />
       <input
         :id="`${id}-${option.value}`"
-        v-model="checked"
-        type="checkbox"
+        v-model="model"
         :value="option.value"
+        type="checkbox"
         :disabled="option.disabled"
-        @change="$emit('update:modelValue', checked)"
       />
       <label :for="`${id}-${option.value}`">
         {{ option.label }}
@@ -74,6 +66,7 @@ const checked = ref<string[]>(props.modelValue);
 @include color-scheme(dark) {
   --checkbox-background-color: transparent;
 }
+
 .checkbox {
   &__container {
     display: flex;
@@ -130,6 +123,7 @@ const checked = ref<string[]>(props.modelValue);
 
     &:has(input:disabled) {
       opacity: 0.45;
+
       &::before {
         opacity: 0.825;
         background-color: var(--overall-border-color);
@@ -140,6 +134,7 @@ const checked = ref<string[]>(props.modelValue);
       &::before {
         box-shadow: 0 0 0 1.5px var(--checkbox-border-color-focus);
       }
+
       .checkbox__mark {
         opacity: 1;
         transform: scale(0.75, 1);

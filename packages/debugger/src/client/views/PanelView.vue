@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { inject, nextTick, ref, watch } from 'vue';
+import Button from '@component/Button.vue';
 import type { Panel } from '@composable/usePanel';
 import { useClassNames } from '@composable/useClassNames';
-import Button from '@component/Button.vue';
 
 type PanelProps = {
   /** Panel ID. */

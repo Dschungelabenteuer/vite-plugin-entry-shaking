@@ -1,0 +1,14 @@
+{
+  "$schema": "../examples.schema.json",
+  "examples": {
+    "single": {
+      "description": [
+        "`NamedExportOne` is imported from an entry. In this entry file,",
+        "`NamedExportOne` is directly imported via `{ NamedExportOne }` from another module and",
+        "then reexported using a simple `export { NamedExportOne }` statement."
+      ],
+      "content": "import { NamedExportOne } from \"./entries/single\";",
+      "print": ["NamedExportOne"]
+    }
+  }
+}

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { ShikijiTransformer } from 'shikiji';
-import { ref, computed, watchEffect, nextTick, toRefs, watch } from 'vue';
-import { transformerNotationDiff } from 'shikiji-transformers';
+import type { ShikiTransformer } from 'shiki';
+import { ref, computed, toRefs, watch } from 'vue';
+import { transformerNotationDiff } from '@shikijs/transformers';
 
 import type { DiffsFileId } from '#types';
-import { useDiffs } from '@composable/useDiffs';
 import CodeBlock from '@component/CodeBlock.vue';
+import { useDiffs } from '@composable/useDiffs';
 
 type DiffViewerProps = {
   /** Unique identifier for the file. */
@@ -22,7 +22,7 @@ const fileId = computed(() => props.id as DiffsFileId);
 const diffs = useDiffs();
 const code = ref('');
 
-const transformers: ShikijiTransformer[] = [transformerNotationDiff()];
+const transformers:  ShikiTransformer[] = [transformerNotationDiff()];
 
 watch([from, to], async ([newFrom, newTo]) => {
   if (!newFrom.length && newTo.length!) return;
