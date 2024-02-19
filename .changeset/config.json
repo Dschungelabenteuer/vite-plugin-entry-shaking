@@ -8,7 +8,8 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [
-    "vite-plugin-entry-shaking-example-complete",
+    "vite-plugin-entry-shaking-example-template",
+    "vite-plugin-entry-shaking-example-syntaxes",
     "vite-plugin-entry-shaking-example-simple"
   ]
 }
