@@ -154,22 +154,22 @@ describe('transformImports', () => {
 
   it('should not transform if it does not import any target entry (unresolved import)', async () => {
     const id = STUB_ID;
-    const { code, imps, exps } = createOneLineImport('{ anything }', 'anywhere');
+    const { code, imps } = createOneLineImport('{ anything }', 'anywhere');
     const ctx = await createTestContext({ targets: [entryA] });
     ctx.entries = new Map([[entryA, MOCK_EMPTY_ENTRY_DATA] as const]);
 
-    const out = await Transformer.transformImports(ctx, id, code, imps, exps);
+    const out = await Transformer.transformImports(ctx, id, code, imps);
     expect(ImportAnalyzer.analyzeImportStatement).not.toHaveBeenCalled();
     expect(out).toStrictEqual(code);
   });
 
   it('should not transform if it does not import any target entry (resolved import)', async () => {
     const id = STUB_ID;
-    const { code, imps, exps } = createOneLineImport('{ anything }', entryB);
+    const { code, imps } = createOneLineImport('{ anything }', entryB);
     const ctx = await createTestContext({ targets: [entryA] });
     ctx.entries = new Map([[entryA, MOCK_EMPTY_ENTRY_DATA] as const]);
 
-    const out = await Transformer.transformImports(ctx, id, code, imps, exps);
+    const out = await Transformer.transformImports(ctx, id, code, imps);
     expect(ImportAnalyzer.analyzeImportStatement).not.toHaveBeenCalled();
     expect(out).toStrictEqual(code);
   });
@@ -177,12 +177,12 @@ describe('transformImports', () => {
   it('should transform if it does import at least one target entry', async () => {
     const id = __dirname;
     const name = 'A_MODULE_A';
-    const { code, imps, exps } = createOneLineImport(`{ ${name} }`, aliasA);
+    const { code, imps } = createOneLineImport(`{ ${name} }`, aliasA);
     const ctx = await createTestContext({ targets: [entryA] });
     const exports = new Map([[name, { path: './modules/A', importDefault: true }]]);
     ctx.entries = new Map([[entryA, createMockEntryData(exports)]]);
 
-    const out = await Transformer.transformImports(ctx, id, code, imps, exps);
+    const out = await Transformer.transformImports(ctx, id, code, imps);
     const params = getExpectedParams(ctx, code, entryA);
     expect(ImportAnalyzer.analyzeImportStatement).toHaveBeenNthCalledWith(1, ...params);
     expect(out).toStrictEqual(dedent(`import { default as ${name} } from '${entryAModuleA}';`));
@@ -192,8 +192,8 @@ describe('transformImports', () => {
     const id = __dirname;
     const nameA = 'A_MODULE_A';
     const nameH = 'A_MODULE_H';
-    const { code: aCode, imps: aImps, exps: aExps } = createOneLineImport(`{ ${nameA} }`, aliasA);
-    const { code: hCode, imps: hImps, exps: hExps } = createOneLineImport(`{ ${nameH} }`, aliasA);
+    const { code: aCode, imps: aImps } = createOneLineImport(`{ ${nameA} }`, aliasA);
+    const { code: hCode, imps: hImps } = createOneLineImport(`{ ${nameH} }`, aliasA);
     const ctx = await createTestContext({ targets: [] });
     const exportsA = new Map([
       [nameA, { path: './modules/A', importDefault: true }],
@@ -204,8 +204,7 @@ describe('transformImports', () => {
     // We won't test output, just function calls, so let's merge in a silly way.
     const code = `${aCode}\n${hCode}`;
     const imps = [...aImps, ...hImps];
-    const exps = [...aExps, ...hExps];
-    await Transformer.transformImports(ctx, id, code, imps, exps);
+    await Transformer.transformImports(ctx, id, code, imps);
     const params = getExpectedParams(ctx, code, entryA);
     expect(ImportAnalyzer.analyzeImportStatement).toHaveBeenNthCalledWith(1, ...params);
     expect(ImportAnalyzer.analyzeImportStatement).toHaveBeenNthCalledWith(2, ...params);

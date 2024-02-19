@@ -1,5 +1,5 @@
 {
-  "name": "vite-plugin-entry-shaking-example-template",
+  "name": "vite-plugin-entry-shaking-example-issue-28",
   "type": "module",
   "version": "0.0.0",
   "private": true,

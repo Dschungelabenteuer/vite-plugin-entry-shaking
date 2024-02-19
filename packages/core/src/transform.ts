@@ -64,7 +64,7 @@ export async function transformImportsIfNeeded(
 
   const { time, out } = await ctx.measure(
     `Transforming file "${id}"`,
-    async () => await transform(ctx, id, code, imports, exports),
+    async () => await transform(ctx, id, code, imports),
   );
 
   ctx.eventBus?.emit('registerTransform', {
@@ -91,12 +91,10 @@ export async function transformImports(
   id: string,
   code: string,
   imports: readonly ImportSpecifier[],
-  exports: readonly ExportSpecifier[],
 ): Promise<string | undefined> {
   // We only need to transform file if it imports at least one of targets.
   await init;
   const src = new MagicString(code);
-  const reexports = createReexportStatement(exports);
 
   // Analyze the imported entities of the file.
   for (const { n: path, ss: startPosition, se: endPosition } of imports) {
@@ -115,8 +113,8 @@ export async function transformImports(
       );
     }
   }
-  const out = src.toString();
-  return reexports.length ? [out, reexports].join('\n') : out;
+
+  return src.toString();
 }
 
 /**

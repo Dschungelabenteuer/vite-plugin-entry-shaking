@@ -1,11 +1,11 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync } from 'fs';
+import { createRequire } from 'module';
+import { resolve } from 'path';
 
-const { version, name } = JSON.parse(
-  readFileSync(new URL('../../core/package.json', import.meta.url)).toString(),
-);
-
-/** Version of the base plugin. */
+const require = createRequire(import.meta.url);
+const packageMainPath = require.resolve('vite-plugin-entry-shaking');
+const packageJsonPath = resolve(packageMainPath, '../../package.json');
+const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+const { name, version } = packageJson;
 export const VERSION = version as string;
-
-/** Name of the base plugin. */
 export const PLUGIN_NAME = name as string;
