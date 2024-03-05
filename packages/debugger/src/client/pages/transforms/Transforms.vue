@@ -80,10 +80,7 @@ const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.
       @sort="methods.onSortChange"
     >
       <template #row="rowProps">
-        <Transform
-          :key="`transform-${rowProps.index}`"
-          v-bind="rowProps"
-        />
+        <Transform v-bind="rowProps" />
       </template>
     </GridView>
   </BrowserView>

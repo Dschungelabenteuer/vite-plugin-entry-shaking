@@ -112,6 +112,7 @@ defineExpose({
 }
 
 .dialog {
+  view-transition-name: dialog;
   position: fixed;
   inset-block: 0;
   display: grid;
@@ -148,6 +149,7 @@ defineExpose({
   }
 
   &::backdrop {
+    view-transition-name: dialog-backdrop;
     backdrop-filter: var(--blur-lg);
     background: var(--dialog-backdrop-color);
     transition: all ease var(--transition-duration-short);

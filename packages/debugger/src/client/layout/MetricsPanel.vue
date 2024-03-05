@@ -7,7 +7,6 @@ import Button from '@component/Button.vue';
 
 import type { Panel } from '@composable/usePanel';
 import PanelView from '@views/PanelView.vue';
-import { store } from '#store';
 
 const closeBtnRef = ref<InstanceType<typeof Button> | null>(null);
 const metricsPanel = inject<Panel>('metricsPanel')!;
@@ -66,15 +65,36 @@ watch(isOpen, (open) => {
 </script>
 
 <template>
-  <PanelView panel-id="metrics-panel" title="Metrics" close-panel-label="Close metrics panel">
+  <PanelView
+    panel-id="metrics-panel"
+    title="Metrics"
+    close-panel-label="Close metrics panel"
+  >
     <div>
-      <Metrics :header="timeHeader" :details="timeDetails" />
-      <Metrics :header="requestsHeader" :details="requestsDetails" />
+      <Metrics
+        :header="timeHeader"
+        :details="timeDetails"
+      />
+      <Metrics
+        :header="requestsHeader"
+        :details="requestsDetails"
+      />
     </div>
     <template #footer>
-      <Button :bordered="true" icon="upload" disabled="Imports are only possible when running a detached instance."
-        label="Import" @click="toggle" />
-      <Button :bordered="true" icon="download" disabled="Coming soon (or later)" label="Export" @click="toggle" />
+      <Button
+        :bordered="true"
+        icon="upload"
+        disabled="Imports are only possible when running a detached instance."
+        label="Import"
+        @click="toggle"
+      />
+      <Button
+        :bordered="true"
+        icon="download"
+        disabled="Coming soon (or later)"
+        label="Export"
+        @click="toggle"
+      />
     </template>
   </PanelView>
 </template>

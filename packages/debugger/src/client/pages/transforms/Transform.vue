@@ -45,7 +45,7 @@ const props = defineProps<TransformProps>();
     align-items: center;
     position: sticky;
     left: 0;
-    backdrop-filter: blur(3px);
+    /* backdrop-filter: blur(3px); // perf issue */
 
     &::before {
       content: '';

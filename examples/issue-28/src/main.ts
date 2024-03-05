@@ -1,4 +1,5 @@
 import { Bar } from './second';
+import { SomeContent as MyContent } from './some-file';
 
 /**
  * This is where Bar would be used, but what about Foo?
@@ -7,4 +8,4 @@ import { Bar } from './second';
  * - where's that "undesired tree-shaking" happening?
  *
  */
-console.info(Bar);
+console.info(Bar, MyContent);

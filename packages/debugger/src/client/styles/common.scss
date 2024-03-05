@@ -37,6 +37,11 @@ body,
   background-color: var(--accent-color);
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  @extend %reset-animation;
+}
+
 #wrapper {
   @include flex-col(center, normal);
   background: var(--background-color);

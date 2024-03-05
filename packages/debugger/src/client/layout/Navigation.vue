@@ -68,7 +68,7 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
   a,
   button {
     @include button;
-    @include button-large;
+    @include button-medium;
     transition: ease var(--transition-duration-short);
   }
 

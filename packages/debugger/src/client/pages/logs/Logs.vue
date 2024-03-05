@@ -71,10 +71,7 @@ const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.
       @sort="methods.onSortChange"
     >
       <template #row="rowProps">
-        <Log
-          :key="`log-${rowProps.index}`"
-          v-bind="rowProps"
-        />
+        <Log v-bind="rowProps" />
       </template>
     </GridView>
   </BrowserView>

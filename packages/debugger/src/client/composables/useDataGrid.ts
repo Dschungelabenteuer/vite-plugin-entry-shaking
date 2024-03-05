@@ -1,8 +1,12 @@
-import type { ComputedRef, Ref } from 'vue';
-import { computed, nextTick, defineComponent, h, onMounted, ref, watch } from 'vue';
+import type { Ref, ComputedRef } from 'vue';
+import { computed, nextTick, defineComponent, h, onMounted, ref, watch, inject } from 'vue';
 import { getElementBoundaries } from '#utils';
-import { useActiveElement } from '@vueuse/core';
 import { getFocusableChildren } from './useFocusTrap';
+
+type RenderTracker = { row: number; resolve: (value: unknown) => void; reject: () => void };
+let renderCallback: undefined | RenderTracker;
+
+const getColIndex = (el: HTMLElement) => Number(el.getAttribute('aria-colindex')) ?? 0;
 
 /**
  * Functional grid row component.
@@ -13,17 +17,18 @@ import { getFocusableChildren } from './useFocusTrap';
  * consistent.
  */
 export const Row = defineComponent({
-  props: ['columns', 'rowIndex'],
+  props: ['columns', 'rowIndex', 'activeRow', 'activeCol'],
   emits: ['cellClick'],
   setup(props, { slots, emit }) {
     const rowRef = ref<HTMLElement | undefined>();
+    const gridRef = inject<Ref<HTMLElement | null>>('gridRef')!;
 
     const prepareRow = () => {
       const children = [...(rowRef.value?.children ?? [])];
       // Warn if number of children mismatch the number of columns.
       if (children.length !== Number(props.columns.length)) {
         console.warn(
-          `[Grid warn] Columns and children count mismatch.\n` +
+          `[useDataGrid] Columns and children count mismatch.\n` +
             `The following element is expected to have ${props.columns.length} children ` +
             `but has actually ${rowRef.value?.children.length}. This may cause both ` +
             `styling and accessibility issues:\n`,
@@ -33,27 +38,62 @@ export const Row = defineComponent({
 
       // Dynamically rove and add aria-colindex to children.
       (children as HTMLElement[]).forEach((child, index) => {
+        rove(child);
         roveFocusableChildren(child);
         const className = props.columns[index].class;
+        const colIndex = index + 1;
         child.removeEventListener('click', handleClick);
-        child.setAttribute('aria-colindex', `${index + 1}`);
-        child.setAttribute('data-rowindex', `${props.rowIndex + 2}`);
+        child.setAttribute('aria-colindex', `${colIndex}`);
         child.classList.add(props.columns[index].class);
         if (className) child.classList.add(className);
         child.addEventListener('click', handleClick, { capture: true });
       });
+
+      updateRow();
+    };
+
+    /** Called whenever a row is updated/replaced (e.g. content pool update). */
+    const updateRow = () => {
+      // Update row index.
+      (rowRef.value as HTMLElement).setAttribute('aria-rowindex', `${props.rowIndex + 1}`);
+
+      if (props.rowIndex + 1 === props.activeRow) {
+        const child = rowRef.value?.querySelector(
+          `[aria-colindex="${props.activeCol}"]`,
+        ) as HTMLElement;
+
+        if (child) {
+          unrove(child);
+          nextTick(() => {
+            (child as HTMLElement).focus({
+              preventScroll: true,
+            });
+          });
+        }
+      } else if (
+        rowRef.value &&
+        gridRef.value &&
+        rowRef.value === document.activeElement?.parentElement
+      ) {
+        gridRef.value.focus();
+      }
+
+      // Set row as rendered if we were waiting for it.
+      if (renderCallback && renderCallback.row === props.rowIndex + 1) {
+        renderCallback.resolve(true);
+        renderCallback = undefined;
+      }
     };
 
     const handleClick = (e: MouseEvent) => {
-      const row = props.rowIndex + 2;
-      const col = Number((e.currentTarget as HTMLElement).getAttribute('aria-colindex')) ?? 0;
-      console.log('@@click', row, col);
+      const row = props.rowIndex + 1;
+      const col = getColIndex(e.currentTarget as HTMLElement);
       emit('cellClick', row, col);
     };
 
     watch(
       () => props.rowIndex,
-      () => prepareRow(),
+      () => updateRow(),
       { flush: 'post' },
     );
 
@@ -78,27 +118,16 @@ const unrove = (el: HTMLElement) => el.setAttribute('tabindex', '0');
  * @param gridRef Reference to grid element.
  * @param colCount Total count of columns.
  * @param rowCount Total count of rows.
+ * @param itemSize Size of a single grid item.
+ * @param pageSize Number of rows to jump up/down when using PAGE keys.
  */
 export function useGridNavigation(
-  gridRef: Ref<HTMLElement | undefined>,
+  gridRef: Ref<HTMLElement | null>,
   colCount: ComputedRef<number>,
   rowCount: ComputedRef<number>,
+  itemSize: number,
+  pageSize: ComputedRef<number>,
 ) {
-  /**
-   * This hack is required because when scrolling pretty fast or long-pressing arrow keys,
-   * focused element may be flushed by vue-virtual-scroller's own logic, therefore giving
-   * away the focus to the body element. Fine-grained control over that behaviour would
-   * probably be much less performant and maintainable.
-   */
-  const activeElement = useActiveElement();
-  watch(activeElement, (el) => {
-    if (el?.nodeName === 'BODY') {
-      focusActiveCell();
-    }
-
-    isGridFocused.value = el === gridRef.value;
-  });
-
   /** List of elements whose tabindices are changed based on focus. */
   let editedTabindexEls: HTMLElement[] = [];
   /** Index of active grid row. */
@@ -109,23 +138,44 @@ export function useGridNavigation(
   const isGridFocused = ref<boolean>(false);
   /** Is shortcut list open? */
   const isShortcutListOpen = ref<boolean>(false);
+  /** Scrollable grid content boundaries.  */
+  const gridScrollerBoundaries = ref<{ top: number; bottom: number }>({ top: 0, bottom: 0 });
+  /** Scrollable grid content element. */
+  const gridScrollerElement = ref<HTMLElement | null>(null);
 
   /** Is the first row reached? */
   const firstRowReached = computed(() => activeRow.value <= 1);
   /** Is the last row reached? */
   const lastRowReached = computed(() => activeRow.value >= rowCount.value + 1);
+  /** Active row selector. */
+  const activeRowSelector = computed(() => `[aria-rowindex="${activeRow.value}"]`);
   /** Is the first row reached? */
   const firstColReached = computed(() => activeCol.value <= 1);
   /** Is the last row reached? */
   const lastColReached = computed(() => activeCol.value >= colCount.value);
+  /** Active column selector. */
+  const activeColumnSelector = computed(() => `[aria-colindex="${activeCol.value}"]`);
+  /** Scroll width. */
+  const scrollWidth = computed(() => gridScrollerElement.value?.scrollWidth ?? 0);
+  /** Scroll left. */
+  const scrollLeft = computed(() => gridScrollerElement.value?.scrollLeft ?? 0);
+  /** Scroll height. */
+  const scrollHeight = computed(() => gridScrollerElement.value?.scrollHeight ?? 0);
+  /** Scroll top. */
+  const scrollTop = computed(() => gridScrollerElement.value?.scrollTop ?? 0);
 
-  const gridScrollerBoundaries = ref<{ top: number; bottom: number }>({ top: 0, bottom: 0 });
-  const gridScrollerElement = ref<HTMLElement | null>(null);
+  const scrollTo = (x: number, y: number) => gridScrollerElement.value?.scrollTo(x, y);
+  const scrollToStartX = () => scrollTo(0, scrollTop.value);
+  const scrollToEndX = () => scrollTo(scrollWidth.value, scrollTop.value);
+  const scrollToStartY = () => scrollTo(scrollLeft.value, 0);
+  const scrollToEndY = () => scrollTo(scrollLeft.value, scrollHeight.value);
+  const scrollToActiveRow = () =>
+    scrollTo(scrollLeft.value, activeRow.value * itemSize - (gridRef.value?.clientHeight ?? 0) / 2);
 
   /** Whenever a line is mounted, let's add roving tabindex behaviour. */
   onMounted(() => {
     if (!gridRef.value) return;
-    gridScrollerElement.value = gridRef.value.querySelector('.vue-recycle-scroller');
+    gridScrollerElement.value = gridRef.value.querySelector('.grid');
     gridScrollerBoundaries.value = getElementBoundaries(gridScrollerElement.value ?? gridRef.value);
     roveFocusableChildren(gridRef.value);
   });
@@ -136,14 +186,29 @@ export function useGridNavigation(
     editedTabindexEls = [];
   }
 
+  /** Gets active cell. */
+  async function getActiveCell(awaitRowRender = true) {
+    const getCellSelector = () => `${activeRowSelector.value} ${activeColumnSelector.value}`;
+    const getCell = () => gridRef.value?.querySelector<HTMLElement>(getCellSelector());
+    renderCallback?.reject();
+    await nextTick();
+
+    return (
+      getCell() ??
+      (await new Promise((resolve, reject) => {
+        if (awaitRowRender) return resolve(undefined);
+        renderCallback = { resolve, reject, row: activeRow.value };
+      })
+        .then(() => getCell())
+        .catch(() => undefined))
+    );
+  }
+
   /** Focuses active cell, or first focusable item of active cell if any. */
-  function focusActiveCell(autoscroll = true) {
+  async function focusActiveCell(autoscroll = true, awaitRowRender = true) {
     resetRovingTabindex();
-    const rowSelector = `[aria-rowindex="${activeRow.value}"]`;
-    const colSelector = `[aria-colindex="${activeCol.value}"]`;
-    const cellSelector = `${rowSelector} ${colSelector}`;
-    const cell = gridRef.value?.querySelector<HTMLElement>(cellSelector);
-    if (!cell) return;
+    const cell = await getActiveCell(awaitRowRender);
+    if (!cell) return scrollToActiveRow();
 
     const focusableChildren = getFocusableChildren(cell);
     const restoreTabindices = (el: HTMLElement) => {
@@ -166,7 +231,7 @@ export function useGridNavigation(
           gridScrollerElement.value.scrollLeft,
           gridScrollerElement.value.scrollTop + rowSize,
         );
-      } else if (top - gridScrollerBoundaries.value.top <= 2 * rowSize) {
+      } else if (top - gridScrollerBoundaries.value.top <= 1 * rowSize) {
         gridScrollerElement.value?.scrollTo(
           gridScrollerElement.value.scrollLeft,
           gridScrollerElement.value.scrollTop - rowSize,
@@ -196,7 +261,7 @@ export function useGridNavigation(
    * @note I hate switches, we need pattern matching.
    */
   function handleShortcut(e: KeyboardEvent) {
-    if (['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft'].includes(e.key)) {
+    if (['ArrowDown', 'ArrowUp', 'ArrowRight', 'ArrowLeft', 'PageUp', 'PageDown'].includes(e.key)) {
       e.preventDefault();
       e.stopPropagation();
     }
@@ -205,6 +270,10 @@ export function useGridNavigation(
     if (e.key === 'ArrowUp') return focusPreviousRow();
     if (e.key === 'ArrowRight') return focusNextCol();
     if (e.key === 'ArrowLeft') return focusPreviousCol();
+    if (e.key === 'PageUp') return focusPreviousRow(pageSize.value);
+    if (e.key === 'PageDown') return focusNextRow(pageSize.value);
+    if (e.key === 'Home') return focusFirstRow();
+    if (e.key === 'End') return focusLastRow();
     if (e.key === 'Escape') return resetFocus();
     if (e.key === 'h') isShortcutListOpen.value = !isShortcutListOpen.value;
   }
@@ -215,21 +284,29 @@ export function useGridNavigation(
     gridRef.value?.focus();
   }
 
-  function focusNextRow() {
+  function focusFirstRow() {
+    activeRow.value = 2;
+    scrollToStartY();
+    nextTick(() => focusActiveCell(false));
+  }
+
+  function focusLastRow() {
+    activeRow.value = rowCount.value + 1;
+    scrollToEndY();
+    nextTick(() => focusActiveCell(false));
+  }
+
+  function focusNextRow(step = 1) {
     if (!lastRowReached.value) {
-      activeRow.value += 1;
+      activeRow.value = Math.min(activeRow.value + step, rowCount.value + 1);
       nextTick(() => focusActiveCell());
-    } else {
-      gridRef.value?.scrollTo(gridRef.value.scrollLeft, gridRef.value.scrollHeight);
     }
   }
 
-  function focusPreviousRow() {
+  function focusPreviousRow(step = 1) {
     if (!firstRowReached.value) {
-      activeRow.value -= 1;
+      activeRow.value = Math.max(activeRow.value - step, 1);
       nextTick(() => focusActiveCell());
-    } else {
-      gridRef.value?.scrollTo(gridRef.value.scrollLeft, 0);
     }
   }
 
@@ -238,7 +315,7 @@ export function useGridNavigation(
       activeCol.value += 1;
       nextTick(() => focusActiveCell());
     } else {
-      gridRef.value?.scrollTo(gridRef.value.scrollWidth, gridRef.value.scrollTop);
+      scrollToEndX();
     }
   }
 
@@ -247,7 +324,7 @@ export function useGridNavigation(
       activeCol.value -= 1;
       nextTick(() => focusActiveCell());
     } else {
-      gridRef.value?.scrollTo(0, gridRef.value.scrollTop);
+      scrollToStartX();
     }
   }
 

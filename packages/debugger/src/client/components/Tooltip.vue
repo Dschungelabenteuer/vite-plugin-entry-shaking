@@ -31,7 +31,7 @@ const tooltipClass = computed(() => [$class(), stateClass.value]);
 }
 
 .tooltip {
-  z-index: 1000;
+  z-index: 10000;
   @include padding;
   width: max-content;
   margin: var(--spacing-md);

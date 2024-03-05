@@ -8,12 +8,19 @@ type KbdProps = {
   content: string | string[];
   /** Should we dimm the kbd ? */
   dimmed?: boolean;
+  /** Condensed mod. */
+  condensed?: boolean;
 };
 
 const $class = useClassNames('kbd');
 const props = defineProps<KbdProps>();
 
-const classes = computed(() => [$class(), props.dimmed ? 'dimmed' : '']);
+const classes = computed(() => [
+  $class(),
+  props.dimmed ? 'dimmed' : '',
+  props.condensed ? 'condensed' : '',
+]);
+
 const items = computed(() => {
   const list = Array.isArray(props.content) ? props.content : [props.content];
   return list.map((item) => {
@@ -89,6 +96,10 @@ const items = computed(() => {
   color: var(--text-color);
   opacity: var(--kbd-opacity);
   @include padding(var(--spacing-sm), var(--spacing-sm));
+
+  &.condensed {
+    @include padding(var(--spacing-2xs), var(--spacing-xs));
+  }
 
   &.dimmed {
     opacity: var(--kbd-opacity-dimmed);

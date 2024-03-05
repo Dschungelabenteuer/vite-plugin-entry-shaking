@@ -6,6 +6,8 @@ const entryDetails = inject<EntryDetailsProps>('entry-details')!;
 </script>
 
 <template>
-  time: {{ entryDetails.entry?.time }}ms self: {{ entryDetails.entry?.self }}ms
-  <div>hello entry metrics</div>
+  <div>
+    time: {{ entryDetails.entry?.time }}ms self: {{ entryDetails.entry?.self }}ms
+    <div>hello entry metrics</div>
+  </div>
 </template>

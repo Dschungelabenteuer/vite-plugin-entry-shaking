@@ -22,15 +22,19 @@ const fileId = computed(() => props.id as DiffsFileId);
 const diffs = useDiffs();
 const code = ref('');
 
-const transformers:  ShikiTransformer[] = [transformerNotationDiff()];
+const transformers: ShikiTransformer[] = [transformerNotationDiff()];
 
-watch([from, to], async ([newFrom, newTo]) => {
-  if (!newFrom.length && newTo.length!) return;
-  await diffs.prepare();
-  diffs.compare(fileId.value, newFrom, newTo).then((val) => {
-    code.value = val as string;
-  });
-});
+watch(
+  [from, to],
+  async ([newFrom, newTo]) => {
+    if (!newFrom.length && newTo.length!) return;
+    await diffs.prepare();
+    diffs.compare(fileId.value, newFrom, newTo).then((val) => {
+      code.value = val as string;
+    });
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

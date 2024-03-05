@@ -64,7 +64,7 @@ export async function transformImportsIfNeeded(
 
   const { time, out } = await ctx.measure(
     `Transforming file "${id}"`,
-    async () => await transform(ctx, id, code, imports),
+    async () => await transform(ctx, id, code, imports, exports),
   );
 
   ctx.eventBus?.emit('registerTransform', {
@@ -91,10 +91,12 @@ export async function transformImports(
   id: string,
   code: string,
   imports: readonly ImportSpecifier[],
+  exports: readonly ExportSpecifier[],
 ): Promise<string | undefined> {
   // We only need to transform file if it imports at least one of targets.
   await init;
   const src = new MagicString(code);
+  const reexports = createReexportStatement(exports);
 
   // Analyze the imported entities of the file.
   for (const { n: path, ss: startPosition, se: endPosition } of imports) {
@@ -113,8 +115,8 @@ export async function transformImports(
       );
     }
   }
-
-  return src.toString();
+  const out = src.toString();
+  return reexports.length ? [out, reexports].join('\n') : out;
 }
 
 /**
@@ -158,7 +160,9 @@ export async function importsTargetEntry(
  * @param exports List of exports extracted by es-module-lexer.
  */
 export function createReexportStatement(exports: readonly ExportSpecifier[]) {
-  const namedExports = exports.map(({ n }) => n).filter(Boolean);
+  const namedExports = exports
+    .filter((e) => e.n !== undefined && e.ln === undefined)
+    .map(({ n }) => n);
   if (namedExports.length === 0) return '';
   return `export { ${namedExports.join(',')} };`;
 }

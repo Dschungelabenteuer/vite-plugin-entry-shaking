@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, toRefs } from 'vue';
+import { computed, onBeforeMount, onMounted, provide, ref, toRefs } from 'vue';
 import { useRoute } from 'vue-router';
 
 import type { EntryData } from 'vite-plugin-entry-shaking';
@@ -106,7 +106,6 @@ const handleEntryView = (path: string) => {
     >
       <template #row="rowProps">
         <Entry
-          :key="`entry-${rowProps.index}`"
           v-bind="rowProps"
           @view="handleEntryView"
         />
@@ -117,8 +116,8 @@ const handleEntryView = (path: string) => {
   <Dialog
     ref="dialogRef"
     title="Entry data"
-    width="760px"
-    height="500px"
+    width="960px"
+    height="640px"
     @close="activeEntry = undefined"
   >
     <EntryDetails

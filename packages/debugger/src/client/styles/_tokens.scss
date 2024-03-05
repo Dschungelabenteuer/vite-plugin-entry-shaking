@@ -49,7 +49,7 @@
   // Overall (dark).
   --overall-background-color: #00000044;
   --overall-border-color: #ffffff0c;
-  --overall-border-color-stronger: #ffffff28;
+  --overall-border-color-stronger: #e9c6c618;
   --background-color: #110f1d;
   --background-color-alt: #1f130f;
   --background-color-alt-subtle: #191114;
@@ -89,6 +89,8 @@
 /// Common variables.
 @include token {
   // Spacing.
+  --spacing-2xs: 0.125rem;
+  --spacing-xs: 0.175rem;
   --spacing-sm: 0.25rem;
   --spacing-md: 0.5rem;
   --spacing-lg: 1rem;

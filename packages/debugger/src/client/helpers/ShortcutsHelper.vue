@@ -114,6 +114,14 @@ const { styles: popoverStyles } = popover;
         </ul>
       </div>
     </div>
+    <div :class="$class('meta')">
+      <div>
+        <span>
+          <Kbd content="H" />
+        </span>
+        <span>Toggle shortcut list</span>
+      </div>
+    </div>
   </Popover>
 </template>
 
@@ -126,10 +134,21 @@ const { styles: popoverStyles } = popover;
   display: flex;
   justify-content: center;
 
+  &__meta {
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    padding: var(--spacing-sm);
+    margin-inline: calc(var(--spacing-md) * -1);
+    margin-block-start: var(--spacing-md);
+    font-size: var(--font-size-xs);
+    @include border-top;
+  }
+
   &__list {
     pointer-events: none;
-
     display: flex;
+
     ul {
       list-style-type: none;
       margin: var(--spacing-md);

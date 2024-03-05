@@ -1,6 +1,6 @@
 # vite-plugin-entry-shaking-debugger
 
-## 0.0.0-next-20240219215732
+## 0.0.0-next-20240219224802
 
 ### Minor Changes
 
@@ -9,4 +9,4 @@
 ### Patch Changes
 
 - Updated dependencies
-  - vite-plugin-entry-shaking@0.0.0-next-20240219215732
+  - vite-plugin-entry-shaking@0.0.0-next-20240219224802

@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useClassNames } from '@composable/useClassNames';
+import { useViewTransition } from '@composable/useViewTransition';
 import Navigation from './Navigation.vue';
 
 type HeaderProps = {
@@ -12,10 +14,18 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   showTitle: true,
   showNavigation: true,
 });
+
+const headerRef = ref<HTMLElement | null>(null);
+const transition = useViewTransition({
+  names: { 'layout-header': headerRef },
+});
 </script>
 
 <template>
-  <header :class="$class()">
+  <header
+    ref="headerRef"
+    :class="$class()"
+  >
     <router-link
       v-if="showTitle"
       :class="$class('title')"
@@ -50,5 +60,14 @@ const props = withDefaults(defineProps<HeaderProps>(), {
   .navigation {
     margin-inline-start: auto;
   }
+}
+
+::view-transition-new(layout-header),
+::view-transition-old(layout-header) {
+  animation: none;
+}
+
+::view-transition-old(layout-header) {
+  display: none;
 }
 </style>

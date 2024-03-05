@@ -46,7 +46,9 @@
 }
 
 @mixin button {
+
   @include flex;
+  height: var(--button-height, auto);
   cursor: pointer;
   color: var(--text-color);
   text-decoration: none;
@@ -125,7 +127,7 @@
 
 @mixin button-small {
   padding: calc(var(--spacing-sm) + 3px);
-  :not(.icon-only) {
+  &:not(.icon-only) {
     svg {
       margin-inline-end: var(--spacing-sm);
     }

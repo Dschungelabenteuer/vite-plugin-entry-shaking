@@ -63,6 +63,7 @@ watch(isOpen, (open) => {
 <style lang="scss">
 .panel {
   @include contained;
+  overflow: visible;
   max-width: 300px;
   display: grid;
   grid-template-columns: 1fr;
@@ -98,10 +99,6 @@ watch(isOpen, (open) => {
     display: flex;
     padding-block: 1.5px;
     align-items: center;
-
-    > .icon-button {
-      height: 100%;
-    }
 
     h2 {
       font-size: 1.14rem;

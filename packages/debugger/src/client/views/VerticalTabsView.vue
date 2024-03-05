@@ -3,6 +3,7 @@ import type { Component, DefineComponent } from 'vue';
 import { computed, nextTick, ref } from 'vue';
 import Button from '@component/Button.vue';
 import { useClassNames } from '@composable/useClassNames';
+import { useViewTransition } from '@composable/useViewTransition';
 
 export type VerticalTab = {
   /** Tab ID. */
@@ -32,6 +33,7 @@ type VerticalTabsProps = {
 
 const $class = useClassNames('vertical-tabs');
 const props = defineProps<VerticalTabsProps>();
+const { transition } = useViewTransition({});
 
 const tabButtonsRef = ref<(InstanceType<typeof Button> | null)[]>([]);
 const tabPanelsRef = ref<(HTMLElement | null)[]>([]);
@@ -41,7 +43,9 @@ const getTabId = (tabId: VerticalTab['id']) => `${prefix.value}_${tabId}`;
 const getTabPanelId = (tabId: VerticalTab['id']) => `${getTabId(tabId)}_tab`;
 const getTabButtonId = (tabId: VerticalTab['id']) => `${getTabId(tabId)}_btn`;
 const tablistWidth = computed(() => (props.iconOnly ? 'auto' : props.width));
-const setActiveTab = (index: number) => {
+const setActiveTab = async (index: number) => {
+  if (index === activeIndex.value) return;
+  await transition();
   activeIndex.value = index;
   nextTick(() => {
     tabButtonsRef.value[index]?.reference?.focus();
@@ -82,7 +86,7 @@ const handleTab = (e: KeyboardEvent) => {
         :aria-controls="getTabPanelId(tab.id)"
         :aria-selected="activeIndex === index"
         role="tab"
-        @click="activeIndex = index"
+        @click="setActiveTab(index)"
         @arrow-up="prevTab"
         @arrow-left="prevTab"
         @arrow-right="nextTab"
@@ -106,7 +110,10 @@ const handleTab = (e: KeyboardEvent) => {
         tabindex="0"
         role="tabpanel"
       >
-        <component :is="tab.component" />
+        <component
+          :is="tab.component"
+          v-if="activeIndex === index"
+        />
       </div>
     </div>
   </div>

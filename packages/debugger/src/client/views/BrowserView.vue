@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import Input from '@component/Input.vue';
 import Button from '@component/Button.vue';
 import { useClassNames } from '@composable/useClassNames';
+import { useViewTransition } from '@composable/useViewTransition';
 
 type BrowserViewProps = {
   /** Browser page name. */
@@ -41,6 +42,20 @@ const props = withDefaults(defineProps<BrowserViewProps>(), {
 });
 
 const classes = computed(() => [$class(), props.condensed ? 'condensed' : '']);
+const headerTitleRef = ref<HTMLElement | null>(null);
+const headerIconRef = ref<HTMLElement | null>(null);
+const headerSearchRef = ref<HTMLElement | null>(null);
+const headerFilterButtonRef = ref<HTMLElement | null>(null);
+const headerCountsRef = ref<HTMLElement | null>(null);
+const transitions = useViewTransition({
+  names: {
+    'browser-header-title': headerTitleRef,
+    'browser-header-icon': headerIconRef,
+    'browser-header-search': headerSearchRef,
+    'browser-header-filter-button': headerFilterButtonRef,
+    'browser-header-counts': headerCountsRef,
+  },
+});
 
 const onSearch = (e: InputEvent) => {
   emit('search', (e.target as HTMLInputElement).value);
@@ -51,37 +66,57 @@ const onSearch = (e: InputEvent) => {
   <div :class="classes">
     <header :class="$class('header')">
       <div :class="$class('header-meta')">
-        <Icon
-          v-if="pageIcon"
-          :icon="`tabler:${pageIcon}`"
-        />
-        <h1>{{ name }}</h1>
+        <div
+          ref="headerIconRef"
+          :class="$class('header-icon')"
+        >
+          <Icon
+            v-if="pageIcon"
+            :icon="`tabler:${pageIcon}`"
+          />
+        </div>
+        <h1
+          ref="headerTitleRef"
+          :class="$class('header-title')"
+        >
+          {{ name }}
+        </h1>
       </div>
-      <div :class="$class('header-counts')">
+      <div
+        ref="headerCountsRef"
+        :class="$class('header-counts')"
+      >
         <span v-if="total === matched">{{ total }} items</span>
         <span v-else>{{ matched }} / {{ total }} items</span>
       </div>
       <div :class="$class('header-actions')">
         <Input
           id="search"
+          ref="headerSearchRef"
+          :class="$class('header-search')"
+          shortcut="Ctrl+F"
           icon="search"
           :label="searchLabel"
           :hide-label="true"
           :placeholder="searchPlaceholder"
           @input="onSearch"
         />
-        <Button
-          v-if="$slots.filters"
-          aria-controls="metrics-panel"
-          icon="filter"
-          :floating-placement="'bottom-end'"
-          :icon-only="true"
-          :label="filterLabel"
+        <div
+          ref="headerFilterButtonRef"
+          :class="$class('header-icon')"
         >
-          <template #popover>
-            <slot name="filters" />
-          </template>
-        </Button>
+          <Button
+            v-if="$slots.filters"
+            icon="filter"
+            :floating-placement="'bottom-end'"
+            :icon-only="true"
+            :label="filterLabel"
+          >
+            <template #popover>
+              <slot name="filters" />
+            </template>
+          </Button>
+        </div>
       </div>
       <slot name="header-after" />
     </header>
@@ -102,7 +137,6 @@ const onSearch = (e: InputEvent) => {
 
 .browser-view {
   --size-page-content: calc(100% - var(--spacing-xs));
-
   --size-page-header: 3rem;
   --padding-page-header: var(--spacing-lg) var(--spacing-md);
   --font-size-page-header: var(--font-size-sm);
@@ -124,10 +158,11 @@ const onSearch = (e: InputEvent) => {
 
   &__header {
     @include flex-row(normal, center);
+    z-index: 1000;
     height: var(--size-page-header);
     padding-inline: var(--padding-page-header);
 
-    h1 {
+    &-title {
       font-size: var(--font-size-page-header);
     }
 
@@ -163,5 +198,58 @@ const onSearch = (e: InputEvent) => {
     box-shadow: 0 0 0 1px var(--overall-border-color);
     background: var(--overall-background-color);
   }
+}
+
+::view-transition-new(browser-header-counts) {
+}
+
+::view-transition-old(browser-header-counts) {
+}
+
+::view-transition-new(browser-header-search) {
+}
+
+::view-transition-old(browser-header-search) {
+}
+
+::view-transition-new(browser-header-filter-button) {
+  height: fit-content;
+  width: fit-content;
+  object-fit: cover;
+  overflow: clip;
+  animation: 300ms ease scale-in forwards;
+}
+
+::view-transition-old(browser-header-filter-button) {
+  height: fit-content;
+  width: fit-content;
+  object-fit: cover;
+  overflow: clip;
+  animation: 300ms ease scale-out forwards;
+}
+
+::view-transition-new(browser-header-icon) {
+  animation: 300ms ease scale-in forwards;
+}
+
+::view-transition-old(browser-header-icon) {
+  animation: 300ms ease scale-out forwards;
+}
+
+::view-transition-new(browser-header-title) {
+  --slide-in-distance: 0.8rem;
+  height: fit-content;
+  width: fit-content;
+  object-fit: cover;
+  overflow: clip;
+  animation: 200ms ease slide-in-left forwards;
+}
+
+::view-transition-old(browser-header-title) {
+  --slide-in-distance: 0.8rem;
+  height: fit-content;
+  width: fit-content;
+  object-fit: cover;
+  animation: 200ms ease slide-out-right forwards;
 }
 </style>

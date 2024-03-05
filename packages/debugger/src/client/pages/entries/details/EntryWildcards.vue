@@ -57,6 +57,7 @@ const page = computed(() => ({ name: 'Wilcards' }));
 <template>
   <BrowserView
     :class="$class()"
+    page-icon="asterisk"
     v-bind="page"
     :total="total"
     :matched="matched"
@@ -80,7 +81,7 @@ const page = computed(() => ({ name: 'Wilcards' }));
     >
       <template #row="rowProps">
         <EntryWildcard
-          :key="`wildcard-${rowProps.index}`"
+          :key="`wildcard-${rowProps.item.id}`"
           v-bind="rowProps"
         />
       </template>

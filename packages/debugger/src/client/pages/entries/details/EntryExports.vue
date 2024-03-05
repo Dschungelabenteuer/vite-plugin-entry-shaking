@@ -72,6 +72,7 @@ const page = computed(() => ({ name: 'Exports' }));
   <BrowserView
     :class="$class()"
     v-bind="page"
+    page-icon="package-export"
     :total="total"
     :matched="matched"
     :condensed="true"
@@ -94,7 +95,7 @@ const page = computed(() => ({ name: 'Exports' }));
     >
       <template #row="rowProps">
         <EntryExport
-          :key="`export-${rowProps.index}`"
+          :key="`export-${rowProps.item}`"
           v-bind="rowProps"
         />
       </template>

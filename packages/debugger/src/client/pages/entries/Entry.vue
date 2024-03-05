@@ -61,26 +61,27 @@ const props = defineProps<EntryProps>();
 
   &__access {
     z-index: 10;
-    height: 100%;
+    height: calc(100% - 2px) !important;
     width: 100%;
     display: flex;
     align-items: center;
     position: sticky;
+    bottom: 0px;
     left: 0;
-    backdrop-filter: blur(3px);
+    /* backdrop-filter: blur(3px); // perf issue */
 
     &::before {
       content: '';
       position: absolute;
       width: 100%;
-      height: calc(100% + 3px);
+      height: 100%;
       background: var(--entry-fixed-action-background-tint);
       background-position: left center;
       background-attachment: fixed;
       background-size: 100vw 100vh;
       box-shadow: 1px 0 0 0 var(--grid-header-border-color);
       left: 0;
-      top: -3px;
+      top: 0;
       z-index: -1;
       opacity: 0.82;
     }

@@ -40,6 +40,8 @@ const popoverClass = computed(() => [$class(), stateClass.value]);
 
 .popover {
   @include padding;
+  z-index: 1090;
+
   width: 100%;
   min-width: max-content;
   margin-block: var(--spacing-sm);
@@ -70,7 +72,7 @@ const popoverClass = computed(() => [$class(), stateClass.value]);
   }
 
   &__wrapper {
-    z-index: 90;
+    z-index: 1090;
     pointer-events: none;
   }
 }

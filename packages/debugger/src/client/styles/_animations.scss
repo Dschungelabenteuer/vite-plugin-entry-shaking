@@ -1,0 +1,149 @@
+%reset-animation {
+  animation: none;
+  mix-blend-mode: normal;
+  overflow: clip;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.72);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.72);
+    opacity: 0;
+  }
+}
+@keyframes slide-in-up {
+  from {
+    transform: translateY(calc(-1 * var(--slide-in-distance, 0.5rem)));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0rem);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-down {
+  from {
+    transform: translateY(calc(var(--slide-in-distance, 0.5rem)));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0rem);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(calc(-1 * var(--slide-in-distance, 0.5rem)));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0rem);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(calc(var(--slide-in-distance, 0.5rem)));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0rem);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-up {
+  from {
+    transform: translateY(0rem);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(calc(-1 * var(--slide-in-distance, 0.5rem)));
+    opacity: 0;
+  }
+}
+
+@keyframes slide-out-down {
+  from {
+    transform: translateY(0rem);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(var(--slide-in-distance, 0.5rem));
+    opacity: 0;
+  }
+
+}
+
+
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0rem);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(calc(-1 * var(--slide-in-distance, 0.5rem)));
+    opacity: 0;
+  }
+}
+
+@keyframes slide-out-right {
+  from {
+    transform: translateX(0rem);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(var(--slide-in-distance, 0.5rem));
+    opacity: 0;
+  }
+
+}
+
+
+:root {
+  --list-translate-x: 0.68rem;
+  --list-translate-x-duration: 200ms;
+}
+
+.list-enter-active,
+.list-leave-active {
+  overflow: hidden;
+  transition: all var(--list-translate-x-duration) ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(var(--list-translate-x));
+}
