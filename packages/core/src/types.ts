@@ -33,6 +33,8 @@ export interface PluginMetrics {
   process: number;
 }
 
+export type MetricsTime = [time: number, self: number];
+
 /** Target entry data. */
 export interface EntryData {
   /** Source content of the entry file. */

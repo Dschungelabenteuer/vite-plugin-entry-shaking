@@ -95,7 +95,7 @@ can test your changes against on of the provided
 
 The
 ["Resources" document](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/blob/main/RESOURCES.md)
-also may help you understand how the plugin works under the hood.
+also may help you understand how the plugin works under the hood and provide a bit of guidance when working with this repo's codebase.
 
 ## Checking your work
 

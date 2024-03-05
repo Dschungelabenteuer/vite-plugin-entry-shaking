@@ -7,13 +7,14 @@ import targets from './entries.json';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const rootDir = resolve(__dirname, '../..');
 const pathToTests = resolve(__dirname, './src/data/');
 const pathToTestCases = resolve(pathToTests, 'cases');
 
 export default defineConfig(async () => ({
   plugins: [
     await EntryShakingPlugin({
-      targets: targets.map((target) => resolve(pathToTestCases, target)),
+      targets: targets.map((target) => resolve(rootDir, target)),
       enableDiagnostics: true,
       maxWildcardDepth: 1,
       debug: true,

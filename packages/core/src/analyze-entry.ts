@@ -9,6 +9,7 @@ import type {
   EntryImports,
   EntryPath,
   ImportParams,
+  MetricsTime,
   RemoveReadonly,
   WildcardExports,
 } from './types';
@@ -31,6 +32,7 @@ async function analyzeEntries(ctx: Context) {
     });
     return ctx.entries;
   });
+
   ctx.logger.success(`Entries analysis complete`);
   ctx.metrics.analysis = { time, self };
   ctx.metrics.process = time;
@@ -47,7 +49,7 @@ async function analyzeEntries(ctx: Context) {
 async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number) {
   if (ctx.entries.has(entryPath)) return;
 
-  return await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e) => {
+  await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e) => {
     const message = `Could not analyze entry file "${entryPath}"`;
     console.error(e);
     ctx.logger.error(message);
@@ -64,12 +66,12 @@ async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number) {
  * @param entryPath Absolute path of the entry file.
  * @param depth Static analysis' context depth.
  */
-async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number) {
+async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number): Promise<MetricsTime> {
   const exportsMap: EntryExports = new Map([]);
   const wildcardExports: WildcardExports = { named: new Map([]), direct: [] };
   let source: string = '';
   let exps: ExportSpecifier[] = [];
-  let inclusiveTime = 0;
+  let nonselfTime = 0;
 
   const { time } = await ctx.measure(`Analysis of entry "${entryPath}"`, async () => {
     await init;
@@ -81,7 +83,7 @@ async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number)
 
     // First analyze the imported entities of the entry.
     for (const { n: path, ss: startPosition, se: endPosition } of imports) {
-      inclusiveTime += await methods.analyzeEntryImport(
+      const [t, s] = await methods.analyzeEntryImport(
         ctx,
         source,
         wildcardExports,
@@ -92,6 +94,8 @@ async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number)
         endPosition,
         depth,
       );
+
+      nonselfTime += t - s;
     }
 
     // Then analyze the exports with the gathered data.
@@ -109,11 +113,10 @@ async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number)
 
   const updatedSource = EntryCleaner.cleanupEntry(source, exportsMap, exps);
   const charactersDiff = source.length - updatedSource.length;
-  const self = time - inclusiveTime;
+  const self = time - nonselfTime;
 
   // Finally export entry's analysis output.
   ctx.logger.debug(`Cleaned-up entry "${entryPath}" (-${charactersDiff} chars)`);
-  ctx.metrics.process += time;
   ctx.entries.set(entryPath, {
     exports: exportsMap,
     wildcardExports,
@@ -124,7 +127,7 @@ async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number)
     self,
   });
 
-  return time;
+  return [time, self];
 }
 
 /**
@@ -149,36 +152,39 @@ async function analyzeEntryImport(
   startPosition: number,
   endPosition: number,
   depth: number,
-) {
-  let inclusiveTime = 0;
-  const statement = rawEntry.slice(startPosition, endPosition);
-  const { namedImports, defaultImports, wildcardImport } = Parsers.parseImportStatement(statement);
+): Promise<MetricsTime> {
+  let nonselfTime = 0;
+  const { time } = await ctx.measure(`Analysis of entry import`, async () => {
+    const statement = rawEntry.slice(startPosition, endPosition);
+    const { namedImports, defaultImports, wildcardImport } = Parsers.parseImportStatement(statement);
 
-  defaultImports.forEach((defaultImport) => {
-    analyzedImports.set(defaultImport, { path, importDefault: true });
-  });
-
-  if (wildcardImport) {
-    const out = await methods.registerWildcardImportIfNeeded(ctx, path, entryPath, depth);
-    inclusiveTime += out ?? 0;
-    const { alias } = Parsers.parseImportParams(wildcardImport);
-    if (alias) {
-      wildcardExports.named.set(alias, path);
-    } else {
-      wildcardExports.direct.push(path);
-    }
-  }
-
-  namedImports.forEach((namedImport) => {
-    const { name, alias } = Parsers.parseImportParams(namedImport);
-    analyzedImports.set(alias ?? name, {
-      path,
-      importDefault: false,
-      originalName: name,
+    defaultImports.forEach((defaultImport) => {
+      analyzedImports.set(defaultImport, { path, importDefault: true });
     });
-  });
 
-  return inclusiveTime;
+    if (wildcardImport) {
+      const out = await methods.registerWildcardImportIfNeeded(ctx, path, entryPath, depth);
+      nonselfTime += out ?? 0;
+      const { alias } = Parsers.parseImportParams(wildcardImport);
+      if (alias) {
+        wildcardExports.named.set(alias, path);
+      } else {
+        wildcardExports.direct.push(path);
+      }
+    }
+
+    namedImports.forEach((namedImport) => {
+      const { name, alias } = Parsers.parseImportParams(namedImport);
+      analyzedImports.set(alias ?? name, {
+        path,
+        importDefault: false,
+        originalName: name,
+      });
+    });
+  }, true);
+
+  const self = time - nonselfTime;
+  return [time, self];
 }
 
 /**

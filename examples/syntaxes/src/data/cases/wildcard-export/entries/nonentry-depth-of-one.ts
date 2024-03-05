@@ -1,1 +1,1 @@
-export * from '../modules/nonentry-depth-of-two-one';
+export * from '../modules/nonentry-depth-of-one-one';

@@ -5,6 +5,9 @@
   "private": true,
   "author": "Charles Gruenais",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.1.0"
+  },
   "homepage": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/#readme",
   "repository": {
     "type": "git",

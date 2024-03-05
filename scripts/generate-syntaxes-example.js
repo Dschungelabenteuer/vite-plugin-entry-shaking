@@ -5,6 +5,7 @@ import { readFileSync, readdirSync, writeFileSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const rootDir = resolve(__dirname, '..');
 const pathToCore = resolve(__dirname, '../packages/core');
 const pathToExamples = resolve(__dirname, '../examples');
 const pathToSyntaxesExample = resolve(pathToExamples, 'syntaxes/src/data');
@@ -58,20 +59,21 @@ async function createCasesEntries() {
       const entryPath = resolve(entry.path, entry.name);
       const content = await getEntryContent(entryPath);
       await writeFile(targetEntryPath, content);
-      entriesPaths.push(targetEntryPath);
+      entriesPaths.push(targetEntryPath.replace(rootDir, '.'));
     }
 
     for (const example of examples) {
       const { exampleName, exampleContent, exampleDescription } = example;
       const { requiresModules, requiresEntries } = example;
       const examplePath = resolve(targetGroupPath, `${exampleName}.ts`);
+      const exampleRelPath = examplePath.replace(rootDir, '.');
       await writeFile(examplePath, exampleContent);
 
       if (requiresEntries) {
         Object.entries(requiresEntries).forEach(([entryPath, entryContent]) => {
           const targetEntryPath = resolve(targetGroupPath, `${entryPath}.ts`);
           writeFileSync(targetEntryPath, entryContent);
-          entriesPaths.push(targetEntryPath);
+          entriesPaths.push(targetEntryPath.replace(rootDir, '.'));
         });
       }
 
@@ -82,7 +84,7 @@ async function createCasesEntries() {
         });
       }
 
-      groupSummary.push({ exampleName, exampleDescription, examplePath });
+      groupSummary.push({ exampleName, exampleDescription, examplePath: exampleRelPath });
     }
 
     summary.push([group.name, groupSummary]);

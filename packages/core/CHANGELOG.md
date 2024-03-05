@@ -1,11 +1,5 @@
 # vite-plugin-entry-shaking
 
-## 0.0.0-next-20240219224802
-
-### Minor Changes
-
-- Next version preview
-
 ## 0.3.3
 
 ### Patch Changes
