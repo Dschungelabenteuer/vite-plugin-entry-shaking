@@ -3,6 +3,7 @@ import type { ViteDevServer } from 'vite';
 import { entries } from '../../mocks/entries';
 import { transforms } from '../../mocks/transforms';
 import { logs } from '../../mocks/logs';
+import { metrics } from '../../mocks/metrics';
 
 import { READY, wsMessageName } from '../shared';
 import { JSONMap } from '../serializer';
@@ -20,7 +21,7 @@ function devPlugin() {
     name: 'vpes-client-dev-plugin',
     configureServer({ ws }: ViteDevServer) {
       ws.on(READY, () => {
-        ws.send(READY, JSONMap.stringify({ entries, logs, consumer }));
+        ws.send(READY, JSONMap.stringify({ entries, logs, consumer, metrics }));
         transforms.forEach((transform) => {
           ws.send(_('registerTransform'), JSONMap.stringify(transform));
         });

@@ -2,11 +2,14 @@ import fs from 'fs';
 import { beforeAll, describe, it, expect, vi, beforeEach } from 'vitest';
 import dedent from 'ts-dedent';
 
-import type { EntryExports, EntryImports, PluginEntries } from '../src/types';
+import type { Duration, EntryExports, EntryImports, PluginEntries } from '../src/types';
 import EntryAnalyzer from '../src/analyze-entry';
+import EntryCleaner from '../src/cleanup-entry';
 import { createTestContext, createTestWildcardExports, resolveUnitEntry } from './utils';
 
 vi.mock('fs');
+
+const mockedDuration: Duration = [0, 0];
 
 describe('analyzeEntries', () => {
   beforeAll(async () => {
@@ -33,7 +36,9 @@ describe('analyzeEntry', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementation(() => Promise.resolve(0));
+    vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementation(async () =>
+      Promise.resolve(mockedDuration),
+    );
   });
 
   it('should directly return void if entry was already parsed', async () => {
@@ -177,6 +182,51 @@ describe('doAnalyzeEntry', () => {
   });
 });
 
+describe('cleanupEntry', () => {
+  const entryPath = '@entry/path';
+  const code = 'code content';
+  const withImport = 'import { Something } from "somewhere"; export const a = "my" + Something';
+  const withoutImport = 'export const a = `my thing`';
+
+  it('should call entry cleaner', async () => {
+    const ctx = await createTestContext({ targets: [], diagnostics: { definedWithinEntry: true } });
+    vi.spyOn(EntryCleaner, 'cleanupEntry');
+    EntryAnalyzer.cleanupEntry(ctx, new Set(), entryPath, code, new Map(), [], true);
+    expect(EntryCleaner.cleanupEntry).toHaveBeenCalled();
+  });
+
+  it('should not add diagnostic if `diagnostics.definedWithinEntry` is set to `false`', async () => {
+    const ctx = await createTestContext({
+      targets: [],
+      diagnostics: { definedWithinEntry: false },
+    });
+    vi.spyOn(EntryCleaner, 'cleanupEntry').mockImplementationOnce(() => withImport);
+    EntryAnalyzer.cleanupEntry(ctx, new Set(), entryPath, code, new Map(), [], true);
+    expect(ctx.diagnostics.list.length).toStrictEqual(0);
+  });
+
+  it('should not add diagnostic if `diagnostics.definedWithinEntry` is set to `true` but does not define exported code', async () => {
+    const ctx = await createTestContext({ targets: [], diagnostics: { definedWithinEntry: true } });
+    vi.spyOn(EntryCleaner, 'cleanupEntry').mockImplementationOnce(() => withImport);
+    EntryAnalyzer.cleanupEntry(ctx, new Set(), entryPath, code, new Map(), [], false);
+    expect(ctx.diagnostics.list.length).toStrictEqual(0);
+  });
+
+  it('should not add diagnostic if `diagnostics.definedWithinEntry` is set to `true` but does not include any import', async () => {
+    const ctx = await createTestContext({ targets: [], diagnostics: { definedWithinEntry: true } });
+    vi.spyOn(EntryCleaner, 'cleanupEntry').mockImplementationOnce(() => withoutImport);
+    EntryAnalyzer.cleanupEntry(ctx, new Set(), entryPath, code, new Map(), [], true);
+    expect(ctx.diagnostics.list.length).toStrictEqual(0);
+  });
+
+  it('should add diagnostic if `diagnostics.definedWithinEntry` is set to `true` and requirements are met', async () => {
+    const ctx = await createTestContext({ targets: [], diagnostics: { definedWithinEntry: true } });
+    vi.spyOn(EntryCleaner, 'cleanupEntry').mockImplementationOnce(() => withImport);
+    EntryAnalyzer.cleanupEntry(ctx, new Set(), entryPath, code, new Map(), [], true);
+    expect(ctx.diagnostics.list.length).toStrictEqual(1);
+  });
+});
+
 describe('analyzeEntryImport', async () => {
   const path = '@any/path';
   const entryPath = '/path/to/entry';
@@ -194,6 +244,7 @@ describe('analyzeEntryImport', async () => {
     EntryAnalyzer.analyzeEntryImport(
       ctx,
       input,
+      new Set(),
       wildcardImports,
       analyzedImports,
       entryPath,
@@ -309,6 +360,7 @@ describe('analyzeEntryImport', async () => {
       run(`export * from "${path}"`);
       expect(EntryAnalyzer.registerWildcardImportIfNeeded).toHaveBeenCalledWith(
         ctx,
+        expect.any(Set),
         path,
         entryPath,
         0,
@@ -327,6 +379,7 @@ describe('analyzeEntryImport', async () => {
       run(`import * from "${path}"`);
       expect(EntryAnalyzer.registerWildcardImportIfNeeded).toHaveBeenCalledWith(
         ctx,
+        expect.any(Set),
         path,
         entryPath,
         0,
@@ -422,7 +475,13 @@ describe('registerWildcardImportIfNeeded', () => {
 
     it('should call `registerWildcardImport` even if `maxWildcardDepth` was not set', async () => {
       const ctx = await createTestContext({ targets: [entryOnePath, otherTargetEntryPath] });
-      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, otherTargetEntryPath, entryOnePath, 0);
+      EntryAnalyzer.registerWildcardImportIfNeeded(
+        ctx,
+        new Set(),
+        otherTargetEntryPath,
+        entryOnePath,
+        0,
+      );
       expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
       expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
         ctx,
@@ -435,7 +494,13 @@ describe('registerWildcardImportIfNeeded', () => {
     it('should call `registerWildcardImport` even if `maxWildcardDepth` was reached', async () => {
       const targets = [entryOnePath, otherTargetEntryPath];
       const ctx = await createTestContext({ targets, maxWildcardDepth: 2 });
-      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, otherTargetEntryPath, entryOnePath, 3);
+      EntryAnalyzer.registerWildcardImportIfNeeded(
+        ctx,
+        new Set(),
+        otherTargetEntryPath,
+        entryOnePath,
+        3,
+      );
       expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
       expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
         ctx,
@@ -443,6 +508,42 @@ describe('registerWildcardImportIfNeeded', () => {
         entryOnePath,
         4,
       );
+    });
+
+    it('should not add diagnostic if `maxWildcardDepth` was reached and `diagnostics.maxDepthReached` is set to `false`', async () => {
+      const targets = [entryOnePath];
+      const ctx = await createTestContext({
+        targets,
+        maxWildcardDepth: 2,
+        diagnostics: { maxDepthReached: false },
+      });
+      const diagnostics = new Set<number>();
+      EntryAnalyzer.registerWildcardImportIfNeeded(
+        ctx,
+        diagnostics,
+        otherTargetEntryPath,
+        entryOnePath,
+        3,
+      );
+      expect(diagnostics.size).toStrictEqual(0);
+    });
+
+    it('should add diagnostic if `maxWildcardDepth` was reached and `diagnostics.maxDepthReached` is set to `true`', async () => {
+      const targets = [entryOnePath];
+      const ctx = await createTestContext({
+        targets,
+        maxWildcardDepth: 2,
+        diagnostics: { maxDepthReached: true },
+      });
+      const diagnostics = new Set<number>();
+      EntryAnalyzer.registerWildcardImportIfNeeded(
+        ctx,
+        diagnostics,
+        otherTargetEntryPath,
+        entryOnePath,
+        3,
+      );
+      expect(diagnostics.size).toStrictEqual(1);
     });
   });
 
@@ -452,19 +553,37 @@ describe('registerWildcardImportIfNeeded', () => {
 
     it('should not call `registerWildcardImport` if `maxWildcardDepth` was not set', async () => {
       const ctx = await createTestContext({ targets: [entryOnePath] });
-      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, wildcardExportedPath, entryOnePath, 0);
+      EntryAnalyzer.registerWildcardImportIfNeeded(
+        ctx,
+        new Set(),
+        wildcardExportedPath,
+        entryOnePath,
+        0,
+      );
       expect(EntryAnalyzer.registerWildcardImport).not.toHaveBeenCalled();
     });
 
     it('should not call `registerWildcardImport` if `maxWildcardDepth` was reached', async () => {
       const ctx = await createTestContext({ targets: [entryOnePath], maxWildcardDepth: 2 });
-      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, wildcardExportedPath, entryOnePath, 3);
+      EntryAnalyzer.registerWildcardImportIfNeeded(
+        ctx,
+        new Set(),
+        wildcardExportedPath,
+        entryOnePath,
+        3,
+      );
       expect(EntryAnalyzer.registerWildcardImport).not.toHaveBeenCalled();
     });
 
     it('should call `registerWildcardImport` if `maxWildcardDepth` was not reached', async () => {
       const ctx = await createTestContext({ targets: [entryOnePath], maxWildcardDepth: 2 });
-      EntryAnalyzer.registerWildcardImportIfNeeded(ctx, wildcardExportedPath, entryOnePath, 1);
+      EntryAnalyzer.registerWildcardImportIfNeeded(
+        ctx,
+        new Set(),
+        wildcardExportedPath,
+        entryOnePath,
+        1,
+      );
       expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
       expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
         ctx,

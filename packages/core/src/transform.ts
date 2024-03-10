@@ -19,7 +19,7 @@ export async function transformIfNeeded(
 ): Promise<string | undefined> {
   ctx.logger.debug(`Processing file "${id}"`, undefined);
   const isCandidate = methods.requiresTransform(ctx, id);
-  const { out, time } = await ctx.measure(
+  const { out, time } = await ctx.timer.measure(
     'Transforming file if needed',
     async () => {
       if (!isCandidate) {
@@ -32,6 +32,7 @@ export async function transformIfNeeded(
   );
 
   ctx.eventBus?.emit('increaseProcessTime', time);
+  ctx.eventBus?.emit('increaseTransformTime', time);
   return out;
 }
 
@@ -52,17 +53,22 @@ export async function transformImportsIfNeeded(
   const exportedStr = `${exports.length} exports`;
   ctx.logger.debug(`es-module-lexer returned ${importedStr} and ${exportedStr} for "${id}"`);
 
-  const importsTarget = await methods.importsTargetEntry(ctx, id, imports);
+  let potentialRequestsAvoided = 0;
+  const importedEntries = await methods.getEntryImports(ctx, id, imports);
+  const entriesMatched = importedEntries.length;
   const { transformImports: transform } = methods;
-  if (!importsTarget) {
-    ctx.logger.debug(
-      `Did not transform "${id}" because it does not import any registered target`,
-      undefined,
-    );
+  if (!entriesMatched) {
+    const ignoredMessage = `Did not transform "${id}" because it does not import any registered target`;
+    ctx.logger.debug(ignoredMessage, undefined);
     return;
   }
 
-  const { time, out } = await ctx.measure(
+  importedEntries.forEach((entry) => {
+    potentialRequestsAvoided += ctx.entries.get(entry)?.importsCount ?? 0;
+    ctx.eventBus?.emit('increaseEntryHits', entry);
+  });
+
+  const { time, out } = await ctx.timer.measure(
     `Transforming file "${id}"`,
     async () => await transform(ctx, id, code, imports, exports),
   );
@@ -73,6 +79,8 @@ export async function transformImportsIfNeeded(
     transformed: out ?? code,
     time,
     timestamp: Date.now(),
+    entriesMatched,
+    potentialRequestsAvoided,
   });
 
   return out;
@@ -136,22 +144,23 @@ export function requiresTransform(ctx: Context, id: string) {
  * @param id Resolved id of the file.
  * @param imports List of imports.
  */
-export async function importsTargetEntry(
+export async function getEntryImports(
   ctx: Context,
   id: string,
   imports: readonly ImportSpecifier[],
-) {
+): Promise<string[]> {
   try {
-    return await Promise.any(
-      imports.map(async (importParams) => {
+    return await imports.reduce(
+      async (out, importParams) => {
         const { n: importPath } = importParams;
         const resolvedPath = importPath && (await ctx.resolver(importPath, id));
-        if (!resolvedPath || !ctx.entries.has(resolvedPath)) throw new Error();
-        return true;
-      }),
+        if (resolvedPath && ctx.entries.has(resolvedPath)) (await out).push(resolvedPath);
+        return out;
+      },
+      Promise.resolve([] as string[]),
     );
   } catch (e) {
-    return false;
+    return [];
   }
 }
 
@@ -172,7 +181,7 @@ const methods = {
   transformImportsIfNeeded,
   transformImports,
   requiresTransform,
-  importsTargetEntry,
+  getEntryImports,
   createReexportStatement,
 };
 

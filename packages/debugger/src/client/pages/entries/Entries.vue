@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeMount, onMounted, provide, ref, toRefs } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import { useRoute } from 'vue-router';
 
 import type { EntryData } from 'vite-plugin-entry-shaking';

@@ -29,6 +29,10 @@ export type UseFloating = <
   handlers?: UseFloatingHandlers;
 };
 
+export const FLOATING_CONTAINER_ID_VAR = 'floatingContainerId';
+export const FLOATING_MAIN_CONTAINER_ID = 'floating-container-main';
+export const FLOATING_CONTAINER_CLASS = 'floating-container';
+
 /**
  * General-purpose `floating-ui` wrapper composable.
  * It exposed useful and self-explanatory control methods: `close`, `open` and `toggle`.
@@ -37,17 +41,18 @@ export type UseFloating = <
  * @param options Floating-ui options.
  */
 export const useFloating: UseFloating = (reference, floatingEl, options) => {
-  const middleware = ref([flip(), shift(), offset({ crossAxis: -20 })]);
+  const middleware = ref([flip(), shift(), offset({ crossAxis: 0 })]);
   const isOpen = ref(false);
-  const { floatingStyles: styles } = useFloatingUi(reference, floatingEl, {
+  const a = useFloatingUi(reference, floatingEl, {
     whileElementsMounted: autoUpdate,
     middleware,
     ...options,
   });
 
+
   const open = () => (isOpen.value = true);
   const close = () => (isOpen.value = false);
   const toggle = () => (isOpen.value = !isOpen.value);
 
-  return { isOpen, open, close, toggle, styles };
+  return { isOpen, open, close, toggle, styles: a.floatingStyles };
 };

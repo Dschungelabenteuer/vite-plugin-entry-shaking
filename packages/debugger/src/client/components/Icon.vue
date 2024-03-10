@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Icon } from '@iconify/vue';
-import type { UseFloatingOptions } from '@floating-ui/vue';
 import { useTooltip } from '@composable/useTooltip';
+import { useTeleport } from '@composable/useTeleport';
 import Tooltip from './Tooltip.vue';
 
 type IconProps = {
@@ -21,15 +21,16 @@ const props = withDefaults(defineProps<IconProps>(), {
 
 const reference = ref<HTMLButtonElement | null>(null);
 const tooltipRef = ref<InstanceType<typeof Tooltip> | null>(null);
-const tooltipOptions = computed<UseFloatingOptions>(() =>
-  props.autoupdateFloatingPosition ? {} : { whileElementsMounted: undefined },
-);
+const tooltipOptions = computed(() => ({
+  ...(!props.autoupdateFloatingPosition ? { whileElementsMounted: undefined } : {}),
+}));
 
 const {
   isOpen: isTooltipOpen,
   styles: tooltipStyles,
   handlers: tooltipHandlers,
 } = useTooltip(reference, tooltipRef, tooltipOptions.value);
+const teleport = useTeleport();
 
 const set = 'tabler';
 const icon = computed(() => `${set}:${props.name}`);
@@ -49,13 +50,19 @@ const icon = computed(() => `${set}:${props.name}`);
         :icon="icon"
       />
     </span>
-    <Tooltip
-      ref="tooltipRef"
-      :is-open="isTooltipOpen"
-      :style="tooltipStyles"
+    <Teleport
+      :disabled="teleport.disabled.value"
+      :to="teleport.to.value"
     >
-      {{ tooltip }}
-    </Tooltip>
+      <Tooltip
+        v-if="tooltip"
+        ref="tooltipRef"
+        :is-open="isTooltipOpen"
+        :style="tooltipStyles"
+      >
+        {{ tooltip }}
+      </Tooltip>
+    </Teleport>
     <span
       v-if="tooltip"
       class="sr-only"

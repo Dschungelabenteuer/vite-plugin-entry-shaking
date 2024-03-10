@@ -1,5 +1,5 @@
 import type { ViteHotContext } from 'vite/types/hot';
-import type { DebuggerEvents } from 'vite-plugin-entry-shaking/src/event-bus';
+import type { DebuggerEvents } from 'vite-plugin-entry-shaking';
 import { store } from '#store';
 import { READY, VITE_DISCONNECTED, VITE_CONNECTING, wsMessageName } from '../../shared';
 import { JSONMap } from '../../serializer';
@@ -22,14 +22,27 @@ export async function useHotModule(): Promise<ViteHotContext> {
   watchServerStatus(hot);
   getInitialState(hot);
   getOnEventBus(hot, {
-    registerLog: (log) => {
-      store.logs.push(log);
-    },
     increaseProcessTime: (a) => {
       store.metrics.process += a;
     },
+    increaseTransformTime: (a) => {
+      store.metrics.transform += a;
+    },
+    incrementJsRequests: () => {
+      store.metrics.jsRequests += 1;
+    },
+    incrementOtherRequests: () => {
+      store.metrics.otherRequests += 1;
+    },
+    increaseEntryHits: (a) => {
+      const entry = store.entries.get(a);
+      if (entry) entry.hits += 1;
+    },
     registerTransform: (transform) => {
-      store.transforms.push(transform);
+      store.transforms.set(transform.id, transform);
+    },
+    registerLog: (log) => {
+      store.logs.push(log);
     },
   });
 
@@ -47,7 +60,7 @@ function getInitialState(hotContext: ViteHotContext) {
     store.logs = data.logs ?? [];
     store.entries = data.entries;
     store.metrics = data.metrics;
-    store.transforms = data.transforms ?? [];
+    store.transforms = data.transforms ?? new Map();
     store.status = 'connected';
   });
 }

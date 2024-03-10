@@ -39,7 +39,7 @@ export interface ChannelStore {
   /** Plugin metrics. */
   metrics: PluginMetrics;
   /** List of transforms. */
-  transforms: TransformData[];
+  transforms: Map<string, TransformData>;
   /** List of targets. */
   entries: PluginEntries;
   /** List of logs. */

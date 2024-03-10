@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "include": ["**/*.ts", "**/*.tsx", "**/*.vue"],
-    "references": [{ "path": "./tsconfig.node.json" }],
+
     "target": "es2020",
     "module": "esnext",
     "strict": true,
@@ -15,7 +14,6 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "exclude": ["node_modules"],
     "lib": [
       "esnext",
       "dom",
@@ -27,5 +25,8 @@
         "./src/*"
       ]
     }
-  }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.vue"],
+  "references": [{ "path": "./tsconfig.node.json" }],
+  "exclude": ["node_modules"]
 }

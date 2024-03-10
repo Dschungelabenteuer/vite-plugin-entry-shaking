@@ -10,7 +10,8 @@ export const store = reactive<ChannelStore>({
   logs: [],
   metrics: {} as PluginMetrics,
   entries: new Map(),
-  transforms: [],
+  transforms: new Map(),
   status: 'disconnected',
   consumer: { name: 'Debugger' },
+  mounted: false,
 });

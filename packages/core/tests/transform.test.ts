@@ -2,7 +2,7 @@ import type { ExportSpecifier, ImportSpecifier } from 'es-module-lexer';
 import dedent from 'ts-dedent';
 import { describe, it, expect, beforeAll, vi, beforeEach, afterEach } from 'vitest';
 
-import type { EntryData, FinalPluginOptions, PluginEntries } from '../src/types';
+import type { EntryData, PluginEntries, PluginOptions } from '../src/types';
 import Transformer from '../src/transform';
 import ImportAnalyzer from '../src/analyze-import';
 import {
@@ -18,10 +18,10 @@ const _a = (name: string) => `@mocks/${_e(name)}`;
 const _e = (name: string) => `entry-${name}`;
 const ANY_PATH = 'any-path';
 const aliasA = _a('a');
-const defaultOptions: FinalPluginOptions = {
+const defaultOptions: PluginOptions = {
   extensions: ['ext'],
   maxWildcardDepth: 0,
-  enableDiagnostics: false,
+  diagnostics: false,
   ignorePatterns: [/node_modules/],
   debug: false,
   targets: [],
@@ -80,17 +80,18 @@ describe('transformImportsIfNeeded', () => {
   });
 
   it('should call transformImports when the file is candidate', async () => {
-    const res = true;
-    const ctx = await createTestContext({ targets: [] });
-    vi.spyOn(Transformer, 'importsTargetEntry').mockImplementationOnce(() => Promise.resolve(res));
+    const pathToFile = 'path/to/file';
+    const res = [pathToFile] as string[];
+    const ctx = await createTestContext({ targets: ['path/to/file'] });
+    vi.spyOn(Transformer, 'getEntryImports').mockImplementationOnce(() => Promise.resolve(res));
     await Transformer.transformImportsIfNeeded(ctx, STUB_ID, STUB_SOURCE);
     expect(Transformer.transformImports).toHaveBeenCalled();
   });
 
   it('should not call transformImports when the file is not candidate', async () => {
-    const res = false;
+    const res = [] as string[];
     const ctx = await createTestContext({ targets: [] });
-    vi.spyOn(Transformer, 'importsTargetEntry').mockImplementationOnce(() => Promise.resolve(res));
+    vi.spyOn(Transformer, 'getEntryImports').mockImplementationOnce(() => Promise.resolve(res));
     await Transformer.transformImportsIfNeeded(ctx, STUB_ID, STUB_SOURCE);
     expect(Transformer.transformImports).not.toHaveBeenCalled();
   });
@@ -237,7 +238,7 @@ describe('requiresTransform', () => {
   });
 });
 
-describe('importsTargetEntry', () => {
+describe('getEntryImports', () => {
   const imports = [{ n: aliasA }, { n: undefined }] as ImportSpecifier[];
 
   beforeAll(() => {
@@ -248,15 +249,15 @@ describe('importsTargetEntry', () => {
     // should also work with relative paths and bare imports.
     const ctx = await createTestContext(defaultOptions);
     ctx.entries = new Map([[entryA, {} as EntryData]]);
-    const result = await Transformer.importsTargetEntry(ctx, ANY_PATH, imports);
-    expect(result).toStrictEqual(true);
+    const result = await Transformer.getEntryImports(ctx, ANY_PATH, imports);
+    expect(result).toStrictEqual([entryA]);
   });
 
   it('should return false if none of the imports target one of the entries', async () => {
     const ctx = await createTestContext(defaultOptions);
     ctx.entries = new Map([]) as PluginEntries;
-    const result = await Transformer.importsTargetEntry(ctx, ANY_PATH, imports);
-    expect(result).toStrictEqual(false);
+    const result = await Transformer.getEntryImports(ctx, ANY_PATH, imports);
+    expect(result).toStrictEqual([]);
   });
 });
 

@@ -9,22 +9,23 @@ import type {
   EntryImports,
   EntryPath,
   ImportParams,
-  MetricsTime,
+  Duration,
   RemoveReadonly,
   WildcardExports,
+  PluginEntries,
 } from './types';
 
 import EntryCleaner from './cleanup-entry';
 import Parsers from './parse';
-import Utils, { diagnostic } from './utils';
+import Utils from './utils';
 
 /**
  * Analyzes target entry files.
  * @see `doAnalyzeEntry`
  * @param ctx _reference_ Plugin's entry analysis context.
  */
-async function analyzeEntries(ctx: Context) {
-  const { time, self, out } = await ctx.measure('Analysis of target entry files', async () => {
+async function analyzeEntries(ctx: Context): Promise<PluginEntries> {
+  const { time, out } = await ctx.timer.measure('Analysis of target entry files', async () => {
     const targets = [...ctx.targets.entries()];
     await Utils.parallelize(targets, async ([path, depth]) => {
       const absolutePath = (await ctx.resolver(path)) ?? path;
@@ -34,7 +35,7 @@ async function analyzeEntries(ctx: Context) {
   });
 
   ctx.logger.success(`Entries analysis complete`);
-  ctx.metrics.analysis = { time, self };
+  ctx.metrics.analysis = time;
   ctx.metrics.process = time;
   return out!;
 }
@@ -45,11 +46,12 @@ async function analyzeEntries(ctx: Context) {
  * @param ctx _reference_ Plugin's entry analysis context.
  * @param entryPath Absolute path of the entry file.
  * @param depth Static analysis' context depth.
+ * @returns Execution duration.
  */
-async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number) {
-  if (ctx.entries.has(entryPath)) return;
+async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number): Promise<Duration> {
+  if (ctx.entries.has(entryPath)) return [0, 0];
 
-  await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e) => {
+  return await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e) => {
     const message = `Could not analyze entry file "${entryPath}"`;
     console.error(e);
     ctx.logger.error(message);
@@ -65,60 +67,93 @@ async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number) {
  * @param ctx _reference_ Plugin's entry analysis context.
  * @param entryPath Absolute path of the entry file.
  * @param depth Static analysis' context depth.
+ * @returns Execution duration.
  */
-async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number): Promise<MetricsTime> {
+async function doAnalyzeEntry(
+  ctx: Context,
+  entryPath: EntryPath,
+  depth: number,
+): Promise<Duration> {
   const exportsMap: EntryExports = new Map([]);
   const wildcardExports: WildcardExports = { named: new Map([]), direct: [] };
-  let source: string = '';
+  const diagnostics = new Set<number>();
   let exps: ExportSpecifier[] = [];
-  let nonselfTime = 0;
+  let source = '';
+  let updatedSource = '';
+  let charactersDiff = 0;
+  let definesExportedCode = false;
+  let importsCount = 0;
 
-  const { time } = await ctx.measure(`Analysis of entry "${entryPath}"`, async () => {
-    await init;
-    source = readFileSync(resolve(entryPath), 'utf-8');
-    const defaultImport: ImportParams = { path: entryPath, importDefault: true };
-    const analyzedImports: EntryImports = new Map([['default', defaultImport]]);
-    const [imports, exportList] = parse(source);
-    exps = exportList as RemoveReadonly<ExportSpecifier[]>;
+  const [time, self] = await ctx.timer.time(
+    `Analysis of entry "${entryPath}"`,
+    async (nonselfTime) => {
+      await init;
+      source = readFileSync(resolve(entryPath), 'utf-8');
+      const defaultImport: ImportParams = { path: entryPath, importDefault: true };
+      const analyzedImports: EntryImports = new Map([['default', defaultImport]]);
+      const [imports, exportList] = parse(source);
+      exps = exportList as RemoveReadonly<ExportSpecifier[]>;
 
-    // First analyze the imported entities of the entry.
-    for (const { n: path, ss: startPosition, se: endPosition } of imports) {
-      const [t, s] = await methods.analyzeEntryImport(
+      // First analyze the imported entities of the entry.
+      for (const { n: path, ss: startPosition, se: endPosition } of imports) {
+        const [t, s] = await methods.analyzeEntryImport(
+          ctx,
+          source,
+          diagnostics,
+          wildcardExports,
+          analyzedImports,
+          entryPath,
+          path as string,
+          startPosition,
+          endPosition,
+          depth,
+        );
+
+        nonselfTime += t - s;
+      }
+
+      // Then analyze the exports with the gathered data.
+      exps.forEach(({ n: namedExport, ln: localName }) => {
+        const definesExports = methods.analyzeEntryExport(
+          entryPath,
+          exportsMap,
+          wildcardExports,
+          analyzedImports,
+          namedExport,
+          localName,
+        );
+
+        if (!definesExportedCode && definesExports) {
+          definesExportedCode = true;
+        }
+      });
+
+      // Clean-up entry.
+      const cleanedUp = methods.cleanupEntry(
         ctx,
+        diagnostics,
+        entryPath,
         source,
-        wildcardExports,
-        analyzedImports,
-        entryPath,
-        path as string,
-        startPosition,
-        endPosition,
-        depth,
-      );
-
-      nonselfTime += t - s;
-    }
-
-    // Then analyze the exports with the gathered data.
-    exps.forEach(({ n: namedExport, ln: localName }) => {
-      methods.analyzeEntryExport(
-        entryPath,
         exportsMap,
-        wildcardExports,
-        analyzedImports,
-        namedExport,
-        localName,
+        exps,
+        definesExportedCode,
       );
-    });
-  });
 
-  const updatedSource = EntryCleaner.cleanupEntry(source, exportsMap, exps);
-  const charactersDiff = source.length - updatedSource.length;
-  const self = time - nonselfTime;
+      importsCount += analyzedImports.size - 1;
+      updatedSource = cleanedUp.updatedSource;
+      charactersDiff = cleanedUp.charactersDiff;
+      ctx.logger.debug(`Cleaned-up entry "${entryPath}" (-${charactersDiff} chars)`);
+
+      return nonselfTime;
+    },
+  );
 
   // Finally export entry's analysis output.
-  ctx.logger.debug(`Cleaned-up entry "${entryPath}" (-${charactersDiff} chars)`);
   ctx.entries.set(entryPath, {
+    hits: 0,
+    importsCount,
     exports: exportsMap,
+    diagnostics,
     wildcardExports,
     source,
     updatedSource,
@@ -131,9 +166,59 @@ async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number)
 }
 
 /**
+ * Orchestrates the cleanup of an entry file.
+ * @param ctx _reference_ Plugin's entry analysis context.
+ * @param diagnostics _reference_ - Indices of emitted `ctx.diagnostics` for this entry.
+ * @param entryPath Absolute path of the entry file.
+ * @param source Source code of the entry file.
+ * @param exportsMap _reference_ - Map of entry's analyzed exports.
+ * @param exps List of exports.
+ * @param definesExportedCode Whether the entry file exports code it defines.
+ */
+function cleanupEntry(
+  ctx: Context,
+  diagnostics: Set<number>,
+  entryPath: EntryPath,
+  source: string,
+  exportsMap: EntryExports,
+  exps: ExportSpecifier[],
+  definesExportedCode: boolean,
+) {
+  const diagnosticName = 'definedWithinEntry';
+  const updatedSource = EntryCleaner.cleanupEntry(source, exportsMap, exps);
+  const charactersDiff = source.length - updatedSource.length;
+  const requiresDiagnostic =
+    ctx.diagnostics.isEnabled(diagnosticName) &&
+    definesExportedCode &&
+    updatedSource.includes('import');
+  ctx.logger.debug(`Cleaned-up entry "${entryPath}" (-${charactersDiff} chars)`);
+
+  if (requiresDiagnostic) {
+    const base = `Entry file "${entryPath}" exports code it defines and imports code from other modules.`;
+    const diagnosticCtx = { path: entryPath };
+    const diagnosticIndex = ctx.diagnostics.add(
+      diagnosticName,
+      `${base} Such imports are never cleaned up because they could have side-effects and be consumed by` +
+        ` code defined by the entry file. Determining whether such imports are unused could be expensive.` +
+        ` This means that if you were to import any entity defined by that entry file, it could result in unnecessary requests.` +
+        `\n` +
+        `You may ignore this warning by setting the \`diagnostics.${diagnosticName}\` option to false.`,
+      diagnosticCtx,
+    );
+    diagnostics.add(diagnosticIndex);
+  }
+
+  return {
+    updatedSource,
+    charactersDiff,
+  };
+}
+
+/**
  * Analyzes a single import statement made from an entry.
  * @param ctx Plugin's entry analysis context.
  * @param rawEntry Source code of the entry file.
+ * @param diagnostics _reference_ - Indices of emitted `ctx.diagnostics` for this entry.
  * @param wildcardExports _reference_ - aught wildcard exports.
  * @param analyzedImports _reference_ - Map of analyzed imports.
  * @param entryPath Absolute path of the entry point.
@@ -141,10 +226,12 @@ async function doAnalyzeEntry(ctx: Context, entryPath: EntryPath, depth: number)
  * @param startPosition Import statement start position (based on rawEntry).
  * @param endPosition Import statement end position (based on rawEntry).
  * @param depth Static analysis' context depth.
+ * @returns Execution duration.
  */
 async function analyzeEntryImport(
   ctx: Context,
   rawEntry: string,
+  diagnostics: Set<number>,
   wildcardExports: WildcardExports,
   analyzedImports: EntryImports,
   entryPath: EntryPath,
@@ -152,20 +239,20 @@ async function analyzeEntryImport(
   startPosition: number,
   endPosition: number,
   depth: number,
-): Promise<MetricsTime> {
-  let nonselfTime = 0;
-  const { time } = await ctx.measure(`Analysis of entry import`, async () => {
+): Promise<Duration> {
+  return await ctx.timer.time(`Analysis of entry import"`, async (nonselfTime) => {
     const statement = rawEntry.slice(startPosition, endPosition);
-    const { namedImports, defaultImports, wildcardImport } = Parsers.parseImportStatement(statement);
+    const imports = Parsers.parseImportStatement(statement);
 
-    defaultImports.forEach((defaultImport) => {
+    imports.defaultImports.forEach((defaultImport) => {
       analyzedImports.set(defaultImport, { path, importDefault: true });
     });
 
-    if (wildcardImport) {
-      const out = await methods.registerWildcardImportIfNeeded(ctx, path, entryPath, depth);
-      nonselfTime += out ?? 0;
-      const { alias } = Parsers.parseImportParams(wildcardImport);
+    if (imports.wildcardImport) {
+      const method = methods.registerWildcardImportIfNeeded;
+      const [t, s] = await method(ctx, diagnostics, path, entryPath, depth);
+      nonselfTime += t - s ?? 0;
+      const { alias } = Parsers.parseImportParams(imports.wildcardImport);
       if (alias) {
         wildcardExports.named.set(alias, path);
       } else {
@@ -173,7 +260,7 @@ async function analyzeEntryImport(
       }
     }
 
-    namedImports.forEach((namedImport) => {
+    imports.namedImports.forEach((namedImport) => {
       const { name, alias } = Parsers.parseImportParams(namedImport);
       analyzedImports.set(alias ?? name, {
         path,
@@ -181,10 +268,9 @@ async function analyzeEntryImport(
         originalName: name,
       });
     });
-  }, true);
 
-  const self = time - nonselfTime;
-  return [time, self];
+    return nonselfTime;
+  });
 }
 
 /**
@@ -206,7 +292,7 @@ function analyzeEntryExport(
   analyzedImports: EntryImports,
   namedExport: string,
   localName?: string,
-): void {
+): void | true {
   if (namedExport && !wilcardExports.named.has(namedExport)) {
     if (analyzedImports.has(namedExport)) {
       const { path, importDefault, originalName } = analyzedImports.get(namedExport)!;
@@ -221,6 +307,8 @@ function analyzeEntryExport(
         originalName: localName,
         selfDefined: true,
       });
+
+      return true;
     }
   }
 }
@@ -231,41 +319,55 @@ function analyzeEntryExport(
  * target to later resolve its exports.
  * @see `registerWildcardImport`
  * @param ctx Plugin's entry analysis context.
+ * @param diagnostics _reference_ - Indices of emitted `ctx.diagnostics` for this entry.
  * @param path Path to the wildcard-imported module.
  * @param importedFrom Path the wildcard-imported module was imported from.
  * @param depth Static analysis' context depth.
+ * @returns Execution duration.
  */
 async function registerWildcardImportIfNeeded(
   ctx: Context,
+  diagnostics: Set<number>,
   path: string,
   importedFrom: string,
   depth: number,
-) {
-  const importsEntry = ctx.targets.get(path) === 0;
-  const maxDepthReached = depth >= (ctx.options.maxWildcardDepth ?? 0);
+): Promise<Duration> {
+  return await ctx.timer.time(`Wilcard import analysis`, async (nonselfTime) => {
+    const importsEntry = ctx.targets.get(path) === 0;
+    const maxDepthReached = depth >= (ctx.options.maxWildcardDepth ?? 0);
 
-  if (maxDepthReached) {
-    if (importsEntry) {
-      ctx.logger.debug(
-        `Max depth reached, but ${importedFrom} wildcard-imports from another entry "${path}", all good!`,
-      );
-    } else {
-      const level = ctx.options.enableDiagnostics ? 'warn' : 'debug';
-      const base = `Max depth reached at path "${importedFrom}", skipping wildcard import analysis of "${path}"…`;
-      const message = ctx.options.enableDiagnostics
-        ? diagnostic(
+    if (maxDepthReached) {
+      if (importsEntry) {
+        const base = `Max depth reached, but ${importedFrom} wildcard-imports from another entry "${path}", all good!`;
+        ctx.logger.debug(base);
+      } else {
+        const diagnosticName = 'maxDepthReached';
+        const base = `Max depth reached at path "${importedFrom}", skipping wildcard import analysis of "${path}"…`;
+        const requiresDiagnostic = ctx.diagnostics.isEnabled(diagnosticName);
+        ctx.logger.debug(base);
+
+        if (requiresDiagnostic) {
+          const diagnosticCtx = { path, importedFrom };
+          const diagnosticIndex = ctx.diagnostics.add(
+            diagnosticName,
             `${base} This means that if you were to import one of the entities exported by ${path} from ${importedFrom},` +
               ` it would load the cleaned-up entry file which still includes the unmutated wildcard import, resulting in` +
               ` all subsequent modules being loaded by Vite. Consider either adding ${path} to the "targets" option or a` +
-              ` bit of refactoring to minimize usage of wildcards.`,
-          )
-        : base;
-      ctx.logger[level](message);
-      return 0;
-    }
-  }
+              ` bit of refactoring to minimize usage of wildcards.` +
+              `\n` +
+              `You may ignore this warning by setting the \`diagnostics.${diagnosticName}\` option to false.`,
+            diagnosticCtx,
+          );
+          diagnostics.add(diagnosticIndex);
+        }
 
-  return await methods.registerWildcardImport(ctx, path, importedFrom, depth + 1);
+        return 0;
+      }
+    }
+
+    const [t, s] = await methods.registerWildcardImport(ctx, path, importedFrom, depth + 1);
+    return nonselfTime + t - s;
+  });
 }
 
 /**
@@ -275,24 +377,29 @@ async function registerWildcardImportIfNeeded(
  * @param path Path to the wildcard-imported module.
  * @param importedFrom Path the wildcard-imported module was imported from.
  * @param depth Static analysis' context depth.
+ * @returns Execution duration.
  */
 async function registerWildcardImport(
   ctx: Context,
   path: string,
   importedFrom: string,
   depth: number,
-) {
-  const resolvedPath = await ctx.resolver(path, importedFrom);
-  if (!resolvedPath || ctx.targets.has(resolvedPath)) return;
-  ctx.logger.info(`Adding implicit target "${path}" because of a wildcard at "${importedFrom}"`);
-  ctx.targets.set(resolvedPath, depth);
-  return await methods.analyzeEntry(ctx, resolvedPath, depth);
+): Promise<Duration> {
+  return await ctx.timer.time('Register wildcard import', async (nonselfTime) => {
+    const resolvedPath = await ctx.resolver(path, importedFrom);
+    if (!resolvedPath || ctx.targets.has(resolvedPath)) return nonselfTime;
+    ctx.logger.info(`Adding implicit target "${path}" because of a wildcard at "${importedFrom}"`);
+    ctx.targets.set(resolvedPath, depth);
+    const [t] = await methods.analyzeEntry(ctx, resolvedPath, depth);
+    return nonselfTime + t;
+  });
 }
 
 const methods = {
   analyzeEntries,
   analyzeEntry,
   doAnalyzeEntry,
+  cleanupEntry,
   analyzeEntryImport,
   analyzeEntryExport,
   registerWildcardImportIfNeeded,

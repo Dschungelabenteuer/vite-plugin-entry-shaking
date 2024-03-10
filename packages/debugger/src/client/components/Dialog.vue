@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, provide, onMounted } from 'vue';
+import { randomId } from '#utils';
 import Button from '@component/Button.vue';
 import { useClassNames } from '@composable/useClassNames';
 import { useFocusTrap } from '@composable/useFocusTrap';
+import { FLOATING_CONTAINER_CLASS, FLOATING_CONTAINER_ID_VAR } from '@composable/useFloating';
 
 type DialogProps = {
+  /** Dialog id. */
+  id?: string;
   /** Dialog title. */
   title?: string;
   /** Dialog width. */
@@ -24,12 +28,16 @@ const props = withDefaults(defineProps<DialogProps>(), {
   title: undefined,
   width: 'auto',
   height: 'auto',
+  id: randomId('dialog'),
 });
 
+const enableTeleports = ref(false);
 const element = ref<HTMLDialogElement | null>(null)!;
 const timeout = ref<ReturnType<typeof setTimeout>>();
 const classes = computed(() => [$class()]);
 const trap = useFocusTrap(element);
+
+provide(FLOATING_CONTAINER_ID_VAR, props.id);
 
 /** Closes the dialog. */
 const close = () => {
@@ -61,6 +69,12 @@ const handleClose = () => {
   // Wait for the closing animation to finish before emitting the close event.
   timeout.value = setTimeout(() => emit('close'), delay);
 };
+
+onMounted(() => {
+  enableTeleports.value = true;
+});
+
+provide('enableTeleports', enableTeleports);
 
 defineExpose({
   element,
@@ -96,6 +110,10 @@ defineExpose({
       <div :class="$class('footer')">
         <slot name="footer" />
       </div>
+      <div
+        :id="id"
+        :class="FLOATING_CONTAINER_CLASS"
+      />
     </dialog>
   </Teleport>
 </template>
@@ -122,7 +140,7 @@ defineExpose({
   transform-origin: top center;
   opacity: 0;
   transition: all var(--easing-backwards) var(--transition-duration-short);
-  overflow: hidden;
+  overflow: visible;
 
   height: v-bind(height);
   width: v-bind(width);

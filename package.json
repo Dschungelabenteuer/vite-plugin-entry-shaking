@@ -5,9 +5,6 @@
   "private": true,
   "author": "Charles Gruenais",
   "license": "MIT",
-  "engines": {
-    "node": ">=20.1.0"
-  },
   "homepage": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/#readme",
   "repository": {
     "type": "git",
@@ -15,6 +12,9 @@
   },
   "bugs": {
     "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
+  },
+  "engines": {
+    "node": ">=20.1.0"
   },
   "scripts": {
     "postinstall": "pnpm build",
@@ -28,14 +28,14 @@
     "changeset:version": "changeset version && pnpm install --lockfile-only"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^0.4.8",
-    "@changesets/cli": "^2.26.2",
+    "@changesets/changelog-github": "^0.5.0",
+    "@changesets/cli": "^2.27.1",
     "@types/prompts": "^2.4.8",
     "@yungezeit/eslint-config-base": "^0.0.13",
-    "eslint": "^8.52.0",
-    "eslint-config-prettier": "^9.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
     "ora": "^7.0.1",
-    "prettier": "^3.0.3",
+    "prettier": "^3.2.5",
     "prompts": "^2.4.2"
   },
   "pnpm": {

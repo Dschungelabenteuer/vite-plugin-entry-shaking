@@ -5,10 +5,13 @@ export type ParallelCb<T> = (
   array: any[],
 ) => Promise<any>;
 
+/** Runs multiple promises in parallel. */
 export const parallelize: Parallel = async (a, cb) => Promise.all(a.map(cb));
-export const diagnostic = (message: string) => `[diagnostic] ${message}`;
 
+/** Loads plugin's event bus. */
 export const loadEventBus = async () => await import('./event-bus');
+
+/** Loads plugin's debugger. */
 export const loadDebugger = async () => {
   const debuggerPkgName = 'vite-plugin-entry-shaking-debugger';
   try {
@@ -19,4 +22,8 @@ export const loadDebugger = async () => {
   }
 };
 
-export default { parallelize };
+export default {
+  parallelize,
+  loadEventBus,
+  loadDebugger,
+};

@@ -61,8 +61,8 @@ function mockExports(): EntryExports {
 
 export const entries: Context['entries'] = new Map(
   new Array(mockedEntryCount).fill(0).map((): [string, EntryData] => {
-    const timeOne = faker.number.int({ min: 200, max: 500 });
-    const timeTwo = faker.number.int({ min: 200, max: 500 });
+    const timeOne = faker.number.float({ min: 0, max: 100, fractionDigits: 15 });
+    const timeTwo = faker.number.float({ min: 0, max: 500, fractionDigits: 15 });
     const wildcardExports = mockWildcardExports();
     const exports = mockExports();
     const depth = faker.number.int({ min: 0, max: 1 });
@@ -75,6 +75,9 @@ export const entries: Context['entries'] = new Map(
         depth,
         exports,
         isImplicit: faker.datatype.boolean({ probability: 0.12 }),
+        diagnostics: new Set(),
+        importsCount: faker.number.int({ min: 0, max: 12 }),
+        hits: faker.number.int({ min: 0, max: 8 }),
         time: Math.max(timeOne, timeTwo),
         self: Math.min(timeOne, timeTwo),
       },

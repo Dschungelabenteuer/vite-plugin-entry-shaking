@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, inject, nextTick, ref, watch } from 'vue';
 
+import { store } from '#store';
+import { formatDuration } from '#utils';
 import type { Metric } from '@component/Metrics.vue';
 import Metrics from '@component/Metrics.vue';
 import Button from '@component/Button.vue';
@@ -15,7 +17,7 @@ const { toggle, openBtnId, isOpen } = metricsPanel;
 const timeHeader = computed<Metric>(() => ({
   label: 'Total process',
   icon: 'clock',
-  value: 'a',
+  value: formatDuration(store.metrics?.process ?? 0),
   type: 'duration',
 }));
 
@@ -23,13 +25,13 @@ const timeDetails = computed<Metric[]>(() => [
   {
     label: 'Entries analysis',
     icon: 'target',
-    value: 'a',
+    value: formatDuration(store.metrics?.analysis ?? 0),
     type: 'duration',
   },
   {
     label: 'Transforms',
     icon: 'sparkles',
-    value: 'a', // @todo: replace with actual value
+    value: formatDuration(store.metrics?.transform ?? 0),
     type: 'duration',
   },
 ]);
@@ -37,7 +39,7 @@ const timeDetails = computed<Metric[]>(() => [
 const requestsHeader = computed<Metric>(() => ({
   label: 'Total requests',
   icon: 'http-get',
-  value: 'a',
+  value: `${(store.metrics?.jsRequests ?? 0) + (store.metrics?.otherRequests ?? 0)}`,
   type: 'count',
 }));
 
@@ -45,13 +47,13 @@ const requestsDetails = computed<Metric[]>(() => [
   {
     label: 'JS/TS requests',
     icon: 'file-type-js',
-    value: 'a', // @todo: replace with actual value
+    value: `${store.metrics?.jsRequests ?? 0}`,
     type: 'count',
   },
   {
     label: 'Other requests',
     icon: 'file',
-    value: 'a', // @todo: replace with actual value
+    value: `${store.metrics?.otherRequests ?? 0}`,
     type: 'count',
   },
 ]);

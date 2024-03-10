@@ -1,3 +1,5 @@
+import type { Logger as ViteLogger } from 'vite';
+
 /** Vite plugin options. */
 export interface PluginOptions {
   /** List of the entry points. */
@@ -8,14 +10,24 @@ export interface PluginOptions {
   ignorePatterns?: any[];
   /** How deep should this plugin run static analysis when encountering wildcards? */
   maxWildcardDepth?: number | undefined;
-  /** Enable diagnostics ? */
-  enableDiagnostics?: boolean;
+  /** Diagnostics configuration. */
+  diagnostics?: boolean | DiagnosticsConfig;
   /** Defines whether debug mode should be enabled. */
   debug?: boolean;
 }
 
+/** Diagnostics configuration. */
+export interface DiagnosticsConfig {
+  /** Warn if an entry file defines code ? */
+  definedWithinEntry?: boolean;
+  /** Warn if max analysis depth was reached when handling wildcard imports. */
+  maxDepthReached?: boolean;
+}
+
 /** Final plugin options. */
-export type FinalPluginOptions = Required<PluginOptions>;
+export type FinalPluginOptions = Required<Omit<PluginOptions, 'diagnostics'>> & {
+  diagnostics: DiagnosticsConfig;
+};
 
 /** Performance-related duration. */
 export interface PerformanceDuration {
@@ -28,12 +40,18 @@ export interface PerformanceDuration {
 /** Plugin metrics. */
 export interface PluginMetrics {
   /** Time spent analyzing entries. */
-  analysis: PerformanceDuration;
+  analysis: number;
+  /** Time spent transforming files. */
+  transform: number;
   /** Total process time of the plugin. */
   process: number;
+  /** Number of triggered js/ts modules requests. */
+  jsRequests: number;
+  /** Number of triggered requests that are not js/ts modules. */
+  otherRequests: number;
 }
 
-export type MetricsTime = [time: number, self: number];
+export type Duration = [time: number, self: number];
 
 /** Target entry data. */
 export interface EntryData {
@@ -48,11 +66,17 @@ export interface EntryData {
   /** Static analysis-wise depth at which the entry was registered. */
   depth: number;
   /** Time spent analyzing the entry (self). */
-  self?: number;
+  self: number;
   /** Time spent analyzing the entry (inclusive). */
-  time?: number;
+  time: number;
   /** Was the entry implicitly added to targets (through wildcards)? */
   isImplicit?: boolean;
+  /** Indices of emitted `ctx.diagnostics` for this entry. */
+  diagnostics: Set<number>;
+  /** Number of analyzed imported */
+  importsCount: number;
+  /** Times this entry was hit (this does not mean it was eventually requested). */
+  hits: number;
 }
 
 /** Target entry metrics (debug). */
@@ -73,6 +97,10 @@ export interface TransformData {
   time: number;
   /** Transform's timestamp. */
   timestamp: number;
+  /** Number of entries imported by the file.  */
+  entriesMatched: number;
+  /** Amount of potential requests avoided. */
+  potentialRequestsAvoided: number;
 }
 
 /** Map of analyzed entries indexed by their absolute path. */
@@ -98,7 +126,7 @@ export type ImportParams<T = string> = {
   /** Alias of the entity (as imported from the entry by consomming code). */
   alias?: string;
   /** Determines whether the export represents some code defined within the file. */
-  selfDefined?: true;
+  selfDefined?: boolean;
 };
 
 /** Caught wildcard exports. */
@@ -162,3 +190,30 @@ export type ImportStatement = `import ${string}`;
 export type RemoveReadonly<T extends readonly unknown[]> = T extends readonly (infer U)[]
   ? U[]
   : never;
+
+/** Supported log levels. */
+export type LogLevel = 'info' | 'warn' | 'error' | 'debug' | 'success';
+
+/** Interface of a single log. */
+export interface Log {
+  /** Log level. */
+  level: LogLevel;
+  /** Message content of the log. */
+  content: string;
+  /** Timestamp the log was recorded at. */
+  timestamp: number;
+}
+
+/** Vite's base logger. */
+export type BaseLogger = Pick<ViteLogger, Exclude<LogLevel, 'debug' | 'success'>>;
+
+/** Available debugger events and their payload. */
+export type DebuggerEvents = {
+  increaseProcessTime: [number];
+  increaseTransformTime: [number];
+  incrementJsRequests: [];
+  incrementOtherRequests: [];
+  increaseEntryHits: [EntryPath];
+  registerTransform: [TransformData];
+  registerLog: [Log];
+};

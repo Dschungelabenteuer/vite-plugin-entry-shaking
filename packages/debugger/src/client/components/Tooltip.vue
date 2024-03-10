@@ -31,10 +31,9 @@ const tooltipClass = computed(() => [$class(), stateClass.value]);
 }
 
 .tooltip {
-  z-index: 10000;
+  z-index: 10000000;
   @include padding;
   width: max-content;
-  margin: var(--spacing-md);
   border-radius: var(--radius-md);
   transform: translateY(calc(var(--spacing-sm) * -1));
   transition: all var(--easing-backwards) var(--transition-duration-short);
@@ -50,7 +49,7 @@ const tooltipClass = computed(() => [$class(), stateClass.value]);
   }
 
   &__wrapper {
-    z-index: 100;
+    z-index: 10000;
     pointer-events: none;
   }
 }

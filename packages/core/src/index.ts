@@ -1,13 +1,15 @@
 import type { PluginOption } from 'vite';
-import type { LogLevel, Log } from './logger';
 import type {
   PluginMetrics,
   PluginEntries,
   PluginOptions,
+  DebuggerEvents,
   EntryData,
   TransformData,
-  EntryExports,
   WildcardExports,
+  EntryExports,
+  LogLevel,
+  Log,
 } from './types';
 
 import { Context } from './context';
@@ -15,14 +17,16 @@ import { mergeOptions } from './options';
 import { loadDebugger } from './utils';
 
 export type {
-  LogLevel,
-  Log,
   PluginEntries,
   PluginMetrics,
+  PluginOptions,
+  DebuggerEvents,
   EntryData,
   TransformData,
   WildcardExports,
   EntryExports,
+  LogLevel,
+  Log,
   Context,
 };
 
@@ -44,7 +48,14 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
       await context.init();
     },
 
-    load(id) {
+    async configureServer(server) {
+      if (context.options.debug) {
+        const { attachDebugger } = await loadDebugger();
+        attachDebugger(server, context);
+      }
+    },
+
+    async load(id) {
       return context.loadFile(id);
     },
 
@@ -53,14 +64,7 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
     },
 
     async handleHotUpdate({ file }) {
-      await context.updateFile(file);
-    },
-
-    async configureServer(server) {
-      if (context.options.debug) {
-        const { attachDebugger } = await loadDebugger();
-        attachDebugger(server, context);
-      }
+      await context.checkUpdate(file);
     },
   };
 }

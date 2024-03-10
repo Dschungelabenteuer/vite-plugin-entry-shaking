@@ -31,9 +31,9 @@ function getLinkCount(routeName: RouteRecordName): number | undefined {
     case 'Logs':
       return store.logs.length;
     case 'Entries':
-      return store.entries.size;
+      return store.entries.size ?? 0;
     case 'Transforms':
-      return store.transforms.length ?? 0;
+      return store.transforms.size ?? 0;
     default:
       return undefined;
   }

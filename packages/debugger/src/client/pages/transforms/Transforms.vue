@@ -1,22 +1,33 @@
 <script setup lang="ts">
-import { computed, toRefs } from 'vue';
+import { computed, ref, toRefs } from 'vue';
 import { useRoute } from 'vue-router';
 
+import type { TransformData } from 'vite-plugin-entry-shaking';
 import { store } from '#store';
+import Button from '@component/Button.vue';
+import Dialog from '@component/Dialog.vue';
 import { useBrowserData } from '@composable/useBrowserData';
 import BrowserView from '@views/BrowserView.vue';
 import GridView from '@views/GridView.vue';
 
 import Transform from './Transform.vue';
+import TransformDetails from './TransformDetails.vue';
 
 const route = useRoute();
+const dialogRef = ref<InstanceType<typeof Dialog> | null>(null);
 const ctxStore = toRefs(store);
+const source = computed(() =>
+  [...ctxStore.transforms.value.entries()].map(([path, transform]) => ({
+    ...transform,
+    path,
+  })),
+);
 
 const defaultFilters: string[] = [];
-const { id, title, sort, columns, items, filters, matched, methods } = useBrowserData({
+const { id, title, sort, columns, items, matched, methods } = useBrowserData({
   id: 'transforms',
   title: 'List of transforms',
-  source: ctxStore.transforms,
+  source,
   filterFn: (item, f) => true,
   defaultFilters,
   columns: {
@@ -54,8 +65,15 @@ const { id, title, sort, columns, items, filters, matched, methods } = useBrowse
 
 const rowClass = 'transform';
 const minItemSize = 48;
-const total = computed(() => store.transforms?.length);
+const total = computed(() => store.transforms?.size ?? 0);
 const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.icon as string }));
+const activeTransform = ref<TransformData | undefined>(undefined);
+const activePath = ref<string | undefined>(undefined);
+const handleTransformView = (path: string) => {
+  activePath.value = path;
+  activeTransform.value = store.transforms?.get(path);
+  dialogRef.value?.element?.showModal();
+};
 </script>
 
 <template>
@@ -65,10 +83,6 @@ const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.
     :matched="matched"
     @search="methods.onSearch"
   >
-    <!-- <template #filters>
-      <TransformsFilters v-model="filters" />
-    </template> -->
-
     <GridView
       :id="id"
       :items="items"
@@ -80,8 +94,36 @@ const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.
       @sort="methods.onSortChange"
     >
       <template #row="rowProps">
-        <Transform v-bind="rowProps" />
+        <Transform
+          v-bind="rowProps"
+          @view="handleTransformView"
+        />
       </template>
     </GridView>
   </BrowserView>
+
+  <Dialog
+    ref="dialogRef"
+    title="Transform data"
+    width="460px"
+    height="340px"
+    @close="activeTransform = undefined"
+  >
+    <TransformDetails
+      :transform="activeTransform"
+      :path="activePath"
+      @end-reached="() => dialogRef?.focusFirst()"
+    />
+
+    <template #footer>
+      <Button
+        label="Close"
+        icon="x"
+        shortcut="ESC"
+        :bordered="true"
+        size="small"
+        @click="dialogRef?.element?.close()"
+      />
+    </template>
+  </Dialog>
 </template>

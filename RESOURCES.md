@@ -49,6 +49,10 @@ Here is an overview of the main files it uses:
       <td><code>context.ts</code></td>
       <td><code>logger.ts</code></td>
     </tr>
+    <tr>
+      <td><code>diagnostics.ts</code></td>
+      <td><code>event-bus.ts</code></td>
+    </tr>
   </tbody>
   <thead>
     <tr>
@@ -72,6 +76,7 @@ Here is an overview of the main files it uses:
   <tbody>
     <tr>
       <td><code>parse.ts</code></td>
+      <td><code>timer.ts</code></td>
     </tr>
     <tr>
       <td><code>urls.ts</code></td>

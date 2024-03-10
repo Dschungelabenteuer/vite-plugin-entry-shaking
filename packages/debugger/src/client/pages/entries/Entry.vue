@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import type { EntryData } from 'vite-plugin-entry-shaking';
+import { formatDuration } from '#utils';
 import Button from '@component/Button.vue';
 import Icon from '@component/Icon.vue';
 import { useClassNames } from '@composable/useClassNames';
@@ -20,6 +23,8 @@ type EntryEvents = {
 const $class = useClassNames('entry');
 const emit = defineEmits<EntryEvents>();
 const props = defineProps<EntryProps>();
+const totalTime = computed(() => formatDuration(props.item.time));
+const selfTime = computed(() => formatDuration(props.item.self));
 </script>
 
 <template>
@@ -32,8 +37,8 @@ const props = defineProps<EntryProps>();
       @click="emit('view', item.path)"
     />
   </div>
-  <div :class="$class('time')">{{ item.time }}ms</div>
-  <div :class="$class('self')">{{ item.self }}ms</div>
+  <div :class="$class('time')">{{ totalTime }}</div>
+  <div :class="$class('self')">{{ selfTime }}</div>
   <div :class="$class('is-implicit')">
     <div v-show="item.isImplicit">
       <Icon

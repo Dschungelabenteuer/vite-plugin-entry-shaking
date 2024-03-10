@@ -11,6 +11,7 @@ import Popover from '@component/Popover.vue';
 import { useClassNames } from '@composable/useClassNames';
 import { useTooltip } from '@composable/useTooltip';
 import { usePopover } from '@composable/usePopover';
+import { useTeleport } from '@composable/useTeleport';
 
 /** Stringified boolean type. */
 type Booleanish = 'true' | 'false';
@@ -106,7 +107,7 @@ const tooltipOptions = computed(() => ({
 
 const tooltip = useTooltip(reference, tooltipRef, tooltipOptions.value);
 const popover = usePopover(reference, popoverRef);
-
+const teleport = useTeleport();
 // Destructure so that refs get unwrapped in template.
 const { isOpen: isTooltipOpen, styles: tooltipStyles } = tooltip;
 const { isOpen: isPopoverOpen, styles: popoverStyles } = popover;
@@ -171,14 +172,19 @@ defineExpose({ reference });
     />
   </button>
 
-  <Tooltip
-    v-if="iconOnly && !disableTooltip"
-    ref="tooltipRef"
-    :is-open="isTooltipOpen && !isPopoverOpen"
-    :style="tooltipStyles"
+  <Teleport
+    :disabled="teleport.disabled.value"
+    :to="teleport.to.value"
   >
-    {{ disabled ?? label }}
-  </Tooltip>
+    <Tooltip
+      v-if="iconOnly && !disableTooltip"
+      ref="tooltipRef"
+      :is-open="isTooltipOpen && !isPopoverOpen"
+      :style="tooltipStyles"
+    >
+      {{ disabled ?? label }}
+    </Tooltip>
+  </Teleport>
 
   <template v-if="$slots.popover">
     <Popover

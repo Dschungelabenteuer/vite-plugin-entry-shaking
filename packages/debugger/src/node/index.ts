@@ -77,7 +77,7 @@ async function openBrowser(address: string) {
       .catch(() => {
         // Silent error, debugger should still be accessible from printed url.
       });
-  });
+  }, 200);
 }
 
 export default attachDebugger;

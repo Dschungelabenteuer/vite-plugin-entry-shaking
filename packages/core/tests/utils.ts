@@ -8,7 +8,7 @@ import dedent from 'ts-dedent';
 import type { EntryData, PluginOptions, WildcardExports } from '../src/types';
 import type { Parallel } from '../src/utils';
 import EntryAnalyzer from '../src/analyze-entry';
-import { extensions } from '../src/options';
+import { extensions, mergeOptions } from '../src/options';
 import { transformIfNeeded } from '../src/transform';
 import { Context } from '../src/context';
 import utils from '../src/utils';
@@ -55,6 +55,11 @@ export const STUB_ID = '';
 /** Stub for an empty analyzed entry data. */
 export const STUB_EMPTY_ENTRY_DATA: EntryData = {
   exports: new Map(),
+  diagnostics: new Set(),
+  hits: 0,
+  time: 0,
+  self: 0,
+  importsCount: 0,
   source: STUB_SOURCE,
   updatedSource: STUB_SOURCE,
   depth: 0,
@@ -119,7 +124,7 @@ export const setupCase = (target: CaseTarget, middleTarget?: CaseTarget) => ({
 export async function runCase(main: string, options: PluginOptions) {
   const finalOptions: Required<PluginOptions> = {
     ...options,
-    enableDiagnostics: options.enableDiagnostics ?? false,
+    diagnostics: options.diagnostics ?? false,
     maxWildcardDepth: options.maxWildcardDepth ?? 0,
     ignorePatterns: options.ignorePatterns ?? [],
     debug: false,
@@ -187,7 +192,9 @@ export async function createTestContext(options: PluginOptions) {
     createResolver: () => resolver,
     logger: createLogger(),
   } as ResolvedConfig;
-  return new Context(options as Required<PluginOptions>, config);
+
+  const finalOptions = mergeOptions(options);
+  return new Context(finalOptions, config);
 }
 
 /**
@@ -211,6 +218,11 @@ export function createTestWildcardExports(
 export function createMockEntryData(exports: EntryData['exports'] = new Map()): EntryData {
   return {
     exports,
+    hits: 0,
+    time: 0,
+    self: 0,
+    importsCount: 0,
+    diagnostics: new Set(),
     source: STUB_SOURCE,
     updatedSource: STUB_SOURCE,
     depth: 0,

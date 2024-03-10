@@ -1,13 +1,27 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { TransformData } from 'vite-plugin-entry-shaking';
+import { formatDuration } from '#utils';
 import Button from '@component/Button.vue';
 import { useClassNames } from '@composable/useClassNames';
 import type { GridRowProps } from '@views/GridView.vue';
 
-export type TransformProps = GridRowProps<TransformData>;
+export type TransformProps = GridRowProps<
+  TransformData & {
+    /** Transform file path. */
+    path: string;
+  }
+>;
+
+type TransformEvents = {
+  /** Emitted when the user clicks on the "view" button. */
+  view: [path: string];
+};
 
 const $class = useClassNames('transform');
+const emit = defineEmits<TransformEvents>();
 const props = defineProps<TransformProps>();
+const time = computed(() => formatDuration(props.item.time));
 </script>
 
 <template>
@@ -15,12 +29,13 @@ const props = defineProps<TransformProps>();
     <Button
       label="Transform details"
       icon="eye"
-      :icon-only="true"
       :disable-tooltip="true"
+      :icon-only="true"
+      @click="emit('view', item.path)"
     />
   </div>
   <div :class="$class('time')">{{ new Date(item.timestamp ?? 0).toLocaleTimeString() }}</div>
-  <div :class="$class('duration')">{{ item.time }}ms</div>
+  <div :class="$class('duration')">{{ time }}</div>
   <div :class="$class('path')">{{ item.id }}</div>
 </template>
 
