@@ -11,7 +11,10 @@ import { useFloating } from '@composable/useFloating';
  */
 export const usePopover: UseFloating = (reference, floating, options) => {
   const body = document.querySelector('body');
-  const floatingUi = useFloating(reference, floating, options);
+  const floatingUi = useFloating(reference, floating, {
+    placement: 'bottom-end',
+    ...options,
+  });
   const handlers: UseFloatingHandlers = { click: floatingUi.toggle };
 
   const handleClickOutside = (event: Event) => {

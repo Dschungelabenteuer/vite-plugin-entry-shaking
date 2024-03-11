@@ -179,7 +179,7 @@ defineExpose({ reference });
     <Tooltip
       v-if="iconOnly && !disableTooltip"
       ref="tooltipRef"
-      :is-open="isTooltipOpen && !isPopoverOpen"
+      :is-open="isTooltipOpen && (!isPopoverOpen || !$slots.popover)"
       :style="tooltipStyles"
     >
       {{ disabled ?? label }}

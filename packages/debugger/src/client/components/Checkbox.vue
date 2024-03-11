@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import Icon from '@component/Icon.vue';
 import { useClassNames } from '@composable/useClassNames';
 
@@ -85,13 +84,14 @@ const model = defineModel<string[]>();
   &__option {
     --checkbox-size: 1rem;
     --checkbox-margin: calc(var(--spacing-md) + 2px);
+    --checkbox-offset: calc(var(--checkbox-size) + var(--checkbox-margin));
 
     position: relative;
     display: flex;
     align-items: center;
     margin: var(--spacing-sm);
     transition: all ease var(--transition-duration-short);
-
+    padding-inline-end: var(--checkbox-offset);
     input {
       position: absolute;
       height: 100%;
@@ -106,7 +106,7 @@ const model = defineModel<string[]>();
 
     label {
       pointer-events: none;
-      transform: translateX(calc(var(--checkbox-size) + var(--checkbox-margin)));
+      transform: translateX(var(--checkbox-offset));
       transition: all ease var(--transition-duration-short);
     }
 

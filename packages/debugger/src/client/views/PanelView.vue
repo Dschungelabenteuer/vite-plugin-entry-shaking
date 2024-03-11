@@ -37,6 +37,7 @@ watch(isOpen, (open) => {
     <div :class="$class('content')">
       <header :class="$class('header')">
         <Button
+          v-if="isOpen"
           ref="closeBtnRef"
           size="large"
           :aria-controls="panelId"

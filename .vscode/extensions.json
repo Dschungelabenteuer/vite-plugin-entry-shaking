@@ -4,6 +4,5 @@
     "esbenp.prettier-vscode",
     // Only needed if you're working on the example wrapper app.
     "Vue.volar",
-    "Vue.vscode-typescript-vue-plugin"
   ]
 }

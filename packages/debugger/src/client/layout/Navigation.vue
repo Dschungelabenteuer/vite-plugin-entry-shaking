@@ -37,7 +37,7 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
       </li>
       <li
         class="metrics-btn"
-        :disabled="isOpen"
+        v-if="!isOpen"
       >
         <Button
           :id="openBtnId"

@@ -170,7 +170,7 @@ defineExpose({
     view-transition-name: dialog-backdrop;
     backdrop-filter: var(--blur-lg);
     background: var(--dialog-backdrop-color);
-    transition: all ease var(--transition-duration-short);
+    animation: 300ms ease fade-in forwards;
   }
 
   &__header {
