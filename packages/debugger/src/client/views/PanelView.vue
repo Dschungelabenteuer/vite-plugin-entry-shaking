@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject, nextTick, ref, watch } from 'vue';
-import Button from '@component/Button.vue';
+import Button from '@component/Button/Button.vue';
 import type { Panel } from '@composable/usePanel';
 import { useClassNames } from '@composable/useClassNames';
 
@@ -39,7 +39,7 @@ watch(isOpen, (open) => {
         <Button
           v-if="isOpen"
           ref="closeBtnRef"
-          size="large"
+          class="size"
           :aria-controls="panelId"
           :aria-expanded="true"
           icon="arrow-bar-right"
@@ -64,47 +64,48 @@ watch(isOpen, (open) => {
 <style lang="scss">
 .panel {
   @include contained;
-  overflow: visible;
-  max-width: 300px;
+
   display: grid;
-  grid-template-columns: 1fr;
   grid-template-rows: var(--size-header) 1fr var(--size-footer);
+  grid-template-columns: 1fr;
+  max-width: 300px;
+  overflow: visible;
 
   &__backdrop {
-    z-index: 10;
-    background: rgba(0, 0, 0, 0.3);
-    width: 100vw;
-    height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
+    z-index: 10;
+    width: 100vw;
+    height: 100vh;
     pointer-events: none;
+    background: rgb(0 0 0 / 30%);
     backdrop-filter: var(--blur-lg);
     opacity: 0;
     transition: all ease var(--transition-duration-short);
   }
 
   &__content {
+    z-index: 20;
     display: grid;
     grid-template-rows: var(--size-header) 1fr var(--size-footer);
-    z-index: 20;
-    background: var(--overall-background-color);
-    border-inline-start: 1px solid var(--overall-border-color);
-    color: var(--text-color);
     height: 100vh;
+    color: var(--text-color);
+    background: var(--overall-background-color);
     backdrop-filter: var(--blur-xl);
+    border-inline-start: 1px solid var(--overall-border-color);
   }
 
   &__header {
-    box-shadow: 0 0 0 1px var(--overall-border-color);
     display: flex;
-    padding-block: 1.5px;
     align-items: center;
+    padding-block: 1.5px;
+    box-shadow: 0 0 0 1px var(--overall-border-color);
 
     h2 {
-      font-size: 1.14rem;
       width: 100%;
       padding-inline-start: var(--spacing-md);
+      font-size: 1.14rem;
     }
   }
 

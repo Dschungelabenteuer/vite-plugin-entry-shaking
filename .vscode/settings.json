@@ -1,5 +1,16 @@
 {
-  "editor.codeActionsOnSave": { "source.fixAll.eslint": "explicit" },
+  // DX.
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
+  },
+  // ESLint.
   "eslint.validate": ["javascript", "javascriptreact", "yaml", "json", "jsonc", "json5"],
-  "html.format.wrapAttributes": "force-expand-multiline"
+  "html.format.wrapAttributes": "force-expand-multiline",
+  // Stylelint.
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "stylelint.enable": true,
+  "stylelint.validate": ["css", "scss", "postcss", "vue"]
 }

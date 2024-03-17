@@ -53,6 +53,7 @@ onMounted(() => {
 <style lang="scss">
 .theme-wrapper {
   @include contained;
+
   display: flex;
   color: var(--text-color);
   background: var(--background-color);
@@ -61,29 +62,9 @@ onMounted(() => {
 
 .layout-wrapper {
   @include contained;
+
   display: grid;
-  grid-template-columns: 1fr;
   grid-template-rows: var(--size-header) 1fr var(--size-footer);
-
-  main {
-    container: main / inline-size;
-  }
-}
-
-.tooltip-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100dvh;
-  width: 100dvw;
-  z-index: 1000000;
-  pointer-events: none;
-}
-
-main {
-  flex-grow: 1;
-  border-radius: var(--radius-md);
-  max-height: var(--size-page);
-  overflow-y: auto;
+  grid-template-columns: 1fr;
 }
 </style>

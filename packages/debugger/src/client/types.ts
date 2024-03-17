@@ -10,6 +10,9 @@ export type ShortEmits<T extends Record<string, any>> = UnionToIntersection<
   ValueOf<{ [K in keyof T]: (evt: K, ...args: T[K]) => void }>
 >;
 
+/** Stringified boolean type. */
+export type Booleanish = 'true' | 'false';
+
 declare global {
   interface ViewTransition {
     finished: Promise<void>;

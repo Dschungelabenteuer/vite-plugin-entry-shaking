@@ -3,7 +3,7 @@ import { computed, inject } from 'vue';
 
 import { useBrowserData } from '@composable/useBrowserData';
 import { useClassNames } from '@composable/useClassNames';
-import BrowserView from '@views/BrowserView.vue';
+import BrowserView from '@views/Browser/Browser.vue';
 import GridView from '@views/GridView.vue';
 
 import type { EntryDetailsProps } from '../EntryDetails.vue';

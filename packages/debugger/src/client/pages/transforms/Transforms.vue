@@ -4,10 +4,10 @@ import { useRoute } from 'vue-router';
 
 import type { TransformData } from 'vite-plugin-entry-shaking';
 import { store } from '#store';
-import Button from '@component/Button.vue';
+import Button from '@component/Button/Button.vue';
 import Dialog from '@component/Dialog.vue';
 import { useBrowserData } from '@composable/useBrowserData';
-import BrowserView from '@views/BrowserView.vue';
+import BrowserView from '@views/Browser/Browser.vue';
 import GridView from '@views/GridView.vue';
 
 import Transform from './Transform.vue';
@@ -120,8 +120,7 @@ const handleTransformView = (path: string) => {
         label="Close"
         icon="x"
         shortcut="ESC"
-        :bordered="true"
-        size="small"
+        :class="['bordered', 'small']"
         @click="dialogRef?.element?.close()"
       />
     </template>

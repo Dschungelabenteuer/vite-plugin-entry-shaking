@@ -1,14 +1,19 @@
+@import './reset';
 @import './global';
 
-body {
+body,
+#root,
+ {
+  height: 100%;
   margin: 0;
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  background: var(--background-color);
+  background-image: var(--background-gradient);
 }
 
-body,
-#app,
 #wrapper {
   @include contained;
+  @include flex-col(center, normal);
 }
 
 ::selection {
@@ -17,9 +22,9 @@ body,
 }
 
 ::-webkit-scrollbar-track {
-  box-shadow: 0 0 0 var(--scrollbar-border-width) var(--overall-border-color);
-  border-radius: var(--radius-md);
   background-color: transparent;
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 var(--scrollbar-border-width) var(--overall-border-color);
 }
 
 ::-webkit-scrollbar-corner {
@@ -33,8 +38,8 @@ body,
 }
 
 ::-webkit-scrollbar-thumb {
-  border-radius: var(--radius-md);
   background-color: var(--accent-color);
+  border-radius: var(--radius-md);
 }
 
 ::view-transition-old(root),
@@ -42,28 +47,22 @@ body,
   @extend %reset-animation;
 }
 
-#wrapper {
-  @include flex-col(center, normal);
-  background: var(--background-color);
-  background-image: var(--background-gradient);
-}
-
 h1 {
-  color: var(--text-emphasize-color);
   font-size: var(--font-size-xl);
   font-weight: 700;
+  color: var(--text-emphasize-color);
 }
 
 h2 {
-  color: var(--text-emphasize-color);
   font-size: var(--font-size-lg);
   font-weight: 700;
+  color: var(--text-emphasize-color);
 }
 
 h3 {
-  color: var(--text-emphasize-color);
   font-size: var(--font-size-sm);
   font-weight: 700;
+  color: var(--text-emphasize-color);
 }
 
 .sr-only {

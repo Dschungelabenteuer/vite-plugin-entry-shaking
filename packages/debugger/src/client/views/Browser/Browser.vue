@@ -2,33 +2,10 @@
 import { Icon } from '@iconify/vue';
 import { computed, ref } from 'vue';
 import Input from '@component/Input.vue';
-import Button from '@component/Button.vue';
+import Button from '@component/Button/Button.vue';
 import { useClassNames } from '@composable/useClassNames';
 import { useViewTransition } from '@composable/useViewTransition';
-
-type BrowserViewProps = {
-  /** Browser page name. */
-  name: string;
-  /** Page icon. */
-  pageIcon?: string;
-  /** Label used for the "filter" button. */
-  filterLabel?: string;
-  /** Label used for the "search" input. */
-  searchLabel?: string;
-  /** Placeholder used for the "search" input. */
-  searchPlaceholder?: string;
-  /** Total count of items. */
-  total?: number;
-  /** Count of matched items. */
-  matched?: number;
-  /** Condensed display? (reduces overall spacing). */
-  condensed?: boolean;
-};
-
-type BrowserViewEvents = {
-  /** Emitted when the search input changes. */
-  search: [q: string];
-};
+import type { BrowserViewEvents, BrowserViewProps } from './Browser.types';
 
 const $class = useClassNames('browser-view');
 const emit = defineEmits<BrowserViewEvents>();
@@ -147,17 +124,18 @@ const onSearch = (e: InputEvent) => {
     --font-size-page-header: var(--font-size-xs);
   }
 
+  position: relative;
   display: grid;
-  grid-template-columns: 1fr;
   grid-template-rows: var(--size-page-header) 1fr;
+  grid-template-columns: 1fr;
   height: var(--size-page);
   max-height: 100%;
-  position: relative;
-  background: var(--browser-background-color);
   overflow: hidden;
+  background: var(--browser-background-color);
 
   &__header {
     @include flex-row(normal, center);
+
     z-index: 1000;
     height: var(--size-page-header);
     padding-inline: var(--padding-page-header);
@@ -177,10 +155,11 @@ const onSearch = (e: InputEvent) => {
 
     &-counts {
       @include padding;
-      font-size: var(--font-size-2xs);
-      box-shadow: 0 0 0 1px var(--overall-border-color-stronger);
-      border-radius: var(--radius-md);
+
       margin: var(--spacing-md);
+      font-size: var(--font-size-2xs);
+      border-radius: var(--radius-md);
+      box-shadow: 0 0 0 1px var(--overall-border-color-stronger);
     }
 
     &-actions {
@@ -194,37 +173,25 @@ const onSearch = (e: InputEvent) => {
     margin: var(--spacing-md);
     margin-block-start: 0;
     overflow-y: auto;
+    background: var(--overall-background-color);
     border-radius: var(--radius-md);
     box-shadow: 0 0 0 1px var(--overall-border-color);
-    background: var(--overall-background-color);
   }
 }
 
-::view-transition-new(browser-header-counts) {
-}
-
-::view-transition-old(browser-header-counts) {
-}
-
-::view-transition-new(browser-header-search) {
-}
-
-::view-transition-old(browser-header-search) {
-}
-
 ::view-transition-new(browser-header-filter-button) {
-  height: fit-content;
   width: fit-content;
-  object-fit: cover;
+  height: fit-content;
   overflow: clip;
+  object-fit: cover;
   animation: 300ms ease scale-in forwards;
 }
 
 ::view-transition-old(browser-header-filter-button) {
-  height: fit-content;
   width: fit-content;
-  object-fit: cover;
+  height: fit-content;
   overflow: clip;
+  object-fit: cover;
   animation: 300ms ease scale-out forwards;
 }
 
@@ -238,17 +205,19 @@ const onSearch = (e: InputEvent) => {
 
 ::view-transition-new(browser-header-title) {
   --slide-in-distance: 0.8rem;
-  height: fit-content;
+
   width: fit-content;
-  object-fit: cover;
+  height: fit-content;
   overflow: clip;
+  object-fit: cover;
   animation: 200ms ease slide-in-left forwards;
 }
 
 ::view-transition-old(browser-header-title) {
   --slide-in-distance: 0.8rem;
-  height: fit-content;
+
   width: fit-content;
+  height: fit-content;
   object-fit: cover;
   animation: 200ms ease slide-out-right forwards;
 }

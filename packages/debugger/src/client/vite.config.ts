@@ -11,9 +11,11 @@ export default defineConfig({
   plugins: [vue(), dev()],
   resolve: {
     alias: {
+      '$storybook': fileURLToPath(new URL('../../.storybook', import.meta.url)),
       '#store': fileURLToPath(new URL('./store.ts', import.meta.url)),
       '#utils': fileURLToPath(new URL('./utils.ts', import.meta.url)),
-      '#types': fileURLToPath(new URL('./types.ts', import.meta.url)),
+      '#types': fileURLToPath(new URL('../../types.ts', import.meta.url)),
+      '#uitypes': fileURLToPath(new URL('./types.ts', import.meta.url)),
       '@assets': fileURLToPath(new URL('./assets', import.meta.url)),
       '@component': fileURLToPath(new URL('./components', import.meta.url)),
       '@composable': fileURLToPath(new URL('./composables', import.meta.url)),

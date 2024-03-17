@@ -4,8 +4,10 @@ import { useMediaQuery } from '@vueuse/core';
 
 import type { TransformData } from 'vite-plugin-entry-shaking';
 import Input from '@component/Input.vue';
-import Button from '@component/Button.vue';
+import Button from '@component/Button/Button.vue';
+import DropdownMenu from '@component/DropdownMenu.vue';
 import { useClassNames } from '@composable/useClassNames';
+
 import type { VerticalTab } from '@views/VerticalTabsView.vue';
 import VerticalTabsView from '@views/VerticalTabsView.vue';
 import TransformMetrics from './details/TransformMetrics.vue';
@@ -64,7 +66,14 @@ provide('depth', 1);
             :icon-only="true"
             label="Copy file path"
           >
-            <template #popover> hohohooh </template>
+            <template #popover>
+              <DropdownMenu
+                :items="[
+                  { label: 'Copy relative path', action: () => {} },
+                  { label: 'Copy absolute path', action: () => {} },
+                ]"
+              />
+            </template>
           </Button>
         </template>
       </Input>
@@ -82,16 +91,17 @@ provide('depth', 1);
 
 <style lang="scss">
 .transform-details {
-  height: calc(100% + (var(--spacing-lg) * 2));
   display: grid;
-  grid-template-columns: 1fr;
   grid-template-rows: 3rem 1fr;
+  grid-template-columns: 1fr;
+  height: calc(100% + (var(--spacing-lg) * 2));
   margin: calc((var(--spacing-lg) * -1));
   overflow: hidden;
 
   &__path {
     @include border-bottom;
     @include padding(var(--spacing-sm), var(--spacing-xs));
+
     display: flex;
     align-items: center;
     width: 100%;

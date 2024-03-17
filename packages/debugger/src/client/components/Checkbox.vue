@@ -75,10 +75,10 @@ const model = defineModel<string[]>();
 
   &__mark {
     position: absolute;
-    transform: scale(0.675, 0.875);
-    opacity: 0;
     color: var(--checkbox-checkmark-color);
+    opacity: 0;
     transition: all ease var(--transition-duration-short);
+    transform: scale(0.675, 0.875);
   }
 
   &__option {
@@ -89,15 +89,16 @@ const model = defineModel<string[]>();
     position: relative;
     display: flex;
     align-items: center;
+    padding-inline-end: var(--checkbox-offset);
     margin: var(--spacing-sm);
     transition: all ease var(--transition-duration-short);
-    padding-inline-end: var(--checkbox-offset);
+
     input {
       position: absolute;
-      height: 100%;
       width: 100%;
-      opacity: 0;
+      height: 100%;
       cursor: pointer;
+      opacity: 0;
 
       &:disabled {
         cursor: not-allowed;
@@ -106,18 +107,18 @@ const model = defineModel<string[]>();
 
     label {
       pointer-events: none;
-      transform: translateX(var(--checkbox-offset));
       transition: all ease var(--transition-duration-short);
+      transform: translateX(var(--checkbox-offset));
     }
 
     &::before {
-      content: '';
       position: absolute;
-      height: var(--checkbox-size);
       width: var(--checkbox-size);
+      height: var(--checkbox-size);
+      content: '';
       background-color: var(--checkbox-background-color);
-      box-shadow: 0 0 0 1px var(--checkbox-border-color);
       border-radius: var(--radius-sm);
+      box-shadow: 0 0 0 1px var(--checkbox-border-color);
       transition: all ease var(--transition-duration-short);
     }
 
@@ -125,8 +126,8 @@ const model = defineModel<string[]>();
       opacity: 0.45;
 
       &::before {
-        opacity: 0.825;
         background-color: var(--overall-border-color);
+        opacity: 0.825;
       }
     }
 
@@ -141,7 +142,7 @@ const model = defineModel<string[]>();
       }
     }
 
-    &:has(input:hover:not(:disabled):not(:focus):not(:checked)) {
+    &:has(input:hover:not(:disabled, :focus, :checked)) {
       &::before {
         box-shadow: 0 0 0 1px var(--checkbox-border-color-hover);
       }

@@ -5,7 +5,7 @@ import { store } from '#store';
 import { formatDuration } from '#utils';
 import type { Metric } from '@component/Metrics.vue';
 import Metrics from '@component/Metrics.vue';
-import Button from '@component/Button.vue';
+import Button from '@component/Button/Button.vue';
 
 import type { Panel } from '@composable/usePanel';
 import PanelView from '@views/PanelView.vue';
@@ -84,14 +84,14 @@ watch(isOpen, (open) => {
     </div>
     <template #footer>
       <Button
-        :bordered="true"
+        class="bordered"
         icon="upload"
         disabled="Imports are only possible when running a detached instance."
         label="Import"
         @click="toggle"
       />
       <Button
-        :bordered="true"
+        class="bordered"
         icon="download"
         disabled="Coming soon (or later)"
         label="Export"

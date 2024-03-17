@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Component, DefineComponent } from 'vue';
 import { computed, nextTick, ref } from 'vue';
-import Button from '@component/Button.vue';
+import Button from '@component/Button/Button.vue';
 import { useClassNames } from '@composable/useClassNames';
 import { useViewTransition } from '@composable/useViewTransition';
 
@@ -131,6 +131,7 @@ const handleTab = (e: KeyboardEvent) => {
 .vertical-tabs {
   display: flex;
   overflow: hidden;
+
   --radius-active: calc((var(--radius-md) + 6px));
 
   &__tablist {
@@ -141,11 +142,11 @@ const handleTab = (e: KeyboardEvent) => {
 
     .button {
       position: relative;
-      font-size: var(--font-size-sm);
-      width: 100%;
       justify-content: flex-start;
-      border-radius: 0;
+      width: 100%;
+      font-size: var(--font-size-sm);
       background: var(--tablist-background-color);
+      border-radius: 0;
 
       svg {
         font-size: var(--font-size-xl);
@@ -153,18 +154,19 @@ const handleTab = (e: KeyboardEvent) => {
 
       &::before,
       &::after {
-        content: '';
         position: absolute;
         right: 0;
-        height: 100%;
         width: 100%;
-        opacity: 0;
+        height: 100%;
         pointer-events: none;
+        content: '';
+        opacity: 0;
       }
 
       &::before {
         bottom: 0;
         opacity: 1;
+
         @include border-right;
       }
 
@@ -185,41 +187,41 @@ const handleTab = (e: KeyboardEvent) => {
         }
 
         &::after {
+          inset-inline-end: -1px;
           top: calc(100% - 1px);
           height: var(--radius-active);
-          box-shadow: inset 0 1px 0 0 var(--overall-border-color);
           border-inline-end: 1px solid var(--overall-border-color);
-          inset-inline-end: -1px;
           border-start-end-radius: var(--radius-active);
+          box-shadow: inset 0 1px 0 0 var(--overall-border-color);
           opacity: 1;
         }
 
         &::before {
-          height: var(--radius-active);
+          inset-inline-end: -1px;
           bottom: 100%;
+          height: var(--radius-active);
+          border-inline-end: 1px solid var(--overall-border-color);
+          border-end-end-radius: var(--radius-active);
           box-shadow:
             inset 0 -1px 0 0 var(--overall-border-color),
-            inset 0px -2px 4px 0 #00000008;
-          border-inline-end: 1px solid var(--overall-border-color);
-          inset-inline-end: -1px;
-          border-end-end-radius: var(--radius-active);
+            inset 0 -2px 4px 0 #00000008;
         }
 
         + .button {
           border-start-end-radius: var(--radius-active);
-          box-shadow: inset 0px 2px 4px 0 #00000008;
+          box-shadow: inset 0 2px 4px 0 #00000008;
 
           &::before {
-            height: calc(100% - var(--radius-active));
             top: var(--radius-active);
+            height: calc(100% - var(--radius-active));
           }
         }
 
         + .sep {
+          border-start-end-radius: var(--radius-active);
           box-shadow:
             1px 0 0 0 var(--overall-border-color),
-            inset 0px 2px 4px 0 #00000008;
-          border-start-end-radius: var(--radius-active);
+            inset 0 2px 4px 0 #00000008;
         }
       }
 
@@ -230,8 +232,8 @@ const handleTab = (e: KeyboardEvent) => {
         }
 
         &::before {
-          height: calc(100% - var(--radius-active));
           bottom: var(--radius-active);
+          height: calc(100% - var(--radius-active));
         }
       }
     }
@@ -239,6 +241,7 @@ const handleTab = (e: KeyboardEvent) => {
     .sep {
       height: 100%;
       background: var(--tablist-background-color);
+
       @include border-right;
     }
   }
@@ -250,8 +253,8 @@ const handleTab = (e: KeyboardEvent) => {
   }
 
   &__panel {
-    display: none;
     position: relative;
+    display: none;
 
     &.active {
       display: initial;

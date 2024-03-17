@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import type { TransformData } from 'vite-plugin-entry-shaking';
 import { formatDuration } from '#utils';
-import Button from '@component/Button.vue';
+import Button from '@component/Button/Button.vue';
 import { useClassNames } from '@composable/useClassNames';
 import type { GridRowProps } from '@views/GridView.vue';
 
@@ -42,39 +42,40 @@ const time = computed(() => formatDuration(props.item.time));
 <style lang="scss">
 .transform {
   &::after {
-    content: '';
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    content: '';
     background: transparent;
-    left: 0;
-    top: 0;
     opacity: 0.16;
   }
 
   &__access {
-    z-index: 10;
-    height: 100%;
-    width: 100%;
-    display: flex;
-    align-items: center;
     position: sticky;
     left: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+
     /* backdrop-filter: blur(3px); // perf issue */
 
     &::before {
-      content: '';
       position: absolute;
+      top: -3px;
+      left: 0;
+      z-index: -1;
       width: 100%;
       height: calc(100% + 3px);
+      content: '';
       background: var(--entry-fixed-action-background-tint);
-      background-position: left center;
       background-attachment: fixed;
+      background-position: left center;
       background-size: 100vw 100vh;
       box-shadow: 1px 0 0 0 var(--grid-header-border-color);
-      left: 0;
-      top: -3px;
-      z-index: -1;
       opacity: 0.82;
     }
 
@@ -91,11 +92,11 @@ const time = computed(() => formatDuration(props.item.time));
   }
 
   &__path {
-    font-family: monospace;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: var(--font-size-sm);
     padding-inline: var(--spacing-lg);
+    overflow: hidden;
+    font-family: monospace;
+    font-size: var(--font-size-sm);
+    text-overflow: ellipsis;
   }
 }
 </style>

@@ -10,9 +10,11 @@
     "skipLibCheck": true,
     "types": ["node", "vite/client"],
     "paths": {
+      "$storybook/*": ["./.storybook/*"],
       "#store": ["./src/client/store.ts"],
       "#utils": ["./src/client/utils.ts"],
       "#types": ["./src/types.ts"],
+      "#uitypes": ["./src/client/types.ts"],
       "@assets/*": ["./src/client/assets/*"],
       "@component/*": ["./src/client/components/*"],
       "@composable/*": ["./src/client/composables/*"],
@@ -22,5 +24,6 @@
       "@styles/*": ["./src/client/styles/*"]
     }
   },
+  "include": ["**/*", ".storybook/**/*"],
   "exclude": ["coverage", "dist", "node_modules"]
 }

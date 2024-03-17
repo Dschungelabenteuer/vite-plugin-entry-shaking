@@ -3,7 +3,7 @@ import { computed } from 'vue';
 
 import type { EntryData } from 'vite-plugin-entry-shaking';
 import { formatDuration } from '#utils';
-import Button from '@component/Button.vue';
+import Button from '@component/Button/Button.vue';
 import Icon from '@component/Icon.vue';
 import { useClassNames } from '@composable/useClassNames';
 import type { GridRowProps } from '@views/GridView.vue';
@@ -65,29 +65,30 @@ const selfTime = computed(() => formatDuration(props.item.self));
   white-space: nowrap;
 
   &__access {
+    position: sticky;
+    bottom: 0;
+    left: 0;
     z-index: 10;
-    height: calc(100% - 2px) !important;
-    width: 100%;
     display: flex;
     align-items: center;
-    position: sticky;
-    bottom: 0px;
-    left: 0;
+    width: 100%;
+    height: calc(100% - 2px) !important;
+
     /* backdrop-filter: blur(3px); // perf issue */
 
     &::before {
-      content: '';
       position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
       width: 100%;
       height: 100%;
+      content: '';
       background: var(--entry-fixed-action-background-tint);
-      background-position: left center;
       background-attachment: fixed;
+      background-position: left center;
       background-size: 100vw 100vh;
       box-shadow: 1px 0 0 0 var(--grid-header-border-color);
-      left: 0;
-      top: 0;
-      z-index: -1;
       opacity: 0.82;
     }
 
@@ -97,11 +98,11 @@ const selfTime = computed(() => formatDuration(props.item.self));
   }
 
   &__path {
-    font-family: monospace;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: var(--font-size-sm);
     padding-inline: var(--spacing-lg);
+    overflow: hidden;
+    font-family: monospace;
+    font-size: var(--font-size-sm);
+    text-overflow: ellipsis;
   }
 
   &__time,

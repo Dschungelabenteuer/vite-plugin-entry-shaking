@@ -1,7 +1,7 @@
 %reset-animation {
-  animation: none;
-  mix-blend-mode: normal;
   overflow: clip;
+  mix-blend-mode: normal;
+  animation: none;
 }
 
 @keyframes fade-in {
@@ -16,90 +16,97 @@
 
 @keyframes scale-in {
   from {
-    transform: scale(0.72);
     opacity: 0;
+    transform: scale(0.72);
   }
+
   to {
-    transform: scale(1);
     opacity: 1;
+    transform: scale(1);
   }
 }
 
 @keyframes scale-out {
   from {
-    transform: scale(1);
     opacity: 1;
+    transform: scale(1);
   }
+
   to {
-    transform: scale(0.72);
     opacity: 0;
+    transform: scale(0.72);
   }
 }
+
 @keyframes slide-in-up {
   from {
-    transform: translateY(calc(-1 * var(--slide-in-distance, 0.5rem)));
     opacity: 0;
+    transform: translateY(calc(-1 * var(--slide-in-distance, 0.5rem)));
   }
+
   to {
-    transform: translateY(0rem);
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
 @keyframes slide-in-down {
   from {
-    transform: translateY(calc(var(--slide-in-distance, 0.5rem)));
     opacity: 0;
+    transform: translateY(calc(var(--slide-in-distance, 0.5rem)));
   }
+
   to {
-    transform: translateY(0rem);
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
 @keyframes slide-in-left {
   from {
-    transform: translateX(calc(-1 * var(--slide-in-distance, 0.5rem)));
     opacity: 0;
+    transform: translateX(calc(-1 * var(--slide-in-distance, 0.5rem)));
   }
+
   to {
-    transform: translateX(0rem);
     opacity: 1;
+    transform: translateX(0);
   }
 }
 
 @keyframes slide-in-right {
   from {
-    transform: translateX(calc(var(--slide-in-distance, 0.5rem)));
     opacity: 0;
+    transform: translateX(calc(var(--slide-in-distance, 0.5rem)));
   }
+
   to {
-    transform: translateX(0rem);
     opacity: 1;
+    transform: translateX(0);
   }
 }
 
 @keyframes slide-out-up {
   from {
-    transform: translateY(0rem);
     opacity: 1;
+    transform: translateY(0);
   }
 
   to {
-    transform: translateY(calc(-1 * var(--slide-in-distance, 0.5rem)));
     opacity: 0;
+    transform: translateY(calc(-1 * var(--slide-in-distance, 0.5rem)));
   }
 }
 
 @keyframes slide-out-down {
   from {
-    transform: translateY(0rem);
     opacity: 1;
+    transform: translateY(0);
   }
 
   to {
-    transform: translateY(var(--slide-in-distance, 0.5rem));
     opacity: 0;
+    transform: translateY(var(--slide-in-distance, 0.5rem));
   }
 
 }
@@ -108,29 +115,28 @@
 
 @keyframes slide-out-left {
   from {
-    transform: translateX(0rem);
     opacity: 1;
+    transform: translateX(0);
   }
 
   to {
-    transform: translateX(calc(-1 * var(--slide-in-distance, 0.5rem)));
     opacity: 0;
+    transform: translateX(calc(-1 * var(--slide-in-distance, 0.5rem)));
   }
 }
 
 @keyframes slide-out-right {
   from {
-    transform: translateX(0rem);
     opacity: 1;
+    transform: translateX(0);
   }
 
   to {
-    transform: translateX(var(--slide-in-distance, 0.5rem));
     opacity: 0;
+    transform: translateX(var(--slide-in-distance, 0.5rem));
   }
 
 }
-
 
 :root {
   --list-translate-x: 0.68rem;
@@ -142,6 +148,7 @@
   overflow: hidden;
   transition: all var(--list-translate-x-duration) ease;
 }
+
 .list-enter-from,
 .list-leave-to {
   opacity: 0;

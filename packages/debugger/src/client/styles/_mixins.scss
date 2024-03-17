@@ -1,13 +1,13 @@
 @mixin contained {
-  overflow: hidden;
-  height: 100vh;
   width: 100%;
+  height: 100vh;
+  overflow: hidden;
 }
 
 @mixin reset-list {
-  list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
+  list-style: none;
 }
 
 @mixin padding($block: var(--spacing-sm), $inline: var(--spacing-md)) {
@@ -40,25 +40,25 @@
 
 @mixin flex($justify-content: center, $align-items: center, $flex-direction: row) {
   display: flex;
-  justify-content: $justify-content;
-  align-items: $align-items;
   flex-direction: $flex-direction;
+  align-items: $align-items;
+  justify-content: $justify-content;
 }
 
 @mixin button {
-
   @include flex;
+
   height: var(--button-height, auto);
-  cursor: pointer;
   color: var(--text-color);
   text-decoration: none;
+  cursor: pointer;
   background: transparent;
-  border-radius: calc(var(--radius-md) + 6px);
   border: 0;
+  border-radius: calc(var(--radius-md) + 6px);
 
   &:disabled {
-    opacity: 0.4;
     cursor: not-allowed;
+    opacity: 0.4;
   }
 
   &:hover,
@@ -120,13 +120,13 @@
   }
 
   .shortcut {
-    margin-inline-start: var(--spacing-md);
-    margin-inline-end: 0;
+    margin-inline: var(--spacing-md) 0;
   }
 }
 
 @mixin button-small {
   padding: calc(var(--spacing-sm) + 3px);
+
   &:not(.icon-only) {
     svg {
       margin-inline-end: var(--spacing-sm);

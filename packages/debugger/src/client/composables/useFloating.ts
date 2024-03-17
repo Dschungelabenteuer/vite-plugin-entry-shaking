@@ -7,14 +7,7 @@ import { useFloating as useFloatingUi, autoUpdate, flip, shift, offset } from '@
 type CSSStyles = Record<string, any>;
 export type UseFloatingHandlers = Partial<Record<UseFloatingHandler, () => void>>;
 export type UseFloatingHandler = 'mouseenter' | 'mouseleave' | 'focus' | 'blur' | 'click';
-export type UseFloating = <
-  Reference extends Ref<HTMLButtonElement | null>,
-  Floating extends Ref<any | null>,
->(
-  reference: Reference,
-  floatingEl: Floating,
-  options?: UseFloatingOptions,
-) => {
+export type UseFloatingReturn = {
   /** Is the floating element shown? */
   isOpen: Ref<boolean>;
   /** Shows the floating element. */
@@ -28,6 +21,15 @@ export type UseFloating = <
   /** Floating handlers. */
   handlers?: UseFloatingHandlers;
 };
+
+export type UseFloating = <
+  Reference extends Ref<HTMLButtonElement | null>,
+  Floating extends Ref<any | null>,
+>(
+  reference: Reference,
+  floatingEl: Floating,
+  options?: UseFloatingOptions,
+) => UseFloatingReturn;
 
 export const FLOATING_CONTAINER_ID_VAR = 'floatingContainerId';
 export const FLOATING_MAIN_CONTAINER_ID = 'floating-container-main';
@@ -48,7 +50,6 @@ export const useFloating: UseFloating = (reference, floatingEl, options) => {
     middleware,
     ...options,
   });
-
 
   const open = () => (isOpen.value = true);
   const close = () => (isOpen.value = false);

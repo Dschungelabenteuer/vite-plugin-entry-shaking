@@ -1,7 +1,8 @@
-import { onMounted, onUnmounted } from 'vue';
+import { nextTick, onMounted, onUnmounted, watch } from 'vue';
 
 import type { UseFloating, UseFloatingHandlers } from '@composable/useFloating';
 import { useFloating } from '@composable/useFloating';
+import { getFocusableChildren } from './useFocusTrap';
 
 /**
  * Popover composable based on `useFloating`.
@@ -37,6 +38,14 @@ export const usePopover: UseFloating = (reference, floating, options) => {
 
   onUnmounted(() => {
     body!.removeEventListener('click', handleClickOutside);
+  });
+
+  watch(floatingUi.isOpen, (isOpen) => {
+    if (!isOpen || !floating.value) return;
+    nextTick(() => {
+      console.log(floating.value);
+      console.log(getFocusableChildren(floating.value!));
+    });
   });
 
   return { ...floatingUi, handlers };

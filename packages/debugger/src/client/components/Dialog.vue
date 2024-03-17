@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, provide, onMounted } from 'vue';
 import { randomId } from '#utils';
-import Button from '@component/Button.vue';
+import Button from '@component/Button/Button.vue';
 import { useClassNames } from '@composable/useClassNames';
 import { useFocusTrap } from '@composable/useFocusTrap';
 import { FLOATING_CONTAINER_CLASS, FLOATING_CONTAINER_ID_VAR } from '@composable/useFloating';
@@ -121,56 +121,54 @@ defineExpose({
 <style lang="scss">
 @include color-scheme(light) {
   --dialog-background-color: var(--overall-background-color);
-  --dialog-backdrop-color: #ffffff44;
+  --dialog-backdrop-color: #fff4;
 }
 
 @include color-scheme(dark) {
-  --dialog-background-color: color-mix(in srgb, var(--background-color-alt) 50%, rgb(9, 6, 19));
+  --dialog-background-color: color-mix(in srgb, var(--background-color-alt) 50%, rgb(9 6 19));
   --dialog-backdrop-color: color-mix(in srgb, var(--background-color-alt) 20%, transparent);
 }
 
 .dialog {
-  view-transition-name: dialog;
   position: fixed;
   inset-block: 0;
   display: grid;
   grid-template-rows: 3rem 1fr 3rem;
-  pointer-events: none;
-  transform: translateY(-0.8rem);
-  transform-origin: top center;
-  opacity: 0;
-  transition: all var(--easing-backwards) var(--transition-duration-short);
-  overflow: visible;
-
-  height: v-bind(height);
   width: v-bind(width);
-
-  margin: auto;
-  background-color: var(--dialog-background-color);
-  border-radius: var(--radius-md);
-  border: none;
+  height: v-bind(height);
   padding: 0;
-  box-shadow: var(--dialog-shadow);
+  margin: auto;
+  overflow: visible;
   color: var(--text-subtle-color);
+  pointer-events: none;
+  background-color: var(--dialog-background-color);
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow: var(--dialog-shadow);
   box-shadow:
     0 0 0 1px var(--popover-border-color),
-    0.4px 0.7px 0.9px hsl(var(--shadow-color) / 0.22),
-    1.1px 2px 2.6px -0.8px hsl(var(--shadow-color) / 0.22),
-    2.7px 4.8px 6.2px -1.7px hsl(var(--shadow-color) / 0.22),
-    6.5px 11.4px 14.8px -2.5px hsl(var(--shadow-color) / 0.22);
+    0.4px 0.7px 0.9px hsl(var(--shadow-color) / 22%),
+    1.1px 2px 2.6px -0.8px hsl(var(--shadow-color) / 22%),
+    2.7px 4.8px 6.2px -1.7px hsl(var(--shadow-color) / 22%),
+    6.5px 11.4px 14.8px -2.5px hsl(var(--shadow-color) / 22%);
+  opacity: 0;
+  transition: all var(--easing-backwards) var(--transition-duration-short);
+  transform: translateY(-0.8rem);
+  transform-origin: top center;
+  view-transition-name: dialog;
 
   &[open] {
     pointer-events: inherit;
-    transform: translateY(0);
     opacity: 1;
     transition: all var(--easing-forwards) var(--transition-duration-medium);
+    transform: translateY(0);
   }
 
   &::backdrop {
-    view-transition-name: dialog-backdrop;
-    backdrop-filter: var(--blur-lg);
     background: var(--dialog-backdrop-color);
+    backdrop-filter: var(--blur-lg);
     animation: 300ms ease fade-in forwards;
+    view-transition-name: dialog-backdrop;
   }
 
   &__header {
@@ -178,12 +176,13 @@ defineExpose({
     align-items: center;
     padding: var(--spacing-md) var(--spacing-lg);
     color: var(--text-emphasize-color);
+
     @include border-bottom;
 
     h2 {
-      font-size: var(--font-size-lg);
-      margin-block: 0;
       padding-block: 0;
+      margin-block: 0;
+      font-size: var(--font-size-lg);
     }
   }
 
@@ -192,6 +191,7 @@ defineExpose({
     align-items: center;
     justify-content: end;
     padding: var(--spacing-md) var(--spacing-lg);
+
     @include border-top;
   }
 

@@ -3,7 +3,7 @@ import { ref, computed, nextTick, provide, onMounted } from 'vue';
 
 import { useMediaQuery } from '@vueuse/core';
 import { getCustomProperty, parseCssDuration } from '#utils';
-import Button from '@component/Button.vue';
+import Button from '@component/Button/Button.vue';
 
 import type { SortableColumn } from '@composable/useBrowserData';
 import { useClassNames } from '@composable/useClassNames';
@@ -251,8 +251,8 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .grid__header {
-  height: v-bind(headerHeight);
   grid-template-columns: v-bind(gridTemplateCols);
+  height: v-bind(headerHeight);
 }
 
 :deep(.grid__row) {
@@ -263,7 +263,7 @@ onMounted(() => {
 
 <style lang="scss">
 @include color-scheme(light) {
-  --grid-header-background-color: #ffffffaa;
+  --grid-header-background-color: #fffa;
   --grid-header-background-tint: transparent;
   --grid-header-border-color: var(--overall-border-color);
   --grid-header-background-blur: var(--blur-lg);
@@ -282,29 +282,28 @@ onMounted(() => {
 }
 
 .grid__wrapper {
+  position: relative;
   height: 100%;
-  position: relative;
   overflow: hidden;
-  position: relative;
 }
 
 .grid__wrapper:focus-within,
 .grid__wrapper:focus-visible,
 .grid__wrapper:focus {
-  box-shadow: none;
   outline: 0;
+  box-shadow: none;
 
   &::before {
-    pointer-events: none;
-    content: '';
     position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
     width: 100%;
     height: 100%;
-    box-shadow: inset 0 0 0 1px var(--accent-color);
-    left: 0;
-    top: 0;
+    pointer-events: none;
+    content: '';
     border-radius: var(--radius-md);
-    z-index: 100;
+    box-shadow: inset 0 0 0 1px var(--accent-color);
     opacity: 1;
   }
 }
@@ -313,6 +312,7 @@ onMounted(() => {
   display: grid;
   align-items: center;
   min-width: max-content;
+
   // Somehow using box-shadow for border prevents smooth
   border-bottom: 1px solid var(--overall-border-color);
 
@@ -325,7 +325,7 @@ onMounted(() => {
       justify-content: center;
     }
 
-    &:not(.centered):not(.no-padding) {
+    &:not(.centered, .no-padding) {
       padding-inline: var(--spacing-lg);
     }
   }
@@ -345,14 +345,14 @@ onMounted(() => {
   position: sticky;
   top: 0;
   left: 0;
-  display: grid;
-  width: calc(100% - var(--scrollbar-border-width));
-  align-items: center;
   z-index: 20;
+  display: grid;
+  align-items: center;
+  width: calc(100% - var(--scrollbar-border-width));
   padding-block: 0;
-  border-top-left-radius: var(--radius-md);
   background-color: var(--grid-header-background-color);
   backdrop-filter: var(--grid-header-background-blur);
+  border-top-left-radius: var(--radius-md);
   box-shadow: 0 0 0 1px var(--grid-header-border-color);
 
   svg {
@@ -367,23 +367,23 @@ onMounted(() => {
   }
 
   &::before {
-    content: '';
     position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
     width: 100%;
     height: 100%;
+    content: '';
     background: var(--grid-header-background-tint);
     background-attachment: fixed;
     background-size: 100vw 100vh;
-    left: 0;
-    top: 0;
-    z-index: -1;
     opacity: 0.72;
   }
 
   .button {
     margin: auto;
-    font-size: inherit;
     font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+    font-size: inherit;
   }
 }
 
@@ -393,15 +393,15 @@ onMounted(() => {
   }
 
   &__slot:first-of-type {
-    z-index: 20;
     position: sticky;
     top: 0;
+    z-index: 20;
   }
 
   &__slot:last-of-type {
-    z-index: 20;
     position: sticky;
     bottom: 0;
+    z-index: 20;
   }
 }
 </style>

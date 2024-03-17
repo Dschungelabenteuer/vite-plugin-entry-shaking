@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 
-import Button from '@component/Button.vue';
-import Badge from '@component/Badge.vue';
+import Button from '@component/Button/Button.vue';
+import Badge from '@component/Badge/Badge.vue';
 import Icon from '@component/Icon.vue';
 import type { Panel } from '@composable/usePanel';
 import { useNavigation } from '@composable/useNavigation';
@@ -36,8 +36,8 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
         </router-link>
       </li>
       <li
-        class="metrics-btn"
         v-if="!isOpen"
+        class="metrics-btn"
       >
         <Button
           :id="openBtnId"
@@ -46,7 +46,7 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
           icon="arrow-bar-left"
           :icon-only="true"
           label="Open metrics panel"
-          size="large"
+          class="large"
           @click="toggle"
         />
       </li>
@@ -69,6 +69,7 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
   button {
     @include button;
     @include button-medium;
+
     transition: ease var(--transition-duration-short);
   }
 
@@ -91,15 +92,15 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
       }
 
       &__badge {
-        background: var(--accent-color);
         color: var(--accent-color-contrast);
+        background: var(--accent-color);
       }
     }
   }
 
   .metrics-btn[disabled='true'] {
-    min-width: 1rem;
     display: none;
+    min-width: 1rem;
   }
 
   @media (max-width: $breakpoint-md) {

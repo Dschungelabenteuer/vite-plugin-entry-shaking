@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router';
 import { store } from '#store';
 import type { LogLevel } from 'vite-plugin-entry-shaking';
 import { useBrowserData } from '@composable/useBrowserData';
-import BrowserView from '@views/BrowserView.vue';
+import BrowserView from '@views/Browser/Browser.vue';
 import GridView from '@views/GridView.vue';
 
 import Log from './Log.vue';

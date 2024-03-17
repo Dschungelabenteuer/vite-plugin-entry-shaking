@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import Kbd from '@component/Kbd.vue';
-import Button from '@component/Button.vue';
+import Button from '@component/Button/Button.vue';
 import Popover from '@component/Popover.vue';
 import { usePopover } from '@composable/usePopover';
 import { useClassNames } from '@composable/useClassNames';
@@ -89,8 +89,7 @@ const { styles: popoverStyles } = popover;
       aria-controls="popoverId"
       icon="x"
       :icon-only="true"
-      :class="$class('close-list')"
-      :bordered="true"
+      :class="[$class('close-list'), 'bordered']"
       size="small"
       label="Close shortcuts list"
       @click="emit('close-list')"
@@ -129,36 +128,37 @@ const { styles: popoverStyles } = popover;
 .shortcuts-helper {
   position: absolute;
   bottom: var(--spacing-lg);
-  width: 100%;
-  max-width: 100vw;
   display: flex;
   justify-content: center;
+  width: 100%;
+  max-width: 100vw;
 
   &__meta {
-    pointer-events: none;
     display: flex;
     justify-content: center;
     padding: var(--spacing-sm);
-    margin-inline: calc(var(--spacing-md) * -1);
     margin-block-start: var(--spacing-md);
+    margin-inline: calc(var(--spacing-md) * -1);
     font-size: var(--font-size-xs);
+    pointer-events: none;
+
     @include border-top;
   }
 
   &__list {
-    pointer-events: none;
     display: flex;
+    pointer-events: none;
 
     ul {
-      list-style-type: none;
-      margin: var(--spacing-md);
       padding: 0;
+      margin: var(--spacing-md);
+      list-style-type: none;
     }
 
     li {
       display: flex;
-      margin-inline: var(--spacing-md);
       margin-block-end: var(--spacing-sm);
+      margin-inline: var(--spacing-md);
       transition: all ease var(--transition-duration-short);
 
       &.disabled {
@@ -174,8 +174,8 @@ const { styles: popoverStyles } = popover;
   &__close-list {
     position: absolute;
     top: calc(var(--spacing-md) * -1);
-    background-color: var(--popover-background-color);
     right: 0;
+    background-color: var(--popover-background-color);
   }
 }
 </style>
