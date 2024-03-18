@@ -4,7 +4,7 @@ export type ButtonProps = {
   /** Button label. */
   label: string;
   /** If specified, reason why the button is disabled. */
-  disabled?: string;
+  disabled?: boolean | string;
   /** Button icon. */
   icon?: string;
   /** Should we only show the icon? */

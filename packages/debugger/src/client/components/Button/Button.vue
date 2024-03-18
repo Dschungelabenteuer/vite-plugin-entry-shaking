@@ -22,7 +22,6 @@ const props = withDefaults(defineProps<ButtonProps>(), {
   }),
 });
 
-defineOptions({ inheritAttrs: false });
 const reference = ref<HTMLButtonElement | null>(null);
 const tooltipRef = ref<InstanceType<typeof Tooltip> | null>(null);
 const popoverRef = ref<InstanceType<typeof Popover> | null>(null);
@@ -30,6 +29,7 @@ const button = useButton(props, emit, $class(), reference, tooltipRef, popoverRe
 const { attributes, handlers, tooltip, popover, teleport } = button;
 const { popoverId } = attributes;
 
+defineOptions({ inheritAttrs: false });
 defineExpose({ reference });
 </script>
 
