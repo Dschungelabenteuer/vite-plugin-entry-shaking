@@ -4,11 +4,11 @@ import { useRoute } from 'vue-router';
 
 import type { TransformData } from 'vite-plugin-entry-shaking';
 import { store } from '#store';
-import Button from '@component/Button/Button.vue';
-import Dialog from '@component/Dialog.vue';
-import { useBrowserData } from '@composable/useBrowserData';
+import Button from '@components/Button/Button.vue';
+import Dialog from '@components/Dialog/Dialog.vue';
+import { useBrowserData } from '@views/Browser/useBrowserData';
 import BrowserView from '@views/Browser/Browser.vue';
-import GridView from '@views/GridView.vue';
+import GridView from '@views/Grid/Grid.vue';
 
 import Transform from './Transform.vue';
 import TransformDetails from './TransformDetails.vue';

@@ -25,7 +25,8 @@ type ListenerParams = Parameters<Document['addEventListener']>;
 
 /** Returns all focusable elements of a HTMLElement. */
 export const getFocusableChildren = (element: HTMLElement) =>
-  element.querySelectorAll<FocusableElement>(selector);
+  (element instanceof HTMLElement && element.querySelectorAll<FocusableElement>(selector)) ||
+  undefined;
 
 /**
  * Creates a focus trap on passed item.
@@ -61,7 +62,7 @@ export function useFocusTrap<Reference extends Ref<HTMLElement | null>>(element:
   const refresh = () => {
     if (element.value) {
       const focusableEls = getFocusableChildren(element.value);
-      if (!focusableEls.length) return;
+      if (!focusableEls?.length) return;
       // eslint-disable-next-line prefer-destructuring
       firstFocusable = focusableEls[0];
       lastFocusable = focusableEls[focusableEls.length - 1];

@@ -1,4 +1,11 @@
-import type { Ref, ComponentPublicInstance } from 'vue';
+import { type Ref, type ComponentPublicInstance, toValue } from 'vue';
+
+type TemplateRefTypes =
+  | Ref<HTMLElement | null>
+  | Ref<ComponentPublicInstance | null>
+  | ComponentPublicInstance
+  | HTMLElement
+  | null;
 
 const randomIntString = () => Math.random().toString(36);
 const randomString = () =>
@@ -15,13 +22,19 @@ export const getElementBoundaries = (element: HTMLElement): { top: number; botto
   };
 };
 
-const isComponentInstance = (
-  el: Ref<HTMLElement | null> | Ref<ComponentPublicInstance | null>,
-): el is Ref<ComponentPublicInstance | null> => (el.value ? '$el' in el.value : false);
+export const isComponentInstance = (
+  el: TemplateRefTypes,
+): el is typeof el extends Ref
+  ? Ref<ComponentPublicInstance | null>
+  : ComponentPublicInstance | null => {
+  const element = toValue(el);
+  return element ? '$el' in element : false;
+};
 
-export const getElement = (el: Ref<HTMLElement | null> | Ref<ComponentPublicInstance | null>) => {
-  if (!el?.value) return;
-  return isComponentInstance(el) ? (el.value.$el as HTMLElement) : el.value;
+export const getElement = (el: TemplateRefTypes) => {
+  const element = toValue(el);
+  if (!element) return;
+  return isComponentInstance(element) ? (element.$el as HTMLElement) : element;
 };
 
 export const getCustomProperty = (name: string) =>
@@ -40,3 +53,5 @@ export const formatDuration = (duration: number) => {
   if (duration > 1000) return `${(duration / 1000).toFixed(2)}s`;
   return `${duration.toFixed(1)}ms`;
 };
+
+export const mergeKeyVal = ([key, val]: [key: string, col: any]) => ({ key, ...val });

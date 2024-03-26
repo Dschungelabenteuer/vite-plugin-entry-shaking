@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, toRefs } from 'vue';
 import { useRoute } from 'vue-router';
+import type { LogLevel } from 'vite-plugin-entry-shaking';
 
 import { store } from '#store';
-import type { LogLevel } from 'vite-plugin-entry-shaking';
-import { useBrowserData } from '@composable/useBrowserData';
+import { useBrowserData } from '@views/Browser/useBrowserData';
 import BrowserView from '@views/Browser/Browser.vue';
-import GridView from '@views/GridView.vue';
+import GridView from '@views/Grid/Grid.vue';
 
 import Log from './Log.vue';
 import LogsFilters from './LogsFilters.vue';

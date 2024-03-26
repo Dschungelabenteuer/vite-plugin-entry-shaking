@@ -1,0 +1,15 @@
+export type DialogProps = {
+  /** Dialog id. */
+  id?: string;
+  /** Dialog title. */
+  title?: string;
+  /** Dialog width. */
+  width?: string;
+  /** Dialog height. */
+  height?: string;
+};
+
+export type DialogEvents = {
+  /** Emitted when the dialog is closed. */
+  close: [];
+};

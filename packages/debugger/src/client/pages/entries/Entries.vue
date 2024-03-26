@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, toRefs } from 'vue';
 import { useRoute } from 'vue-router';
-
 import type { EntryData } from 'vite-plugin-entry-shaking';
+
 import { store } from '#store';
-import Button from '@component/Button/Button.vue';
-import Dialog from '@component/Dialog.vue';
-import { useBrowserData } from '@composable/useBrowserData';
+import Button from '@components/Button/Button.vue';
+import Dialog from '@components/Dialog/Dialog.vue';
+import { useBrowserData } from '@views/Browser/useBrowserData';
 import BrowserView from '@views/Browser/Browser.vue';
-import GridView from '@views/GridView.vue';
+import GridView from '@views/Grid/Grid.vue';
 
 import Entry from './Entry.vue';
 import EntriesFilters from './EntriesFilters.vue';

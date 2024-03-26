@@ -3,13 +3,13 @@ import { computed, provide, reactive } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
 
 import type { TransformData } from 'vite-plugin-entry-shaking';
-import Input from '@component/Input.vue';
-import Button from '@component/Button/Button.vue';
-import DropdownMenu from '@component/DropdownMenu.vue';
-import { useClassNames } from '@composable/useClassNames';
+import Input from '@components/Input/Input.vue';
+import Button from '@components/Button/Button.vue';
+import DropdownMenu from '@components/DropdownMenu/DropdownMenu.vue';
+import { useClassNames } from '@composables/useClassNames';
 
-import type { VerticalTab } from '@views/VerticalTabsView.vue';
-import VerticalTabsView from '@views/VerticalTabsView.vue';
+import type { VerticalTab } from '@views/VerticalTabs/VerticalTabs.types';
+import VerticalTabsView from '@views/VerticalTabs/VerticalTabs.vue';
 import TransformMetrics from './details/TransformMetrics.vue';
 import TransformDiffs from './details/TransformDiffs.vue';
 

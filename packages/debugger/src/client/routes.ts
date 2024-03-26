@@ -1,7 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router';
 import { createRouter as createVueRouter, createWebHashHistory } from 'vue-router';
 
-import { doTransition, setAllLazyTransitions } from '@composable/useViewTransition';
+import { doTransition, setAllLazyTransitions } from '@composables/useViewTransition';
 import Home from './pages/home/Home.vue';
 import Logs from './pages/logs/Logs.vue';
 import Entries from './pages/entries/Entries.vue';

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import Icon from '@component/Icon.vue';
-import { useClassNames } from '@composable/useClassNames';
+import { randomId } from '#utils';
+import Icon from '@components/Icon/Icon.vue';
+import { useClassNames } from '@composables/useClassNames';
 import type { CheckboxProps } from './Checkbox.types';
 
 const $class = useClassNames('checkbox');
-const props = defineProps<CheckboxProps>();
-const model = defineModel<boolean>();
+const props = withDefaults(defineProps<CheckboxProps>(), { id: randomId('checkbox') });
+const model = defineModel<boolean | string[]>();
 </script>
 
 <template>
@@ -17,7 +18,7 @@ const model = defineModel<boolean>();
     <input
       :id
       v-model="model"
-      :value="true"
+      :value="value"
       type="checkbox"
       :disabled="disabled"
     />
@@ -33,14 +34,8 @@ const model = defineModel<boolean>();
   --checkbox-border-color: var(--field-border-color);
   --checkbox-border-color-focus: var(--field-border-color-focus);
   --checkbox-border-color-hover: var(--field-border-color-hover);
-}
-
-@include color-scheme(light) {
   --checkbox-background-color: var(--field-background-color);
-}
-
-@include color-scheme(dark) {
-  --checkbox-background-color: transparent;
+  --checkbox-disabled-background-color: var(--field-disabled-background-color);
 }
 
 .checkbox {
@@ -97,7 +92,7 @@ const model = defineModel<boolean>();
       opacity: 0.45;
 
       &::before {
-        background-color: var(--overall-border-color);
+        background-color: var(--checkbox-disabled-background-color);
         opacity: 0.825;
       }
     }

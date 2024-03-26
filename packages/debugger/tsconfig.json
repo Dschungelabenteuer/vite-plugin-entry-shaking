@@ -16,11 +16,12 @@
       "#types": ["./src/types.ts"],
       "#uitypes": ["./src/client/types.ts"],
       "@assets/*": ["./src/client/assets/*"],
-      "@component/*": ["./src/client/components/*"],
-      "@composable/*": ["./src/client/composables/*"],
+      "@components/*": ["./src/client/components/*"],
+      "@composables/*": ["./src/client/composables/*"],
       "@helpers/*": ["./src/client/helpers/*"],
+      "@layout/*": ["./src/client/layout/*"],
       "@views/*": ["./src/client/views/*"],
-      "@page/*": ["./src/client/pages/*"],
+      "@pages/*": ["./src/client/pages/*"],
       "@styles/*": ["./src/client/styles/*"]
     }
   },

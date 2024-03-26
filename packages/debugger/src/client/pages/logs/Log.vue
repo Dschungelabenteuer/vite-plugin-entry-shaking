@@ -2,18 +2,8 @@
 import { computed } from 'vue';
 import { Icon } from '@iconify/vue';
 
-import type { Log } from 'vite-plugin-entry-shaking';
-import { useClassNames } from '@composable/useClassNames';
-import type { GridRowProps } from '@views/GridView.vue';
-
-export type LogProps = GridRowProps<{
-  /** Log message content. */
-  content: Log['content'];
-  /** Log level. */
-  level: Log['level'];
-  /** Log time. */
-  timestamp?: Log['timestamp'];
-}>;
+import { useClassNames } from '@composables/useClassNames';
+import type { LogProps } from './Logs.types';
 
 const $class = useClassNames('log');
 const props = defineProps<LogProps>();
@@ -43,25 +33,25 @@ const logIcon = computed(() => {
 <style lang="scss">
 .log {
   &::before {
-    content: '';
-    pointer-events: none;
     position: absolute;
+    top: 0;
+    left: 0;
     width: 3px;
     height: 100%;
+    pointer-events: none;
+    content: '';
     background-color: var(--overall-border-color);
-    left: 0;
-    top: 0;
   }
 
   &::after {
-    content: '';
-    pointer-events: none;
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    pointer-events: none;
+    content: '';
     background: transparent;
-    left: 0;
-    top: 0;
     opacity: 0.16;
   }
 
@@ -74,8 +64,10 @@ const logIcon = computed(() => {
       @if $color-text {
         color: var(--status-color-#{$status});
       } @else {
-        .log__level {
-          color: var(--status-color-#{$status});
+        .log {
+          &__level {
+            color: var(--status-color-#{$status});
+          }
         }
       }
 
@@ -90,7 +82,7 @@ const logIcon = computed(() => {
           background: linear-gradient(
             60deg,
             var(--status-color-#{$status}) -20%,
-            rgba(0, 0, 0, 0) 20%
+            rgb(0 0 0 / 0%) 20%
           );
         }
       }
@@ -103,15 +95,15 @@ const logIcon = computed(() => {
   @include log-status-color(error, true, true);
 
   &__level {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-inline: var(--spacing-sm);
     font-size: var(--font-size-lg);
     text-align: center;
-    height: 2.5rem;
-    width: 2.5rem;
-    margin-inline: var(--spacing-sm);
-    position: relative;
   }
 
   &__time {

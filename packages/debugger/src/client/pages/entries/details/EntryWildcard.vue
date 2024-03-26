@@ -1,15 +1,9 @@
 <script setup lang="ts">
-import { useClassNames } from '@composable/useClassNames';
-
-import type { GridRowProps } from '@views/GridView.vue';
-
-export type TransformProps = GridRowProps<{
-  name: string;
-  path: string;
-}>;
+import { useClassNames } from '@composables/useClassNames';
+import type { WildcardProps } from '../Entries.types';
 
 const $class = useClassNames('entry-wildcard');
-const props = defineProps<TransformProps>();
+const props = defineProps<WildcardProps>();
 </script>
 
 <template>

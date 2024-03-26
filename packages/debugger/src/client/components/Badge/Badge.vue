@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useClassNames } from '@composable/useClassNames';
+import { useClassNames } from '@composables/useClassNames';
 
 import type { BadgeProps } from './Badge.types';
 import { useBadge } from './useBadge';

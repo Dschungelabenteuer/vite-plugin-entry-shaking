@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
-    "@yungezeit/eslint-config-vue": "^0.0.13",
+    "@yungezeit/eslint-config-vue": "^0.0.14",
     "sass": "^1.71.1",
     "typescript": "^5.4.2",
     "vite": "^5.1.5",

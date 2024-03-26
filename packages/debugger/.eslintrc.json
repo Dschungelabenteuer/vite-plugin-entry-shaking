@@ -22,12 +22,12 @@
             "group": "external"
           },
           {
-            "pattern": "@component/**",
+            "pattern": "@components/**",
             "group": "parent",
             "position": "before"
           },
           {
-            "pattern": "@composable/**",
+            "pattern": "@composables/**",
             "group": "parent",
             "position": "before"
           },

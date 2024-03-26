@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import { userEvent, within, expect } from '@storybook/test';
 
 import Browser from './Browser.vue';
 
@@ -11,34 +10,52 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Text: Story = {
+export const Simple: Story = {
   args: {
-    content: 'Textual badge',
+    name: 'My browser',
   },
 };
 
-export const Number: Story = {
+export const WithIcon: Story = {
   args: {
-    content: 14,
+    name: 'My browser',
+    pageIcon: 'home',
   },
 };
 
-/** Something */
-export const CappedNumber: Story = {
+export const WithFilters: Story = {
   args: {
-    max: 99,
-    content: 150,
+    name: 'My browser',
+    pageIcon: 'home',
   },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await userEvent.type(canvas.getByTestId('email'), 'email@provider.com');
-    await userEvent.type(canvas.getByTestId('password'), 'a-random-password');
-    await userEvent.click(canvas.getByRole('button'));
-    await expect(
-      canvas.getByText(
-        'Everything is perfect. Your account is ready and we should probably get you started!',
-      ),
-    ).toBeInTheDocument();
+  render: (args) => ({
+    components: { Browser },
+    setup() {
+      return { args };
+    },
+    template: `
+    <Browser v-bind="args">
+      <template #filters>
+        Filters content
+      </template>
+    </Browser>
+    `,
+  }),
+};
+
+export const WithAllLoaded: Story = {
+  args: {
+    total: 444,
+    matched: 444,
+    name: 'My browser',
+  },
+};
+
+export const WithSomeLoaded: Story = {
+  args: {
+    total: 444,
+    matched: 128,
+    name: 'My browser',
   },
 };
 

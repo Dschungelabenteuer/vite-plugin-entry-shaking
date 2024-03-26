@@ -1,4 +1,6 @@
-import type { TooltipOptions } from '@component/Tooltip/Tooltip.types';
+import type { ComponentPublicInstance } from 'vue';
+import type { TooltipOptions } from '@components/Tooltip/Tooltip.types';
+import type Button from './Button.vue';
 
 export type ButtonProps = {
   /** Button label. */
@@ -9,10 +11,6 @@ export type ButtonProps = {
   icon?: string;
   /** Should we only show the icon? */
   iconOnly?: boolean;
-  /** If specified, adds a shortcut hint to button action. */
-  shortcut?: string;
-  /** Badge to add to the button. */
-  badge?: string;
   /** Tooltip options. */
   tooltipOptions?: TooltipOptions;
 };
@@ -20,6 +18,8 @@ export type ButtonProps = {
 export type ButtonEvents = {
   /** Emitted when clicking the button. */
   'click': [];
+  /** Emitted when keydown is triggered. */
+  'keydown': [event: KeyboardEvent];
   /** Emitted when pressing the Arrow Up key. */
   'arrow-up': [event: KeyboardEvent];
   /** Emitted when pressing the Arrow Down key. */
@@ -43,3 +43,12 @@ export type ButtonEvents = {
   /** Emitted when tabbing. */
   'tab': [event: KeyboardEvent];
 };
+
+export type ButtonSlots = {
+  /** Button popover content. */
+  popover(props: { isOpen: boolean; isTransitioning: boolean }): any;
+  /** Button trailing content. */
+  after(): any;
+};
+
+export type ButtonInstance = InstanceType<typeof Button> & ComponentPublicInstance;

@@ -7,13 +7,41 @@ body,
   height: 100%;
   margin: 0;
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  background: var(--background-color);
-  background-image: var(--background-gradient);
 }
 
 #wrapper {
   @include contained;
   @include flex-col(center, normal);
+}
+
+.theme-wrapper {
+  @include contained;
+
+  display: flex;
+  color: var(--text-color);
+  background: var(--background-color);
+  background-image: var(--background-gradient);
+}
+
+.toaster-container {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100dvw;
+  padding: var(--spacing-lg);
+  padding-block-end: 5vh;
+  pointer-events: none;
+
+  &.max-reached {
+    .toast:nth-child(1) {
+      opacity: 0;
+      scale: 0.92;
+    }
+  }
 }
 
 ::selection {

@@ -1,4 +1,5 @@
 import { computed } from 'vue';
+
 import type { BadgeProps } from './Badge.types';
 
 export const NUMERIC_MAX_SIGN = '+';

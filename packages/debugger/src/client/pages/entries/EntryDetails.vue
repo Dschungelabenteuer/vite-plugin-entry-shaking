@@ -1,36 +1,25 @@
 <script setup lang="ts">
-import { computed, provide, reactive } from 'vue';
+import { computed, inject, provide, reactive } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
 
-import type { EntryData } from 'vite-plugin-entry-shaking';
-import Input from '@component/Input.vue';
-import Button from '@component/Button/Button.vue';
-import { useClassNames } from '@composable/useClassNames';
-import type { VerticalTab } from '@views/VerticalTabsView.vue';
-import VerticalTabsView from '@views/VerticalTabsView.vue';
+import Input from '@components/Input/Input.vue';
+import Button from '@components/Button/Button.vue';
+import type { Toaster } from '@components/Toast/Toast.types';
+import DropdownMenu from '@components/DropdownMenu/DropdownMenu.vue';
+import { useClassNames } from '@composables/useClassNames';
+import type { VerticalTab } from '@views/VerticalTabs/VerticalTabs.types';
+import VerticalTabsView from '@views/VerticalTabs/VerticalTabs.vue';
 import EntryMetrics from './details/EntryMetrics.vue';
 import EntryDiffs from './details/EntryDiffs.vue';
 import EntryExports from './details/EntryExports.vue';
 import EntryWildcards from './details/EntryWildcards.vue';
-
-export type EntryDetailsProps = {
-  /** Entry path. */
-  path?: string;
-  /** Entry data. */
-  entry?: EntryData;
-};
-
-type EntryDetailsEvents = {
-  /** Emitted when the end of the tab list is reached. */
-  'end-reached': [];
-};
+import type { EntryDetailsEvents, EntryDetailsProps } from './Entries.types';
 
 const $class = useClassNames('entry-details');
 const emit = defineEmits<EntryDetailsEvents>();
 const props = defineProps<EntryDetailsProps>();
 const iconOnly = useMediaQuery('(max-width: 600px)');
-provide('entry-details', reactive(props));
-
+const $toaster = inject<Toaster>('$toaster')!;
 const tabs = computed<VerticalTab[]>(() => [
   {
     id: 'metrics',
@@ -62,6 +51,23 @@ const tabs = computed<VerticalTab[]>(() => [
   },
 ]);
 
+const copyAbsolutePath = () => {
+  navigator.clipboard.writeText(props.entry?.path ?? '');
+  $toaster.add({
+    type: 'success',
+    message: 'Copied absolute path to clipboard!',
+  });
+};
+
+const copyRelativePath = () => {
+  navigator.clipboard.writeText(props.entry?.relativePath ?? '');
+  $toaster.add({
+    type: 'success',
+    message: 'Copied relative path to clipboard!',
+  });
+};
+
+provide('entry-details', reactive(props));
 provide('depth', 1);
 </script>
 
@@ -78,11 +84,19 @@ provide('depth', 1);
         <template #after>
           <Button
             icon="clipboard"
-            :floating-placement="'bottom-end'"
+            label="Dropdown"
             :icon-only="true"
-            label="Copy file path"
           >
-            <template #popover> hohohooh </template>
+            <template #popover="{ isOpen, isTransitioning }">
+              <DropdownMenu
+                :is-open
+                :is-transitioning
+                :items="[
+                  { label: 'Copy absolute path', action: copyAbsolutePath },
+                  { label: 'Copy relative path', action: copyRelativePath },
+                ]"
+              />
+            </template>
           </Button>
         </template>
       </Input>

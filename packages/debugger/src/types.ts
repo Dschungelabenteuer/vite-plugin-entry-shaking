@@ -51,27 +51,6 @@ export interface ChannelStore {
 /** Sort direction */
 export type SortDirection = 'asc' | 'desc';
 
-/** ID of file we want to compute diffs from. */
-export type DiffsFileId = string & { __brand: 'DiffsFileId' };
-
-/** Diffs request payload sent to Worker. */
-export interface DiffsRequestPayload {
-  /** Absolute path to the file. */
-  id: DiffsFileId;
-  /** Original source content. */
-  from: string;
-  /** Updated source content. */
-  to: string;
-}
-
-/** Diffs response payload received from Worker. */
-export interface DiffsResponsePayload {
-  /** Absolute path to the file. */
-  id: DiffsFileId;
-  /** All diffs content (source code with diff lines). */
-  result: string;
-}
-
 /**
  * Plugin channel messages.
  * This defines the types of all accepted messages between client and Vite server

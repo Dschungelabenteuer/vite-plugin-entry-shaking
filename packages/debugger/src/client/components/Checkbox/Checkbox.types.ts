@@ -1,10 +1,10 @@
 export type CheckboxProps = {
   /** Input ID. */
-  id: string;
+  id?: string;
   /** Option label. */
   label: string;
-  /** Model value. */
-  modelValue: boolean;
+  /** Value. */
+  value?: string;
   /** Is the option disabled? */
   disabled?: boolean;
 };

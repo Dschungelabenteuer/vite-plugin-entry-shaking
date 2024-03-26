@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import viteLogo from '@assets/vite.svg?raw';
-
 import { store } from '#store';
-import Illustration from '@component/Illustration.vue';
+import Illustration from '@components/Illustration/Illustration.vue';
 </script>
 
 <template>
@@ -27,18 +26,20 @@ import Illustration from '@component/Illustration.vue';
   --ilustration-max-width: 420px;
 
   @include flex;
-  height: 100%;
+
   width: 100%;
   max-width: 100vw;
+  height: 100%;
 
   &__illustration {
     display: block;
-    max-width: var(--ilustration-max-width);
     width: 100%;
+    max-width: var(--ilustration-max-width);
   }
 
   &__title {
     transform: translateX(calc(-1 * var(--name-margin)));
+
     svg {
       width: var(--vite-logo-size);
       height: var(--vite-logo-size);
@@ -49,16 +50,17 @@ import Illustration from '@component/Illustration.vue';
 
   &__tagline {
     @include flex(normal, center);
-    text-transform: uppercase;
-    letter-spacing: 0.12rem;
+
     font-weight: 700;
     color: var(--tagline-color);
+    text-transform: uppercase;
+    letter-spacing: 0.12rem;
   }
 
   &__name {
     font-size: var(--font-size-2xl);
-    transform: translateX(var(--name-margin));
     color: var(--name-color);
+    transform: translateX(var(--name-margin));
   }
 
   @container (max-width: #{$breakpoint-md}) {

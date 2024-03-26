@@ -3,12 +3,12 @@ import { computed, reactive, useAttrs, useSlots } from 'vue';
 
 import { randomId } from '#utils';
 import type { Booleanish, ShortEmits } from '#uitypes';
-import type Tooltip from '@component/Tooltip.vue';
-import type Popover from '@component/Popover.vue';
-import { useTooltip } from '@composable/useTooltip';
-import { usePopover } from '@composable/usePopover';
-import { useTeleport } from '@composable/useTeleport';
-import type { UseFloatingReturn } from '@composable/useFloating';
+import type Tooltip from '@components/Tooltip/Tooltip.vue';
+import type Popover from '@components/Popover/Popover.vue';
+import { useTooltip } from '@components/Tooltip/useTooltip';
+import { usePopover } from '@components/Popover/usePopover';
+import { useTeleport } from '@composables/useTeleport';
+import type { UseFloatingReturn } from '@composables/useFloating';
 import type { ButtonEvents, ButtonProps } from './Button.types';
 
 export function useButton(
@@ -68,6 +68,7 @@ function useButtonAttributes(props: ButtonProps, className: string, popover: Use
     ariaExpanded,
     tabindex,
     popoverId,
+    title: props.disabled && typeof props.disabled === 'string' ? props.disabled : undefined,
     class: classes,
   });
 }

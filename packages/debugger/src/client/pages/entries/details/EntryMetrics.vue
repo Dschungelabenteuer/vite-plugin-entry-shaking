@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { inject } from 'vue';
-import type { EntryDetailsProps } from '../EntryDetails.vue';
+
+import type { EntryDetailsProps } from '../Entries.types';
 
 const entryDetails = inject<EntryDetailsProps>('entry-details')!;
 </script>

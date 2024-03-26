@@ -2,9 +2,9 @@
 import { computed } from 'vue';
 import type { TransformData } from 'vite-plugin-entry-shaking';
 import { formatDuration } from '#utils';
-import Button from '@component/Button/Button.vue';
-import { useClassNames } from '@composable/useClassNames';
-import type { GridRowProps } from '@views/GridView.vue';
+import Button from '@components/Button/Button.vue';
+import { useClassNames } from '@composables/useClassNames';
+import type { GridRowProps } from '@views/Grid/Grid.types';
 
 export type TransformProps = GridRowProps<
   TransformData & {

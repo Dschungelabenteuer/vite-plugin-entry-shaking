@@ -111,8 +111,6 @@
 
 }
 
-
-
 @keyframes slide-out-left {
   from {
     opacity: 1;
@@ -135,7 +133,16 @@
     opacity: 0;
     transform: translateX(var(--slide-in-distance, 0.5rem));
   }
+}
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 :root {
@@ -153,4 +160,17 @@
 .list-leave-to {
   opacity: 0;
   transform: translateX(var(--list-translate-x));
+}
+
+
+.toaster-enter-active,
+.toaster-leave-active {
+  overflow: hidden;
+  transition: all 200ms ease;
+}
+
+.toaster-enter-from,
+.toaster-leave-to {
+  opacity: 0;
+  transform: scale(0.92) translateY(1rem);
 }

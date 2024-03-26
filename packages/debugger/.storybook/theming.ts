@@ -1,4 +1,5 @@
 import { h, reactive } from 'vue';
+import type { StoryContext, StoryFn } from '@storybook/vue3';
 import ThemeWrapper from './ThemeWrapper.vue';
 
 export type ThemeProps = {
@@ -7,7 +8,7 @@ export type ThemeProps = {
 
 const theme = reactive<ThemeProps>({ colorScheme: 'light' });
 
-export const themeDecorator = (storyFn, context) => {
+export const themeDecorator = (storyFn: () => ReturnType<StoryFn>, context: StoryContext) => {
   theme.colorScheme = context.globals.colorScheme || 'light';
   const story = storyFn();
 

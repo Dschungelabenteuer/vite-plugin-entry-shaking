@@ -16,7 +16,7 @@ let hot: ViteHotContext;
 export async function useHotModule(): Promise<ViteHotContext> {
   if (hot) return hot;
 
-  const { createHotContext } = await import(pathToClient);
+  const { createHotContext } = await import(/* @vite-ignore */ pathToClient);
   hot = createHotContext();
 
   watchServerStatus(hot);

@@ -36,6 +36,7 @@
 
   // Field (light).
   --field-background-color: var(--overall-background-color);
+  --field-disabled-background-color: #ddd;
   --field-border-color: var(--overall-border-color-stronger);
   --field-border-color-dimmed: var(--overall-border-color);
   --field-text-color: var(--text-color);
@@ -86,6 +87,7 @@
 
   // Field (dark).
   --field-background-color: #0004;
+  --field-disabled-background-color: #0004;
   --field-border-color: var(--overall-border-color-stronger);
   --field-border-color-dimmed: var(--overall-border-color);
   --field-text-color: var(--text-color);

@@ -1,24 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import type { EntryData } from 'vite-plugin-entry-shaking';
 import { formatDuration } from '#utils';
-import Button from '@component/Button/Button.vue';
-import Icon from '@component/Icon.vue';
-import { useClassNames } from '@composable/useClassNames';
-import type { GridRowProps } from '@views/GridView.vue';
-
-type EntryProps = GridRowProps<
-  EntryData & {
-    /** Entry file path. */
-    path: string;
-  }
->;
-
-type EntryEvents = {
-  /** Emitted when the user clicks on the "view" button. */
-  view: [path: string];
-};
+import Button from '@components/Button/Button.vue';
+import Icon from '@components/Icon/Icon.vue';
+import { useClassNames } from '@composables/useClassNames';
+import type { EntryEvents, EntryProps } from './Entries.types';
 
 const $class = useClassNames('entry');
 const emit = defineEmits<EntryEvents>();
@@ -32,7 +19,7 @@ const selfTime = computed(() => formatDuration(props.item.self));
     <Button
       label="Details"
       icon="eye"
-      :disable-tooltip="true"
+      :tooltip-options="{ disabled: true }"
       :icon-only="true"
       @click="emit('view', item.path)"
     />
