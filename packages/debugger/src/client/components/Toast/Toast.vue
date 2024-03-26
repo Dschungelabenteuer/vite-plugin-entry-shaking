@@ -2,9 +2,10 @@
 import { computed } from 'vue';
 import Icon from '@components/Icon/Icon.vue';
 import { useClassNames } from '@composables/useClassNames';
-import type { ToastProps } from './Toast.types';
+import type { ToastProps, ToastSlots } from './Toast.types';
 
 const $class = useClassNames('toast');
+const slots = defineSlots<ToastSlots>();
 const props = defineProps<ToastProps>();
 const classes = computed(() => [$class(), props.type]);
 const icon = computed(() => {

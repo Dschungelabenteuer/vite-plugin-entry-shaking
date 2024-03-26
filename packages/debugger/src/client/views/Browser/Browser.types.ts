@@ -23,6 +23,9 @@ export type BrowserEvents = {
 };
 
 export type BrowserSlots = {
+  /** Browser content. */
+  default(): any;
+  /** Browser filters. */
   filters(): any;
 };
 

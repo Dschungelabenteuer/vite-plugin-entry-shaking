@@ -29,7 +29,7 @@ const { id, title, sort, columns, items, filters, matched, methods } = useBrowse
   id: 'entries',
   title: 'List of entries',
   source,
-  filterFn: () => true,
+  filterFn: (item, levels) => levels.includes(item.isImplicit ? 'implicit' : 'explicit'),
   defaultFilters,
   columns: {
     icon: {

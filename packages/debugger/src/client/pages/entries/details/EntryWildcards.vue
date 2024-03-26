@@ -29,7 +29,11 @@ const { id, title, sort, columns, items, filters, matched, methods } = useBrowse
   id: 'entry-exports',
   title: 'List of exports',
   source,
-  filterFn: () => true,
+  filterFn: (item, f) => {
+    if (f.includes('named') && item.name !== '-') return true;
+    if (f.includes('direct') && item.name === '-') return true;
+    return false;
+  },
   defaultFilters,
   columns: {
     name: {

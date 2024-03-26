@@ -10,11 +10,12 @@ import {
 import Toaster from '@components/Toast/Toaster.vue';
 import { useClassNames } from '@composables/useClassNames';
 import { FLOATING_CONTAINER_CLASS, FLOATING_CONTAINER_ID_VAR } from '@composables/useFloating';
-import type { DialogEvents, DialogProps } from './Dialog.types';
+import type { DialogEvents, DialogProps, DialogSlots } from './Dialog.types';
 import { useDialog } from './useDialog';
 
 const $class = useClassNames('dialog');
 const emit = defineEmits<DialogEvents>();
+const slots = defineSlots<DialogSlots>();
 const props = withDefaults(defineProps<DialogProps>(), {
   id: randomId('dialog'),
   title: undefined,

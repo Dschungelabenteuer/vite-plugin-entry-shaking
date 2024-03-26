@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useClassNames } from '@composables/useClassNames';
-import type { TooltipProps } from './Tooltip.types';
+import type { TooltipProps, TooltipSlots } from './Tooltip.types';
 
 const $class = useClassNames('tooltip');
+const slots = defineSlots<TooltipSlots>();
 const props = defineProps<TooltipProps>();
 
 const stateClass = computed(() => (props.isOpen ? 'open' : ''));
 const tooltipClass = computed(() => [$class(), stateClass.value]);
-
 </script>
 
 <template>

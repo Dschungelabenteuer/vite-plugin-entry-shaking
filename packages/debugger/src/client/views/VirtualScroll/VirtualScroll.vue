@@ -2,10 +2,15 @@
 import { computed, ref, useSlots } from 'vue';
 import { VIRTUAL_SCROLL_WRAPPER_CLASS } from './useVirtualScroll';
 import { useTransitionableVirtualScroll } from './useTransitionableVirtualScroll';
-import type { VirtualScrollViewEvents, VirtualScrollViewProps } from './VirtualScroll.types';
+import type {
+  VirtualScrollEvents,
+  VirtualScrollProps,
+  VirtualScrollSlots,
+} from './VirtualScroll.types';
 
-const emit = defineEmits<VirtualScrollViewEvents>();
-const props = withDefaults(defineProps<VirtualScrollViewProps>(), {
+const emit = defineEmits<VirtualScrollEvents>();
+const slots = defineSlots<VirtualScrollSlots>();
+const props = withDefaults(defineProps<VirtualScrollProps>(), {
   prerenderedBeforeStart: 0,
   prerenderAfterEnd: 0,
   overflowDelay: 0,
@@ -13,10 +18,10 @@ const props = withDefaults(defineProps<VirtualScrollViewProps>(), {
   axis: 'y',
 });
 
-const slots = useSlots();
+const slotList = useSlots();
 const containerRef = ref<HTMLElement | null>(null);
 const contentRef = ref<HTMLElement | null>(null);
-const beforeItemsCount = computed(() => (slots.before ? 1 : 0));
+const beforeItemsCount = computed(() => (slotList.before ? 1 : 0));
 const {
   getItemDelay,
   onItemRendered,

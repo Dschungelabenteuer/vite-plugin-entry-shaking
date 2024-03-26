@@ -1,4 +1,4 @@
-export interface VirtualScrollViewProps {
+export interface VirtualScrollProps {
   /** Items of the virtual scroll. */
   items: any[];
   /** Size (px) of the virtual scroll container. */
@@ -15,11 +15,20 @@ export interface VirtualScrollViewProps {
   axis?: 'x' | 'y';
 }
 
-export type VirtualScrollViewEvents = {
+export type VirtualScrollEvents = {
   /** Emitted when virutal scroll container is resized. */
   resize: [{ width: number; height: number }];
   /** Emitted when the list is being scrolled. */
   scroll: [];
   /** Emitted when all visible items are rendered (after transition). */
   rendered: [];
+};
+
+export type VirtualScrollSlots = {
+  /** Content of a single item. */
+  default(prop: { item: any }): any;
+  /** Content shown before the scroll container. */
+  before(): any;
+  /** Content shown after the scroll container. */
+  after(): any;
 };

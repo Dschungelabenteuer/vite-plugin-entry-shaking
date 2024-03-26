@@ -2,10 +2,11 @@
 import { computed, provide } from 'vue';
 
 import { useClassNames } from '@composables/useClassNames';
-import type { BrowserEvents, BrowserProps, BrowserSearchFn } from './Browser.types';
+import type { BrowserEvents, BrowserProps, BrowserSearchFn, BrowserSlots } from './Browser.types';
 import BrowserHeader from './Header/BrowserHeader.vue';
 
 const $class = useClassNames('browser-view');
+const slots = defineSlots<BrowserSlots>();
 const emit = defineEmits<BrowserEvents>();
 const props = withDefaults(defineProps<BrowserProps>(), {
   pageIcon: undefined,

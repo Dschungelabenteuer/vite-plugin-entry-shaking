@@ -24,7 +24,11 @@ const { id, title, sort, columns, items, filters, matched, methods } = useBrowse
   id: 'entry-exports',
   title: 'List of exports',
   source,
-  filterFn: (item, f) => true,
+  filterFn: (item, f) => {
+    if (f.includes('defaultImport') && item.importDefault) return true;
+    if (f.includes('selfDefined') && item.selfDefined) return true;
+    return false;
+  },
   defaultFilters,
   columns: {
     flags: {

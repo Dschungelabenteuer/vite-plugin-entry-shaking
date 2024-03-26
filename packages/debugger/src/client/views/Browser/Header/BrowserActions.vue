@@ -9,7 +9,7 @@ import type { BrowserProps, BrowserSlots, BrowserSearchFn } from '../Browser.typ
 
 const $class = inject<ClassNameFn>('$class')!;
 const props = defineProps<Required<BrowserProps>>();
-const slots = defineSlots<BrowserSlots>();
+const slots = defineSlots<Pick<BrowserSlots, 'filters'>>();
 const headerSearchRef = ref<HTMLElement | null>(null);
 const headerFilterButtonRef = ref<HTMLElement | null>(null);
 const transitions = useViewTransition({

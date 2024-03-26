@@ -10,7 +10,9 @@ import { FLOATING_CONTAINER_CLASS, FLOATING_CONTAINER_ID_VAR } from '@composable
 import { useColorScheme } from '@composables/useColorScheme';
 import { usePanel } from '@views/Panel/usePanel';
 import Metrics from '@pages/metrics/Metrics.vue';
+import { BaseSlots } from './Base.types';
 
+const slots = defineSlots<BaseSlots>();
 const dialogContainerId = inject<string>(DIALOG_CONTAINER_ID_VAR)!;
 const floatingContainerId = inject<string>(FLOATING_CONTAINER_ID_VAR)!;
 

@@ -13,3 +13,10 @@ export type DialogEvents = {
   /** Emitted when the dialog is closed. */
   close: [];
 };
+
+export type DialogSlots = {
+  /** Dialog content. */
+  default(): any;
+  /** Dialog footer. */
+  footer(): any;
+};

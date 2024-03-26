@@ -4,6 +4,11 @@ export type TooltipProps = {
   isOpen: boolean;
 };
 
+export type TooltipSlots = {
+  /** Tooltip content. */
+  default(): any;
+};
+
 export type TooltipOptions = {
   /** Prefered placement of the tooltip. */
   placement?: Placement;

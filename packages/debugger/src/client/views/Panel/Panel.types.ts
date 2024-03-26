@@ -9,6 +9,13 @@ export type PanelProps = {
   closePanelLabel: string;
 };
 
+export type PanelSlots = {
+  /** Panel content. */
+  default(): any;
+  /** Panel footer. */
+  footer(): any;
+};
+
 export type Panel = {
   /** ID for the close button element. */
   closeBtnId: string;

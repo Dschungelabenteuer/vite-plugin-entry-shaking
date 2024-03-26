@@ -2,11 +2,12 @@
 import { inject, nextTick, provide, ref, watch } from 'vue';
 import type Button from '@components/Button/Button.vue';
 import { useClassNames } from '@composables/useClassNames';
-import type { PanelProps, Panel } from './Panel.types';
+import { type PanelProps, type Panel, PanelSlots } from './Panel.types';
 import PanelHeader from './PanelHeader.vue';
 import PanelFooter from './PanelFooter.vue';
 
 const $class = useClassNames('panel');
+const slots = defineSlots<PanelSlots>();
 const props = defineProps<PanelProps>();
 
 const closeBtnRef = ref<InstanceType<typeof Button> | null>(null);

@@ -8,6 +8,11 @@ export type ToastProps = {
   type?: ToastType;
 };
 
+export type ToastSlots = {
+  /** Toast content. */
+  default(): any;
+};
+
 export type ToastOptions = {
   /** Should the toast be autoclosed after some delay. */
   autoclose?: boolean;
