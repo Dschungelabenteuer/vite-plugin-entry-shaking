@@ -1,17 +1,8 @@
-export type Metric = {
-  /** Metric icon. */
-  icon?: string;
-  /** Metric label. */
-  label: string;
-  /** Metric value. */
-  value: string;
-  /** Metric type. */
-  type: 'duration' | 'count';
-};
+import type { MetricProps } from '@components/Metric/Metric.types';
 
 export type MetricsProps = {
   /** Header metric. */
-  header: Metric;
+  header: MetricProps;
   /** Content metrics. */
-  details: Metric[];
+  details: MetricProps[];
 };

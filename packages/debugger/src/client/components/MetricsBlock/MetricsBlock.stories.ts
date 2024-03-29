@@ -7,7 +7,7 @@ import { paddingDecorator } from '$storybook/decorators';
 
 const meta = {
   component: MetricsBlock,
-  title: 'Layout/MetricsBlock',
+  title: 'Components/MetricsBlock',
   tags: ['autodocs'],
   decorators: [paddingDecorator],
 } satisfies Meta<typeof MetricsBlock>;

@@ -64,14 +64,15 @@ const isTransitioning = ref(false);
     1.1px 2px 2.6px -0.8px hsl(var(--shadow-color) / 22%),
     2.7px 4.8px 6.2px -1.7px hsl(var(--shadow-color) / 22%),
     6.5px 11.4px 14.8px -2.5px hsl(var(--shadow-color) / 22%);
-  scale: 0.94;
+  opacity: 0;
+  transition: all var(--easing-forwards) var(--transition-duration-medium);
+  scale: 0.9;
 
   &.open {
     pointer-events: all;
     visibility: visible;
     backdrop-filter: var(--blur-lg);
     opacity: 0.94;
-    transition: all var(--easing-forwards) var(--transition-duration-medium);
     transform: translateY(0);
     scale: 1;
   }

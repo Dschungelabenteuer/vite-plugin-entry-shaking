@@ -88,6 +88,8 @@ const { menu, ids, tablistWidth, setActiveTab } = useVerticalTabs(props, tabButt
     }
 
     .button {
+      --button-height: 3.75rem;
+
       position: relative;
       justify-content: flex-start;
       width: 100%;
@@ -121,6 +123,11 @@ const { menu, ids, tablistWidth, setActiveTab } = useVerticalTabs(props, tabButt
       &.active {
         color: var(--text-emphasize-color);
         background: transparent;
+
+        &:not(:focus) {
+          outline-color: transparent;
+          box-shadow: none;
+        }
 
         &::after {
           inset-inline-end: -1px;

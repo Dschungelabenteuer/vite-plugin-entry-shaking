@@ -13,11 +13,13 @@ import type {
   RemoveReadonly,
   WildcardExports,
   PluginEntries,
+  DiagnosticsConfig,
 } from './types';
 
 import EntryCleaner from './cleanup-entry';
 import Parsers from './parse';
 import Utils from './utils';
+import { DiagnosticKinds } from './diagnostics';
 
 /**
  * Analyzes target entry files.
@@ -184,34 +186,23 @@ function cleanupEntry(
   exps: ExportSpecifier[],
   definesExportedCode: boolean,
 ) {
-  const diagnosticName = 'definedWithinEntry';
+  const diagnosticName: keyof DiagnosticsConfig = 'definedWithinEntry';
   const updatedSource = EntryCleaner.cleanupEntry(source, exportsMap, exps);
   const charactersDiff = source.length - updatedSource.length;
   const requiresDiagnostic =
     ctx.diagnostics.isEnabled(diagnosticName) &&
     definesExportedCode &&
     updatedSource.includes('import');
-  ctx.logger.debug(`Cleaned-up entry "${entryPath}" (-${charactersDiff} chars)`);
 
   if (requiresDiagnostic) {
-    const base = `Entry file "${entryPath}" exports code it defines and imports code from other modules.`;
+    const diagnostic = DiagnosticKinds[diagnosticName](entryPath);
     const diagnosticCtx = { path: entryPath };
-    const diagnosticIndex = ctx.diagnostics.add(
-      diagnosticName,
-      `${base} Such imports are never cleaned up because they could have side-effects and be consumed by` +
-        ` code defined by the entry file. Determining whether such imports are unused could be expensive.` +
-        ` This means that if you were to import any entity defined by that entry file, it could result in unnecessary requests.` +
-        `\n` +
-        `You may ignore this warning by setting the \`diagnostics.${diagnosticName}\` option to false.`,
-      diagnosticCtx,
-    );
+    const diagnosticIndex = ctx.diagnostics.add(diagnosticName, diagnostic.message, diagnosticCtx);
     diagnostics.add(diagnosticIndex);
   }
 
-  return {
-    updatedSource,
-    charactersDiff,
-  };
+  ctx.logger.debug(`Cleaned-up entry "${entryPath}" (-${charactersDiff} chars)`);
+  return { updatedSource, charactersDiff };
 }
 
 /**
@@ -337,28 +328,20 @@ async function registerWildcardImportIfNeeded(
     const maxDepthReached = depth >= (ctx.options.maxWildcardDepth ?? 0);
 
     if (maxDepthReached) {
+      const diagnosticName: keyof DiagnosticsConfig = 'maxDepthReached';
+      const diagnostic = DiagnosticKinds[diagnosticName](path, importedFrom);
       if (importsEntry) {
-        const base = `Max depth reached, but ${importedFrom} wildcard-imports from another entry "${path}", all good!`;
-        ctx.logger.debug(base);
+        ctx.logger.debug(diagnostic.base);
       } else {
-        const diagnosticName = 'maxDepthReached';
-        const base = `Max depth reached at path "${importedFrom}", skipping wildcard import analysis of "${path}"…`;
-        const requiresDiagnostic = ctx.diagnostics.isEnabled(diagnosticName);
-        ctx.logger.debug(base);
-
-        if (requiresDiagnostic) {
+        if (ctx.diagnostics.isEnabled(diagnosticName)) {
           const diagnosticCtx = { path, importedFrom };
           const diagnosticIndex = ctx.diagnostics.add(
             diagnosticName,
-            `${base} This means that if you were to import one of the entities exported by ${path} from ${importedFrom},` +
-              ` it would load the cleaned-up entry file which still includes the unmutated wildcard import, resulting in` +
-              ` all subsequent modules being loaded by Vite. Consider either adding ${path} to the "targets" option or a` +
-              ` bit of refactoring to minimize usage of wildcards.` +
-              `\n` +
-              `You may ignore this warning by setting the \`diagnostics.${diagnosticName}\` option to false.`,
+            diagnostic.message,
             diagnosticCtx,
           );
           diagnostics.add(diagnosticIndex);
+          ctx.logger.debug(diagnostic.base);
         }
 
         return 0;

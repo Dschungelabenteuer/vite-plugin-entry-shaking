@@ -121,7 +121,7 @@ defineExpose({ reference });
   justify-content: center;
 
   // Layout.
-  height: var(--button-height, 2rem);
+  height: var(--button-height, 2.45rem);
   padding: calc(var(--spacing-md) + 3px);
   margin-inline: var(--spacing-sm);
 
@@ -199,14 +199,8 @@ defineExpose({ reference });
   }
 
   &.small {
-    height: var(--button-height-small, 1.725rem);
-    padding: calc(var(--spacing-sm) + 3px);
-
-    &:not(.icon-only) {
-      svg {
-        margin-inline-end: var(--spacing-sm);
-      }
-    }
+    height: var(--button-height-small, 2rem);
+    padding: calc(var(--spacing-md) + 3px);
   }
 
   &.large {

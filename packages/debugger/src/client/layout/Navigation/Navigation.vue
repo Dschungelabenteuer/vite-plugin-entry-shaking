@@ -2,8 +2,7 @@
 import { inject } from 'vue';
 
 import Button from '@components/Button/Button.vue';
-import Badge from '@components/Badge/Badge.vue';
-import Icon from '@components/Icon/Icon.vue';
+import RouterButton from '@components/RouterButton/RouterButton.vue';
 import { useClassNames } from '@composables/useClassNames';
 import type { Panel } from '@views/Panel/Panel.types';
 import { useNavigation } from './useNavigation';
@@ -21,19 +20,12 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
         v-for="link in links"
         :key="link.href"
       >
-        <router-link :to="link.href">
-          <Icon
-            v-if="link.icon"
-            :class="$class('icon')"
-            :name="link.icon"
-          />
-          {{ link.name }}
-          <Badge
-            v-if="link.count !== undefined"
-            :class="$class('badge')"
-            :content="String(link.count)"
-          />
-        </router-link>
+        <RouterButton
+          :href="link.href"
+          :icon="link.icon"
+          :label="link.name"
+          :count="link.count"
+        />
       </li>
       <li
         v-if="!isOpen"
@@ -63,38 +55,10 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
 
   li {
     position: relative;
-  }
+    font-size: var(--font-size-sm);
 
-  a,
-  button {
-    @include button;
-    @include button-medium;
-
-    transition: ease var(--transition-duration-short);
-  }
-
-  &__icon {
-    margin-inline-end: var(--spacing-md);
-    font-size: var(--font-size-md);
-    opacity: 0.6;
-  }
-
-  &__badge {
-    margin-inline-start: var(--spacing-md);
-  }
-
-  a.router-link-active {
-    color: var(--accent-color);
-
-    .navigation {
-      &__icon {
-        opacity: 1;
-      }
-
-      &__badge {
-        color: var(--accent-color-contrast);
-        background: var(--accent-color);
-      }
+    .button {
+      font-size: var(--font-size-sm);
     }
   }
 

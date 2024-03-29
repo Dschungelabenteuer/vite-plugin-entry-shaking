@@ -59,6 +59,7 @@ const icon = computed(() => {
   margin-inline: var(--toast-margin-inline);
   pointer-events: none;
   background: var(--toast-background-color);
+  backdrop-filter: blur(4px);
   border-inline-start: 5px solid;
   border-radius: var(--radius-md);
   box-shadow:

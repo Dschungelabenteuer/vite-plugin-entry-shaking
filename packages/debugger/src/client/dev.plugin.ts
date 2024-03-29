@@ -4,10 +4,13 @@ import { entries } from '../../mocks/entries';
 import { transforms } from '../../mocks/transforms';
 import { logs } from '../../mocks/logs';
 import { metrics } from '../../mocks/metrics';
+import { createDiagnostics } from '../../mocks/diagnostics';
 
 import { READY, wsMessageName } from '../shared';
 import { JSONMap } from '../serializer';
 import type { ConsumerPackageInfo } from '../types';
+
+const diagnostics = createDiagnostics(entries);
 
 const _ = wsMessageName;
 
@@ -21,7 +24,7 @@ function devPlugin() {
     name: 'vpes-client-dev-plugin',
     configureServer({ ws }: ViteDevServer) {
       ws.on(READY, () => {
-        ws.send(READY, JSONMap.stringify({ entries, logs, consumer, metrics }));
+        ws.send(READY, JSONMap.stringify({ entries, logs, consumer, metrics, diagnostics }));
         transforms.forEach((transform) => {
           ws.send(_('registerTransform'), JSONMap.stringify(transform));
         });

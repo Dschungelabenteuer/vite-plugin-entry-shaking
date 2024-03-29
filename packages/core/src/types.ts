@@ -73,7 +73,7 @@ export interface EntryData {
   isImplicit?: boolean;
   /** Indices of emitted `ctx.diagnostics` for this entry. */
   diagnostics: Set<number>;
-  /** Number of analyzed imported */
+  /** Number of analyzed imports. */
   importsCount: number;
   /** Times this entry was hit (this does not mean it was eventually requested). */
   hits: number;

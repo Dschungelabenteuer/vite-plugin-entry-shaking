@@ -57,7 +57,7 @@ provide('search', search);
   --font-size-page-header: var(--font-size-sm);
 
   &.condensed {
-    --size-page-header: 2.75rem;
+    --size-page-header: 2.85rem;
     --padding-page-header: var(--spacing-md) var(--spacing-sm);
     --font-size-page-header: var(--font-size-xs);
   }

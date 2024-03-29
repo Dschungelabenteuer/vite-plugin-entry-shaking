@@ -1,23 +1,11 @@
-import type { Metric } from './MetricsBlock.types';
+import {
+  GuestsUsers,
+  RegisteredUsers,
+  TotalUsers,
+  UsageTime,
+} from '@components/Metric/Metric.mocks';
+import type { MetricProps } from '@components/Metric/Metric.types';
 
-export const SimpleHeader: Metric = {
-  label: 'Number of users',
-  icon: 'users',
-  value: '444',
-  type: 'count',
-};
+export const SimpleHeader: MetricProps = TotalUsers;
 
-export const SimpleDetails: Metric[] = [
-  {
-    label: 'Registered users',
-    icon: 'user-bolt',
-    value: '128',
-    type: 'count',
-  },
-  {
-    label: 'Guests',
-    icon: 'user-question',
-    value: '316',
-    type: 'count',
-  },
-];
+export const SimpleDetails: MetricProps[] = [RegisteredUsers, GuestsUsers, UsageTime];

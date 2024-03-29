@@ -2,18 +2,17 @@ import { computed } from 'vue';
 
 import { store } from '#store';
 import { formatDuration } from '#utils';
-
-import type { Metric } from '@components/MetricsBlock/MetricsBlock.types';
+import type { MetricProps } from '@components/Metric/Metric.types';
 
 export function useMetricsPanel() {
-  const timeHeader = computed<Metric>(() => ({
+  const timeHeader = computed<MetricProps>(() => ({
     label: 'Total process',
     icon: 'clock',
     value: formatDuration(store.metrics?.process ?? 0),
     type: 'duration',
   }));
 
-  const timeDetails = computed<Metric[]>(() => [
+  const timeDetails = computed<MetricProps[]>(() => [
     {
       label: 'Entries analysis',
       icon: 'target',
@@ -28,14 +27,14 @@ export function useMetricsPanel() {
     },
   ]);
 
-  const requestsHeader = computed<Metric>(() => ({
+  const requestsHeader = computed<MetricProps>(() => ({
     label: 'Total requests',
     icon: 'http-get',
     value: `${(store.metrics?.jsRequests ?? 0) + (store.metrics?.otherRequests ?? 0)}`,
     type: 'count',
   }));
 
-  const requestsDetails = computed<Metric[]>(() => [
+  const requestsDetails = computed<MetricProps[]>(() => [
     {
       label: 'JS/TS requests',
       icon: 'file-type-js',

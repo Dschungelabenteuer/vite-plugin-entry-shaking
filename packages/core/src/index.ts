@@ -56,6 +56,7 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
     },
 
     async load(id) {
+      console.log('@@@ load', id);
       return context.loadFile(id);
     },
 

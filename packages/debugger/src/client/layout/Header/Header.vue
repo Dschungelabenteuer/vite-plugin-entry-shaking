@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 
 import Navigation from '@layout/Navigation/Navigation.vue';
+import Button from '@components/Button/Button.vue';
+import RouterButton from '@components/RouterButton/RouterButton.vue';
 import { useClassNames } from '@composables/useClassNames';
 import { useViewTransition } from '@composables/useViewTransition';
 import type { HeaderProps } from './Header.types';
@@ -21,13 +23,12 @@ const transition = useViewTransition({ names: { 'layout-header': headerRef } });
     ref="headerRef"
     :class="$class()"
   >
-    <router-link
-      v-if="showTitle"
-      :class="$class('title')"
-      to="/"
-    >
-      VPES&nbsp;debugger
-    </router-link>
+    <div :class="$class('title')">
+      <RouterButton
+        href="/"
+        label="VPES debugger"
+      />
+    </div>
     <Navigation v-if="showNavigation" />
   </header>
 </template>
@@ -35,20 +36,18 @@ const transition = useViewTransition({ names: { 'layout-header': headerRef } });
 <style lang="scss">
 .header {
   z-index: 10;
+  padding-inline-start: var(--spacing-md);
+  background: var(--overall-background-color);
 
   @include flex(normal, center);
   @include border-bottom;
 
-  padding-inline-start: var(--spacing-md);
-  background: var(--overall-background-color);
-
   &__title {
-    @include flex(normal, center);
-
-    padding-inline: var(--spacing-md);
-    font-weight: 600;
-    color: var(--text-emphasize-color);
-    text-decoration: none;
+    .button {
+      font-size: var(--font-size-sm);
+      font-weight: 600;
+      color: var(--text-emphasize-color);
+    }
 
     @media (max-width: $breakpoint-sm) {
       display: none;

@@ -18,7 +18,7 @@ const options: CheckboxProps[] = [
 <template>
   <div :class="$class()">
     <h3>Filter log levels</h3>
-    <Checkbox
+    <Checkboxes
       id="logs-filters"
       v-model="model"
       :options="options"

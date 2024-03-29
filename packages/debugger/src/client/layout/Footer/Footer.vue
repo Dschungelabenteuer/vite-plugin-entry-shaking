@@ -11,22 +11,11 @@ const $class = useClassNames('footer');
 const swapColorScheme = inject<() => void>('swapColorScheme')!;
 const colorScheme = inject<ColorScheme>('colorScheme')!;
 const colorSchemeIcon = computed(() => (colorScheme === 'dark' ? 'sun' : 'moon'));
-
-const $toaster = inject<any>('$toaster')!;
-const addtoaster = () =>
-  $toaster.add(
-    { type: 'success', message: `Toaster added!${new Date().toLocaleTimeString()}` },
-    { duration: 3000 },
-  );
 </script>
 
 <template>
   <footer :class="$class()">
     <ViteStatus />
-    <Button
-      label="add toaster"
-      @click="addtoaster"
-    />
     <div id="color-scheme-switcher">
       <Button
         :icon="colorSchemeIcon"

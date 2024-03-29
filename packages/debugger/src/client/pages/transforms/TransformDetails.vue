@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import { computed, provide, reactive } from 'vue';
-import { useMediaQuery } from '@vueuse/core';
 
 import type { TransformData } from 'vite-plugin-entry-shaking';
-import Input from '@components/Input/Input.vue';
-import Button from '@components/Button/Button.vue';
-import DropdownMenu from '@components/DropdownMenu/DropdownMenu.vue';
-import { useClassNames } from '@composables/useClassNames';
 
 import type { VerticalTab } from '@views/VerticalTabs/VerticalTabs.types';
-import VerticalTabsView from '@views/VerticalTabs/VerticalTabs.vue';
+import Details from '@views/Details/Details.vue';
 import TransformMetrics from './details/TransformMetrics.vue';
 import TransformDiffs from './details/TransformDiffs.vue';
 
@@ -25,10 +20,8 @@ type TransformDetailsEvents = {
   'end-reached': [];
 };
 
-const $class = useClassNames('transform-details');
 const emit = defineEmits<TransformDetailsEvents>();
 const props = defineProps<TransformDetailsProps>();
-const iconOnly = useMediaQuery('(max-width: 600px)');
 provide('transform-details', reactive(props));
 
 const tabs = computed<VerticalTab[]>(() => [
@@ -50,43 +43,15 @@ provide('depth', 1);
 </script>
 
 <template>
-  <div :class="$class()">
-    <div :class="$class('path')">
-      <Input
-        id="transform-path"
-        :model-value="path"
-        icon="file"
-        label="Path"
-        hide-label
-      >
-        <template #after>
-          <Button
-            icon="clipboard"
-            :floating-placement="'bottom-end'"
-            :icon-only="true"
-            label="Copy file path"
-          >
-            <template #popover>
-              <DropdownMenu
-                :items="[
-                  { label: 'Copy relative path', action: () => {} },
-                  { label: 'Copy absolute path', action: () => {} },
-                ]"
-              />
-            </template>
-          </Button>
-        </template>
-      </Input>
-    </div>
-    <VerticalTabsView
-      id="transform-details"
-      label="Transform details"
-      width="200px"
-      min-content-width="400px"
-      :icon-only="iconOnly"
-      :tabs="tabs"
-    />
-  </div>
+  <Details
+    id="transform-details"
+    :absolute-path="String(path)"
+    :relative-path="String(path)"
+    :tabs
+    tabs-label="Transform  details"
+    tabs-width="200px"
+    tabs-min-content-width="400px"
+  />
 </template>
 
 <style lang="scss">
@@ -106,10 +71,6 @@ provide('depth', 1);
     align-items: center;
     width: 100%;
 
-    svg {
-      margin-inline-end: var(--spacing-md);
-    }
-
     .input {
       width: 100%;
       font-family: monospace;
@@ -120,6 +81,10 @@ provide('depth', 1);
 
       &__container {
         flex-grow: 1;
+      }
+
+      &__icon {
+        margin-inline-end: var(--spacing-md);
       }
     }
   }

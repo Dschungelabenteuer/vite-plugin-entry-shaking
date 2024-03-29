@@ -5,7 +5,7 @@ import { getElement } from '#utils';
 type MenuAxis = 'x' | 'y';
 
 export function useMenu(axis: MenuAxis | Ref<MenuAxis>, items: Ref<(HTMLButtonElement | null)[]>) {
-  const index = ref(-1);
+  const index = ref(0);
   const itemsCount = computed(() => items.value?.length ?? 0);
   const lastIndex = computed(() => itemsCount.value - 1);
   const previousIndex = computed(() => (index.value === 0 ? lastIndex.value : index.value - 1));

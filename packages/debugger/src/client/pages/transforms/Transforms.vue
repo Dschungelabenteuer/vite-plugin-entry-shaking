@@ -105,8 +105,8 @@ const handleTransformView = (path: string) => {
   <Dialog
     ref="dialogRef"
     title="Transform data"
-    width="460px"
-    height="340px"
+    width="640px"
+    height="480px"
     @close="activeTransform = undefined"
   >
     <TransformDetails

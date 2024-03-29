@@ -24,6 +24,7 @@ provide('reference', reference);
     :class="$class()"
   >
     <ShortcutsHint
+      v-if="!showList"
       :id
       :message
       :show-tooltip

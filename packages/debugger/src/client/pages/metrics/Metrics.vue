@@ -6,6 +6,7 @@ import Button from '@components/Button/Button.vue';
 
 import type { Panel } from '@views/Panel/Panel.types';
 import PanelView from '@views/Panel/Panel.vue';
+import DiagnosticsOverview from './DiagnosticsOverview.vue';
 import { useMetricsPanel } from './useMetricsPanel';
 
 const closeBtnRef = ref<InstanceType<typeof Button> | null>(null);
@@ -36,6 +37,7 @@ watch(isOpen, (open) => {
         :header="requestsHeader"
         :details="requestsDetails"
       />
+      <DiagnosticsOverview />
     </div>
     <template #footer>
       <Button
@@ -55,3 +57,9 @@ watch(isOpen, (open) => {
     </template>
   </PanelView>
 </template>
+
+<style lang="scss">
+#metrics-panel {
+  z-index: 1000;
+}
+</style>

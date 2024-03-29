@@ -29,8 +29,8 @@ const time = computed(() => formatDuration(props.item.time));
     <Button
       label="Transform details"
       icon="eye"
-      :disable-tooltip="true"
       :icon-only="true"
+      :tooltip-options="{ disabled: true }"
       @click="emit('view', item.path)"
     />
   </div>
