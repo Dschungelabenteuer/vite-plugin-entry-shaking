@@ -11,8 +11,7 @@ export function parseImportStatement(statement: string): ParsedImportStatement {
     wildcardImport: undefined,
   };
 
-  const inlineStatement = statement.replace(/\n/g, '');
-  const [, , importContent] = inlineStatement.match(/(im|ex)port (.*) from/m) ?? [, , undefined];
+  const [, , importContent] = statement.match(/(im|ex)port\s+((.|\n)*)\s+from/) ?? [, , undefined];
   return importContent ? methods.parseImportStatementContent(importContent) : output;
 }
 
@@ -28,7 +27,7 @@ export function parseImportStatementContent(importContent: string) {
   };
 
   const registerImport = (target: 'namedImports' | 'defaultImports') => (s: string) => {
-    const name = s.trim();
+    const name = s.trim().replace(/\n/g, ' ');
     if (name.length) output[target].push(name);
   };
 
@@ -39,11 +38,11 @@ export function parseImportStatementContent(importContent: string) {
   };
 
   const def = [, undefined];
-  const [namedImportsStatement, namedImportsContent] = importContent.match(/{(.*)}/) ?? def;
+  const [namedImportsStatement, namedImportsContent] = importContent.match(/{([\s\S]*)}/) ?? def;
   if (namedImportsStatement && namedImportsContent) {
     importContent = importContent.replace(namedImportsStatement, '');
     namedImportsContent.split(',').forEach((namedImport) => {
-      const name = namedImport.split(' as ')!.map((param) => param.trim());
+      const name = namedImport.split(/\s+as\s+/)!.map((param) => param.trim());
       if (name.length === 1) {
         registerNamedImport(name[0]);
       } else {
@@ -73,7 +72,7 @@ export function parseImportStatementContent(importContent: string) {
  * @param importString Import statement string.
  */
 export function parseImportParams(importString: string) {
-  const [name, alias] = importString.trim().split(' as ');
+  const [name, alias] = importString.trim().split(/\s+as\s+/);
   return { name, alias };
 }
 
