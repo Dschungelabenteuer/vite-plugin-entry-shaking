@@ -242,7 +242,7 @@ async function analyzeEntryImport(
     if (imports.wildcardImport) {
       const method = methods.registerWildcardImportIfNeeded;
       const [t, s] = await method(ctx, diagnostics, path, entryPath, depth);
-      nonselfTime += t - s ?? 0;
+      nonselfTime += t - (s ?? 0);
       const { alias } = Parsers.parseImportParams(imports.wildcardImport);
       if (alias) {
         wildcardExports.named.set(alias, path);
