@@ -1,5 +1,5 @@
 import { normalizePath } from 'vite';
-import type { FinalPluginOptions, PluginOptions } from './types';
+import type { EntryTarget, FinalPluginOptions, PluginOptions } from './types';
 
 /** Default `extensions` option value. */
 const extensions = ['js', 'jsx', 'mjs', 'ts', 'tsx', 'mts'];
@@ -16,5 +16,11 @@ export const mergeOptions = (userOptions: PluginOptions): FinalPluginOptions => 
   ignorePatterns: [...ignorePatterns, ...(userOptions.ignorePatterns ?? [])],
   debug: false,
   ...userOptions,
-  targets: userOptions.targets.map(normalizePath),
+  targets: userOptions.targets.map((target: EntryTarget) => {
+    if (typeof target === 'string') return normalizePath(target);
+    if (target.path) {
+      target.path = normalizePath(target.path);
+    }
+    return target;
+  }),
 });
