@@ -151,8 +151,8 @@ the plugin is processing and its impacts on performances.
 
 ![debugger preview](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/assets/16818271/916fbccd-8463-4b45-b028-7dcb4da677b5)
 
-> [!NOTE] This requires installing `vite-plugin-entry-shaking-debugger` and setting the `debug`
-> option to `true`.
+> [!NOTE]
+> This requires installing `vite-plugin-entry-shaking-debugger` and setting the `debug` option to `true`.
 
 ## Motivation
 
