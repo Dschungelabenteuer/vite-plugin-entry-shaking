@@ -1,5 +1,6 @@
 {
   "name": "vite-plugin-entry-shaking-root",
+  "type": "module",
   "version": "0.0.0",
   "private": true,
   "author": "Charles Gruenais",
@@ -12,23 +13,30 @@
   "bugs": {
     "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
   },
+  "engines": {
+    "node": ">=20.1.0"
+  },
   "scripts": {
     "postinstall": "pnpm build",
     "build": "pnpm --filter \"./packages/core\" build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
     "format": "prettier . --write",
+    "generate-example": "node scripts/generate-example",
     "check": "pnpm format && pnpm lint && pnpm test",
     "changeset:release": "pnpm build && changeset publish",
     "changeset:version": "changeset version && pnpm install --lockfile-only"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "^0.4.8",
-    "@changesets/cli": "^2.26.2",
-    "@yungezeit/eslint-config-base": "^0.0.13",
-    "eslint": "^8.52.0",
-    "eslint-config-prettier": "^9.0.0",
-    "prettier": "^3.0.3"
+    "@changesets/changelog-github": "^0.5.0",
+    "@changesets/cli": "^2.27.1",
+    "@types/prompts": "^2.4.9",
+    "@yungezeit/eslint-config-base": "^0.0.14",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "ora": "^8.0.1",
+    "prettier": "^3.2.5",
+    "prompts": "^2.4.2"
   },
   "pnpm": {
     "packageExtensions": {

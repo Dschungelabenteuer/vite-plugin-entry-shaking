@@ -1,0 +1,121 @@
+[
+  [
+    "cross-entries",
+    []
+  ],
+  [
+    "default-export",
+    [
+      {
+        "exampleName": "import-default-export-of-target",
+        "exampleDescription": "`DefaultImport` is the default export of the entry",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\default-export\\import-default-export-of-target.ts"
+      },
+      {
+        "exampleName": "import-reexported-default",
+        "exampleDescription": "`DefaultImport` is the default export of a module which is directly re-exported from the entry",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\default-export\\import-reexported-default.ts"
+      },
+      {
+        "exampleName": "import-imported-and-exported-default",
+        "exampleDescription": "`DefaultImport` is the default export of a module which is first imported then re-exported by the entry",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\default-export\\import-imported-and-exported-default.ts"
+      },
+      {
+        "exampleName": "import-destructured-default",
+        "exampleDescription": "`DefaultImport` is the default export of a module which is first imported using `import { default as DefaultImport }` then re-exported by the entry",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\default-export\\import-destructured-default.ts"
+      }
+    ]
+  ],
+  [
+    "mixed-imports",
+    [
+      {
+        "exampleName": "single",
+        "exampleDescription": "`MixedDefault` is default-imported from another module and `MixedImportNamed` is an entity imported from that same module.",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\mixed-imports\\single.ts"
+      }
+    ]
+  ],
+  [
+    "named-export-direct-reexport",
+    [
+      {
+        "exampleName": "single",
+        "exampleDescription": "`NamedExportOne` is imported from an entry. In this entry file, `NamedExportOne` is directly exported via `{ NamedExportOne }` from another module",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\named-export-direct-reexport\\single.ts"
+      }
+    ]
+  ],
+  [
+    "named-export-import-reexport",
+    [
+      {
+        "exampleName": "single",
+        "exampleDescription": "`NamedExportOne` is imported from an entry. In this entry file, `NamedExportOne` is directly imported via `{ NamedExportOne }` from another module and then reexported using a simple `export { NamedExportOne }` statement.",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\named-export-import-reexport\\single.ts"
+      }
+    ]
+  ],
+  [
+    "named-export-import-reexport-alias-via-export",
+    [
+      {
+        "exampleName": "single",
+        "exampleDescription": "`AliasedNamedExportOne` is imported from an entry. In this entry file, `AliasedNamedExportOne` is imported via `{ NamedExportOne as AliasedNamedExportOne }` from another module and then reexported using a simple `export { NamedExportOne as NamedExportOneDupe }` statement.",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\named-export-import-reexport-alias-via-export\\single.ts"
+      }
+    ]
+  ],
+  [
+    "named-export-import-reexport-alias-via-import",
+    [
+      {
+        "exampleName": "single",
+        "exampleDescription": "`AliasedNamedExportOne` is imported from an entry. In this entry file, `AliasedNamedExportOne` is imported via `{ NamedExportOne as AliasedNamedExportOne }` from another module and then reexported using a simple `export { AliasedNamedExportOne }` statement.",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\named-export-import-reexport-alias-via-import\\single.ts"
+      }
+    ]
+  ],
+  [
+    "wildcard-export",
+    [
+      {
+        "exampleName": "entry-depth-of-one",
+        "exampleDescription": "`NamedExportOne` is imported from an entry. In this entry file, `NamedExportOne` is re-exported via wildcard from another module which is listed as a target.",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\wildcard-export\\entry-depth-of-one.ts"
+      },
+      {
+        "exampleName": "entry-depth-of-two",
+        "exampleDescription": "`NamedExportOne` is imported from an entry. In this entry file, `NamedExportOne` is re-exported via wildcard from another module. In that module, `NamedExportOne` is also re-exported via wildcard from a third module. In this example, all modules are listed as targets.",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\wildcard-export\\entry-depth-of-two.ts"
+      },
+      {
+        "exampleName": "nonentry-depth-of-one",
+        "exampleDescription": "`NamedExportOne` is imported from an entry. In this entry file, `NamedExportOne` is re-exported via wildcard from another module which is not listed as a target",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\wildcard-export\\nonentry-depth-of-one.ts"
+      },
+      {
+        "exampleName": "nonentry-depth-of-two",
+        "exampleDescription": "`NamedExportOne` is imported from an entry. In this entry file, `NamedExportOne` is re-exported via wildcard from another module. In that module, `NamedExportOne` is also re-exported via wildcard from a third module. In this example, two last modules not listed as targets.",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\wildcard-export\\nonentry-depth-of-two.ts"
+      }
+    ]
+  ],
+  [
+    "wildcard-import-reexport",
+    [
+      {
+        "exampleName": "simple",
+        "exampleDescription": "`NamedExports` is imported from an entry. In this entry file, `NamedExports` is first imported via wildcard from another module and then reexported using a simple `export { NamedExports }` statement.",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\wildcard-import-reexport\\simple.ts"
+      },
+      {
+        "exampleName": "with-intermediate-file",
+        "exampleDescription": "`NamedExports` is imported from an entry. In this entry file, `NamedExports` is implicitly exported via a wildcard export from another module. In that module, `NamedExports` is first imported via wildcard from a third module and then reexported using a simple `export { NamedExports }` statement.",
+        "examplePath": ".\\examples\\syntaxes\\src\\data\\cases\\wildcard-import-reexport\\with-intermediate-file.ts"
+      }
+    ]
+  ]
+]

@@ -1,0 +1,54 @@
+{
+  "extends": ["@yungezeit/vue", "prettier", "plugin:storybook/recommended"],
+  "rules": {
+    "import/order": [
+      "error",
+      {
+        "pathGroups": [
+          {
+            "pattern": "#types",
+            "group": "external"
+          },
+          {
+            "pattern": "#uitypes",
+            "group": "external"
+          },
+          {
+            "pattern": "#utils",
+            "group": "external"
+          },
+          {
+            "pattern": "#store",
+            "group": "external"
+          },
+          {
+            "pattern": "@components/**",
+            "group": "parent",
+            "position": "before"
+          },
+          {
+            "pattern": "@composables/**",
+            "group": "parent",
+            "position": "before"
+          },
+          {
+            "pattern": "@helpers/**",
+            "group": "parent",
+            "position": "before"
+          },
+          {
+            "pattern": "@views/**",
+            "group": "parent",
+            "position": "before"
+          },
+          {
+            "pattern": "@pages/**",
+            "group": "parent",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["#types"]
+      }
+    ]
+  }
+}

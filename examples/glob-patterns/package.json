@@ -1,0 +1,23 @@
+{
+  "name": "vite-plugin-entry-shaking-example-glob-patterns",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@yungezeit/eslint-config-vue": "^0.0.14",
+    "sass": "^1.72.0",
+    "typescript": "^5.4.3",
+    "vite": "^5.2.7",
+    "vite-plugin-entry-shaking": "workspace:*",
+    "vue-tsc": "^2.0.7"
+  }
+}

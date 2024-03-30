@@ -1,0 +1,175 @@
+/// Note: component-related tokens are defined in the component's style layer.
+
+/// Light color scheme.
+@include color-scheme(light) {
+  // Overall (light).
+  --overall-background-color: #fff;
+  --overall-border-color: #ddd;
+  --overall-border-color-stronger: #aaa;
+  --background-color: #fff;
+  --background-color-alt: #d8e8f3;
+  --background-color-alt-subtle: #fbfdfe;
+  --shadow-color: 0deg 0% 85%;
+
+  // Text (light).
+  --text-color: #7a8397;
+  --text-subtle-color: #79859c;
+  --text-emphasize-color: var(--color-dark-blue);
+
+  // Accent (light).
+  --accent-color: #29a157;
+  --accent-color-contrast: #fff;
+
+  // Status (light).
+  --status-color-info: #3288d6;
+  --status-color-warn: #df8824;
+  --status-color-error: #ce2c2c;
+  --status-color-success: #57964e;
+
+  // Illustration (light).
+  --illustration-color: var(--color-dark-blue);
+  --illustration-leaves-outline: #fff;
+  --illustration-leaves-color: #4b7145;
+  --illustration-trunk-color: #75502f;
+  --illustration-background-gradient-start: transparent;
+  --illustration-background-gradient-end: transparent;
+
+  // Field (light).
+  --field-background-color: var(--overall-background-color);
+  --field-disabled-background-color: #ddd;
+  --field-border-color: var(--overall-border-color-stronger);
+  --field-border-color-dimmed: var(--overall-border-color);
+  --field-text-color: var(--text-color);
+  --field-background-color-hover: var(--field-background-color);
+  --field-border-color-hover: color-mix(in srgb, var(--field-border-color) 80%, black);
+  --field-text-color-hover: color-mix(in srgb, var(--field-text-color) 80%, black);
+  --field-background-color-focus: var(--field-background-color);
+  --field-border-color-focus: var(--accent-color);
+  --field-text-color-focus: var(--accent-color);
+
+  // Rest (light).
+  --browser-background-color: #fbfdfe;
+}
+
+/// Dark color scheme.
+@include color-scheme(dark) {
+  // Overall (dark).
+  --overall-background-color: #0004;
+  --overall-border-color: #ffffff0c;
+  --overall-border-color-stronger: #e9c6c618;
+  --background-color: #110f1d;
+  --background-color-alt: #1f130f;
+  --background-color-alt-subtle: #191114;
+  --shadow-color: 0deg 0% 4%;
+
+  // Text (dark).
+  --text-color: #c4b4a9;
+  --text-subtle-color: #8b7768;
+  --text-emphasize-color: #fffd;
+
+  // Accent (dark).
+  --accent-color: #ffae2f;
+  --accent-color-contrast: #1f130f;
+
+  // Status (dark).
+  --status-color-info: #90b7ff;
+  --status-color-warn: #ffae2f;
+  --status-color-error: #ff4e4e;
+  --status-color-success: #8ec639;
+
+  // Illustration (dark).
+  --illustration-color: #0a040a;
+  --illustration-leaves-outline: #60785f;
+  --illustration-leaves-color: #222922; // #60785f
+  --illustration-trunk-color: #332f2b;
+  --illustration-background-gradient-start: #cf8664;
+  --illustration-background-gradient-end: transparent;
+
+  // Field (dark).
+  --field-background-color: #0004;
+  --field-disabled-background-color: #0004;
+  --field-border-color: var(--overall-border-color-stronger);
+  --field-border-color-dimmed: var(--overall-border-color);
+  --field-text-color: var(--text-color);
+  --field-background-color-hover: var(--field-background-color);
+  --field-border-color-hover: color-mix(in srgb, var(--field-border-color) 95%, var(--text-color));
+  --field-text-color-hover: color-mix(in srgb, var(--field-text-color) 80%, var(--text-color));
+  --field-background-color-focus: var(--field-background-color);
+  --field-border-color-focus: var(--accent-color);
+  --field-text-color-focus: var(--accent-color);
+}
+
+/// Common variables.
+@include token {
+  // Spacing.
+  --spacing-2xs: 0.125rem;
+  --spacing-xs: 0.175rem;
+  --spacing-sm: 0.25rem;
+  --spacing-md: 0.5rem;
+  --spacing-lg: 1rem;
+  --spacing-xl: 1.325rem;
+
+  // Radius.
+  --radius-sm: 0.21rem;
+  --radius-md: 0.34rem;
+  --radius-lg: 0.72rem;
+
+  // Font-size.
+  --font-size-2xl: 2rem;
+  --font-size-xl: 1.325rem;
+  --font-size-lg: 1.25rem;
+  --font-size-md: 1.14rem;
+  --font-size-sm: 1rem;
+  --font-size-xs: 0.9rem;
+  --font-size-2xs: 0.7rem;
+
+  // Scrollbar.
+  --scrollbar-size: 8px;
+  --scrollbar-border-width: 1px;
+
+  // Sizes.
+  --size-header: 3rem;
+  --size-footer: 3.5rem;
+  --size-page: calc(100vh - var(--size-header) - var(--size-footer));
+
+  // Easings.
+  --easing-forwards: cubic-bezier(0, 0.8, 0.25, 1);
+  --easing-backwards: cubic-bezier(0.75, -0.01, 0.8, 0.63);
+
+  // Blurs.
+  --blur-md: blur(4px);
+  --blur-lg: blur(8px);
+  --blur-xl: blur(12px);
+}
+
+@include color-scheme {
+  // Common colors.
+  --background-gradient: linear-gradient(
+    133deg,
+    var(--background-color) 0%,
+    var(--background-color-alt)
+  );
+  --tagline-color: var(--text-subtle-color);
+  --name-color: var(--text-emphasize-color);
+  --color-dark-blue: #141c2f;
+  --vite-orange: #ffbc00;
+  --vite-purple: #6345c1;
+}
+
+/// Transitions.
+@include token {
+  --transition-duration-short: 170ms;
+  --transition-duration-medium: 260ms;
+
+  @media (prefers-reduced-motion: reduce) {
+    --transition-duration-short: 0ms;
+    --transition-duration-medium: 0ms;
+  }
+}
+
+/// Breakpoints
+/// Defined as sass variables because container queries and
+/// custom properties do not seem to be well supported yet.
+$breakpoint-xs: 460px;
+$breakpoint-sm: 610px;
+$breakpoint-md: 820px;

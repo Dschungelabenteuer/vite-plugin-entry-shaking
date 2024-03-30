@@ -1,0 +1,23 @@
+html, body, #storybook-root, #root {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.floating-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+
+.dialog-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}

@@ -1,50 +1,74 @@
-import type { PluginOption, Logger, ResolveFn } from 'vite';
-import type { PluginEntries, PluginOptions } from './types';
-import { configureLogger } from './logger';
-import { transformIfNeeded } from './transform';
+import type { PluginOption } from 'vite';
+import type {
+  Diagnostic,
+  PluginMetrics,
+  PluginEntries,
+  PluginOptions,
+  DebuggerEvents,
+  EntryData,
+  TransformData,
+  WildcardExports,
+  EntryExports,
+  LogLevel,
+  Log,
+} from './types';
+
+import { Context } from './context';
 import { mergeOptions } from './options';
-import EntryAnalyzer from './analyze-entry';
-import { parseId } from './urls';
+import { loadDebugger } from './utils';
+
+export type {
+  Diagnostic,
+  PluginEntries,
+  PluginMetrics,
+  PluginOptions,
+  DebuggerEvents,
+  EntryData,
+  TransformData,
+  WildcardExports,
+  EntryExports,
+  LogLevel,
+  Log,
+  Context,
+};
+
+export { DiagnosticKinds } from './diagnostics';
+
+export const name = 'vite-plugin-entry-shaking';
 
 export async function createEntryShakingPlugin(userOptions: PluginOptions): Promise<PluginOption> {
+  /** Final options of the plugin. */
   const options = mergeOptions(userOptions);
-  let logger: Logger;
-  let resolver: ResolveFn;
-  let entries: PluginEntries;
+  /** Plugin's context. */
+  let context: Context;
 
   return {
-    name: 'vite-plugin-entry-shaking',
+    name,
     apply: 'serve',
     enforce: 'post',
 
-    async configResolved({ logger: loggerConfig, createResolver }) {
-      logger = configureLogger(loggerConfig, options.debug);
-      resolver = createResolver();
-      entries = await EntryAnalyzer.analyzeEntries(options.targets, resolver);
-      logger.info(`List of merged options: ${JSON.stringify(options)}`);
-      logger.info(`List of parsed entries: ${JSON.stringify([...entries.keys()])}`);
+    async configResolved(config) {
+      context = new Context(options, config);
+      await context.init();
     },
 
-    async handleHotUpdate({ file }) {
-      if (entries.has(file)) {
-        await EntryAnalyzer.doAnalyzeEntry(entries, file);
+    async configureServer(server) {
+      if (context.options.debug) {
+        const { attachDebugger } = await loadDebugger();
+        attachDebugger(server, context);
       }
+    },
+
+    async load(id) {
+      return context.loadFile(id);
     },
 
     async transform(code, id) {
-      return await transformIfNeeded(id, code, entries, options, resolver, logger);
+      return await context.transformFile(code, id);
     },
 
-    load(id) {
-      const { url, serveSource } = parseId(id);
-      const entry = entries.get(url);
-
-      if (entry) {
-        const version = serveSource ? 'original' : 'mutated';
-        const output = serveSource ? entry.source : entry.updatedSource;
-        logger.info(`Serving ${version} entry file ${url}`);
-        return output;
-      }
+    async handleHotUpdate({ file }) {
+      await context.checkUpdate(file);
     },
   };
 }

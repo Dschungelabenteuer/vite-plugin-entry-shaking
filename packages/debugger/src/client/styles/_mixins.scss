@@ -1,0 +1,67 @@
+@mixin contained {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+@mixin reset-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+@mixin padding($block: var(--spacing-sm), $inline: var(--spacing-md)) {
+  padding: $block $inline;
+}
+
+@mixin border-top($color: var(--overall-border-color), $width: 1px) {
+  box-shadow: 0 #{'-' + $width} 0 0 $color;
+}
+
+@mixin border-bottom($color: var(--overall-border-color), $width: 1px) {
+  box-shadow: 0 $width 0 0 $color;
+}
+
+@mixin border-left($color: var(--overall-border-color), $width: 1px) {
+  box-shadow: #{'-' + $width} 0 0 0 $color;
+}
+
+@mixin border-right($color: var(--overall-border-color), $width: 1px) {
+  box-shadow: $width 0 0 0 $color;
+}
+
+@mixin flex-row($justify-content: center, $align-items: center) {
+  @include flex($justify-content, $align-items, row);
+}
+
+@mixin flex-col($justify-content: center, $align-items: center) {
+  @include flex($justify-content, $align-items, column);
+}
+
+@mixin flex($justify-content: center, $align-items: center, $flex-direction: row) {
+  display: flex;
+  flex-direction: $flex-direction;
+  align-items: $align-items;
+  justify-content: $justify-content;
+}
+
+@mixin color-scheme($scheme: 'any') {
+  @if $scheme == 'any' {
+    [data-color-scheme],
+    [data-color-scheme] *::backdrop {
+      @content;
+    }
+  } @else {
+    [data-color-scheme='#{$scheme}'],
+    [data-color-scheme='#{$scheme}'] *::backdrop {
+      @content;
+    }
+  }
+}
+
+@mixin token() {
+  :root,
+  *::backdrop {
+    @content;
+  }
+}

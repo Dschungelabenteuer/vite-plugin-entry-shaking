@@ -1,11 +1,15 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/assets/16818271/85f20faf-0e76-4339-a703-0f4ef1252de9">
+    <img src="https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/assets/16818271/6af66867-ffea-4f7d-9f56-3801ffd17659" alt="Vite-plugin-entry-shaking illustration" width="600" />
+  </picture>
+</p>
+
 <h1 align="center">vite-plugin-entry-shaking</h1>
 
 <p align="center">
   Mimic tree-shaking behaviour when importing code from an entry file in development mode.
 </p>
-
-> **Warning** This plugin is experimental, bugs might be expected and some edge cases might not be
-> covered.
 
 > **Note** The main execution logic of this plugin only applies to development mode because it
 > addresses an issue which is specific to development mode.
@@ -35,7 +39,15 @@ import EntryShakingPlugin from 'vite-plugin-entry-shaking';
 export default defineConfig({
   plugins: [
     EntryShakingPlugin({
-      targets: [resolve(__dirname, 'src/entry-a')],
+      targets: [
+        // Using direct paths.
+        resolve(__dirname, 'src/entry-a')
+        // Or using glob patterns.
+        {
+          glob: 'src/utils/*.ts',
+          globOptions: { ignore: ['excluded.ts'] },
+        }
+      ],
     }),
   ],
 });
@@ -55,7 +67,7 @@ export default defineConfig({
   <tbody>
     <tr>
       <td>targets <em>(required)</em></td>
-      <td><code>string[]</code></td>
+      <td><code>string[] | { path: string } | { glob: string; globOptions: import('fast-glob').Options</code></td>
       <td>N/A</td>
       <td>You need to list all of the entry points you want this plugin to process.</td>
     </tr>
@@ -72,10 +84,52 @@ export default defineConfig({
       <td>This specifies RegExp/string whose matched paths must be ignored by the plugin.</td>
     </tr>
     <tr>
+      <td>maxWildcardDepth</td>
+      <td><code>number</code></td>
+      <td><code>0</code></td>
+      <td>How deep should this plugin run static analysis when encountering wildcards?</td>
+    </tr>
+    <tr>
+      <td>diagnostics</td>
+      <td><code>boolean | DiagnosticsConfig</code></td>
+      <td><code>true</code></td>
+      <td>Toggles all diagnostics when set as a boolean, or specific diagnostics when set as an object.</td>
+    </tr>
+    <tr>
       <td>debug</td>
       <td><code>boolean</code></td>
       <td><code>false</code></td>
-      <td>Turns on debug mode. This will print debug logs if Vite's <code>logLevel</code> is set to any other value than <code>'silent'</code></td>
+      <td>Toggles debug mode. This will print debug logs if Vite's <code>logLevel</code> is set to any other value than <code>'silent'</code></td>
+    </tr>
+  </tbody>
+</table>
+
+### Diagnostics configuration
+
+Diagnostics are recommendations/warnings emitted by the plugin as it analyzes the specified entry
+files. They aim to help you improve the plugin's efficiency by suggesting changes and provide
+explanation on why they were emitted. See
+[RESOURCES](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/RESOURCES.md)
+for a more in-depth insight about possible diagnostics.
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>definedWithinEntry</td>
+      <td><code>true</code></td>
+      <td>Emit warning if an entry file defines code that may prevent tree-shaking.</td>
+    </tr>
+    <tr>
+      <td>maxDepthReached</td>
+      <td><code>true</code></td>
+      <td>Emits a warning when max analysis depth was reached when handling wildcard imports.</td>
     </tr>
   </tbody>
 </table>
@@ -87,6 +141,26 @@ Examples illustrating usage and benefits can be found
 free to fork and play around. For instance, you can toggle the plugin on and off their respective
 vite config file while serving in development mode and see how it affects the amount of requests
 made by your browser.
+
+This repository provides a simple CLI to help you quickly scaffold a new example, simply run the
+following command from the project's root to get started:
+
+```bash
+pnpm generate-example
+```
+
+## Debugger (experimental)
+
+Version `0.4.0` introduces
+[a debugger](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/packages/debugger)
+as an optional dependency. When installed and attached to the plugin, a debugger application will
+open alongside your actual application in dev mode. This can help you get an overall idea of what
+the plugin is processing and its impacts on performances.
+
+![debugger preview](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/assets/16818271/916fbccd-8463-4b45-b028-7dcb4da677b5)
+
+> [!NOTE] This requires installing `vite-plugin-entry-shaking-debugger` and setting the `debug`
+> option to `true`.
 
 ## Motivation
 
@@ -166,15 +240,31 @@ scenario, any import of an entry point is caught and is forced to serve its muta
 stored while parsing the entry point file. This ensures the entry point only imports what it needs
 to make the code it explicitly defines work.
 
+[Please refer to RESOURCES.md for a more precise overview of what happens under the hood](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/RESOURCES.md).
+
 ## Limitations
 
 - See `es-module-lexer`'s
   [own limitations](https://github.com/guybedford/es-module-lexer#limitations).
+
+- Import statements are not cleaned up from analyzed targets. This means if you import code that was
+  defined **within** a target, you might still load unnecessary modules. This is by design because
+  getting rid of unused imports would require us to traverse each target's AST to make sure it is
+  indeed not used, which would end up quite expensive.
+
+- By default, tree-shaking wildcard imports only work when imported path is part of target list.
+  Other wildcard imports may be handled by setting the `maxWildcardDepth` option.
+  [Read more](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/blob/main/RESOURCES.md#wildcardExports)
+
 - The following syntaxes are not handled:
   - dynamic imports
   - `import json from './json.json' assert { type: 'json' }`
-  - `import * as xxx from '…'`
-  - `export * from '…'`
 
 > **Note** This does not mean you should expect errors using these. Instead, it just means the
 > content they intend to import won't be tree-shaken by the plugin.
+
+## Useful links
+
+- [Vite's documentation](https://vitejs.dev/guide/api-plugin.html#plugin-ordering)
+- [Contribution guide](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/blob/main/CONTRIBUTING.md)
+- [Resources](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/blob/main/RESOURCES.md)

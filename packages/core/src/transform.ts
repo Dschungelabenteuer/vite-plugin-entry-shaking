@@ -1,153 +1,188 @@
-import type { ImportSpecifier } from 'es-module-lexer';
+import type { ExportSpecifier, ImportSpecifier } from 'es-module-lexer';
 import MagicString from 'magic-string';
 import { init, parse } from 'es-module-lexer';
 
-import type { Logger, ResolveFn } from 'vite';
-import type { FinalPluginOptions, PluginEntries } from './types';
+import type { Context } from './context';
 import ImportAnalyzer from './analyze-import';
-import { paint } from './logger';
 
 /**
- * Determines whether a given file should be transformed based on plugin options.
- * @param id Resolved id of the file.
- * @param options Final plugin options.
- */
-export const requiresTransform = (id: string, options: FinalPluginOptions) => {
-  const extension = id.split('.').pop()!;
-  const isIgnored = options.ignorePatterns.some((pattern) => id.match(pattern));
-  return !isIgnored && options.extensions.includes(extension);
-};
-
-/**
- * Determines wether a target entry point is imported.
- * @param id Resolved id of the file.
- * @param imports List of imports.
- * @param entries _reference_ - Map of parsed entry files.
- * @param resolver Vite's resolve function.
- */
-export const importsTargetEntry = async (
-  id: string,
-  imports: readonly ImportSpecifier[],
-  entries: PluginEntries,
-  resolver: ResolveFn,
-) => {
-  try {
-    return await Promise.any(
-      imports.map(async (importParams) => {
-        const { n: importPath } = importParams;
-        const resolvedPath = importPath && (await resolver(importPath, id));
-        if (!resolvedPath || !entries.has(resolvedPath)) throw new Error();
-        return true;
-      }),
-    );
-  } catch (e) {
-    return false;
-  }
-};
-
-/**
- * Transforms imports of targeted entry files.
+ * Transforms a candidate file only if needed.
+ * @param ctx _reference_ Plugin context.
  * @param id Resolved id of the file.
  * @param code Source code of the file.
- * @param entries _reference_ - Map of parsed entry files.
- * @param imports File's list of parsed imports.
- * @param resolver Vite's resolve function.
- * @param logger Plugin's logger.
+ * @returns Transformed file content or undefined if it did not require any transform.
  */
-export async function transformImports(
+export async function transformIfNeeded(
+  ctx: Context,
   id: string,
   code: string,
-  entries: PluginEntries,
-  imports: readonly ImportSpecifier[],
-  resolver: ResolveFn,
-  logger: Logger,
 ): Promise<string | undefined> {
-  // We only need to transform file if it imports at least one of targets.
-  await init;
-  const src = new MagicString(code);
+  ctx.logger.debug(`Processing file "${id}"`, undefined);
+  const isCandidate = methods.requiresTransform(ctx, id);
+  const { out, time } = await ctx.timer.measure(
+    'Transforming file if needed',
+    async () => {
+      if (!isCandidate) {
+        ctx.logger.debug(`Ignored by options: ${id}`, undefined);
+      } else {
+        return await methods.transformImportsIfNeeded(ctx, id, code);
+      }
+    },
+    true,
+  );
 
-
-  for (const { n: targetPath, ss: startPosition, se: endPosition } of imports) {
-    const resolvedImport = targetPath && (await resolver(targetPath, id));
-    const entry = resolvedImport && entries.get(resolvedImport);
-    // If the active import is one of the targets, let's analyze it.
-    if (entry) {
-      await ImportAnalyzer.analyzeImportStatement(
-        src,
-        code,
-        entries,
-        entry.exports,
-        resolvedImport,
-        startPosition,
-        endPosition,
-        resolver,
-      );
-    }
-  }
-
-  logger.info(`[MATCHED] ${id}`);
-  return src.toString();
+  ctx.eventBus?.emit('increaseProcessTime', time);
+  ctx.eventBus?.emit('increaseTransformTime', time);
+  return out;
 }
 
 /**
  * Transforms imports of targeted entry files if any.
+ * @param ctx _reference_ Plugin context.
  * @param id Resolved id of the file.
  * @param code Source code of the file.
- * @param entries _reference_ - Map of parsed entry files.
- * @param resolver Vite's resolve function.
- * @param logger Plugin's logger.
  * @returns Transformed file content or undefined if it did not include relevant import.
  */
 export async function transformImportsIfNeeded(
+  ctx: Context,
   id: string,
   code: string,
-  entries: PluginEntries,
-  resolver: ResolveFn,
-  logger: Logger,
 ): Promise<string | undefined> {
-  const [imports] = parse(code);
+  const [imports, exports] = parse(code);
+  const importedStr = `${imports.length} imports`;
+  const exportedStr = `${exports.length} exports`;
+  ctx.logger.debug(`es-module-lexer returned ${importedStr} and ${exportedStr} for "${id}"`);
 
-  const importsTarget = await methods.importsTargetEntry(id, imports, entries, resolver);
-  if (!importsTarget) {
-    logger.info(paint('gray', `[IGNORED BY ANALYZIS] ${id}`));
-  } else {
-    return await methods.transformImports(id, code, entries, imports, resolver, logger);
+  let potentialRequestsAvoided = 0;
+  const importedEntries = await methods.getEntryImports(ctx, id, imports);
+  const entriesMatched = importedEntries.length;
+  const { transformImports: transform } = methods;
+  if (!entriesMatched) {
+    const ignoredMessage = `Did not transform "${id}" because it does not import any registered target`;
+    ctx.logger.debug(ignoredMessage, undefined);
+    return;
+  }
+
+  importedEntries.forEach((entry) => {
+    potentialRequestsAvoided += ctx.entries.get(entry)?.importsCount ?? 0;
+    ctx.eventBus?.emit('increaseEntryHits', entry);
+  });
+
+  const { time, out } = await ctx.timer.measure(
+    `Transforming file "${id}"`,
+    async () => await transform(ctx, id, code, imports, exports),
+  );
+
+  ctx.eventBus?.emit('registerTransform', {
+    id,
+    source: code,
+    transformed: out ?? code,
+    time,
+    timestamp: Date.now(),
+    entriesMatched,
+    potentialRequestsAvoided,
+  });
+
+  return out;
+}
+
+/**
+ * Transforms imports of targeted entry files.
+ * @param ctx _reference_ Plugin context.
+ * @param id Resolved id of the file.
+ * @param code Source code of the file.
+ * @param imports File's list of parsed imports.
+ * @param exports File's list of parsed exports.
+ */
+export async function transformImports(
+  ctx: Context,
+  id: string,
+  code: string,
+  imports: readonly ImportSpecifier[],
+  exports: readonly ExportSpecifier[],
+): Promise<string | undefined> {
+  // We only need to transform file if it imports at least one of targets.
+  await init;
+  const src = new MagicString(code);
+  const reexports = createReexportStatement(exports);
+
+  // Analyze the imported entities of the file.
+  for (const { n: path, ss: startPosition, se: endPosition } of imports) {
+    const resolvedImport = path && (await ctx.resolver(path, id));
+    const entry = resolvedImport && ctx.entries.get(resolvedImport);
+    // If the active import is one of the targets, let's analyze it.
+    if (entry) {
+      await ImportAnalyzer.analyzeImportStatement(
+        ctx,
+        src,
+        code,
+        entry,
+        resolvedImport,
+        startPosition,
+        endPosition,
+      );
+    }
+  }
+  const out = src.toString();
+  return reexports.length ? [out, reexports].join('\n') : out;
+}
+
+/**
+ * Determines whether a given file should be transformed based on plugin options.
+ * @param ctx _reference_ Plugin context.
+ * @param id Resolved id of the file.
+ */
+export function requiresTransform(ctx: Context, id: string) {
+  const extension = id.split('.').pop()!;
+  const isIgnored = ctx.options.ignorePatterns.some((pattern) => id.match(pattern));
+  return !isIgnored && ctx.options.extensions.includes(extension);
+}
+
+/**
+ * Determines whether a target entry point is imported.
+ * @param ctx _reference_ Plugin context.
+ * @param id Resolved id of the file.
+ * @param imports List of imports.
+ */
+export async function getEntryImports(
+  ctx: Context,
+  id: string,
+  imports: readonly ImportSpecifier[],
+): Promise<string[]> {
+  try {
+    return await imports.reduce(
+      async (out, importParams) => {
+        const { n: importPath } = importParams;
+        const resolvedPath = importPath && (await ctx.resolver(importPath, id));
+        if (resolvedPath && ctx.entries.has(resolvedPath)) (await out).push(resolvedPath);
+        return out;
+      },
+      Promise.resolve([] as string[]),
+    );
+  } catch (e) {
+    return [];
   }
 }
 
 /**
- * Transform a candidate file only if needed.
- * @param id Resolved id of the file.
- * @param code Source code of the file.
- * @param entries _reference_ - Map of parsed entry files.
- * @param options Final plugin options.
- * @param resolver Vite's resolve function.
- * @param logger Plugin's logger.
- * @returns Transformed file content or undefined if it did not require any transform.
+ * Creates a statement to reexport named imports.
+ * @param exports List of exports extracted by es-module-lexer.
  */
-export async function transformIfNeeded(
-  id: string,
-  code: string,
-  entries: PluginEntries,
-  options: FinalPluginOptions,
-  resolver: ResolveFn,
-  logger: Logger,
-): Promise<string | undefined> {
-  const isCandidate = methods.requiresTransform(id, options);
-
-  if (!isCandidate) {
-    logger.info(paint('gray', `[IGNORED BY OPTIONS] ${id}`));
-  } else {
-    return await methods.transformImportsIfNeeded(id, code, entries, resolver, logger);
-  }
+export function createReexportStatement(exports: readonly ExportSpecifier[]) {
+  const namedExports = exports
+    .filter((e) => e.n !== undefined && e.ln === undefined)
+    .map(({ n }) => n);
+  if (namedExports.length === 0) return '';
+  return `export { ${namedExports.join(',')} };`;
 }
 
 const methods = {
-  requiresTransform,
-  importsTargetEntry,
-  transformImports,
-  transformImportsIfNeeded,
   transformIfNeeded,
+  transformImportsIfNeeded,
+  transformImports,
+  requiresTransform,
+  getEntryImports,
+  createReexportStatement,
 };
 
 export default methods;

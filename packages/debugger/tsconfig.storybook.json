@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [".storybook/**/*.ts", ".storybook/**/*.vue", "src"],
+  "exclude": ["src/**/*.spec.ts"]
+}

@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "stylelint-config-standard-scss",
+    "stylelint-config-recommended-vue",
+    "stylelint-config-recommended-vue/scss",
+    "stylelint-config-recess-order"
+  ],
+  "plugins": ["stylelint-scss"],
+  "rules": {
+    "value-keyword-case": null,
+    "no-descending-specificity": null
+  }
+}

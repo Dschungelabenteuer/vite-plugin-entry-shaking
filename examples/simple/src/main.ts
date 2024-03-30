@@ -1,9 +1,5 @@
-import { User, TestValue } from '@utils';
-import initExample from '../../init';
+import { Something } from '@lib/index';
 
-User();
-console.info(TestValue);
+console.info(Something);
 
-if (import.meta.hot) {
-  initExample(import.meta, 'Simple');
-}
+document.body.innerHTML = 'Content';

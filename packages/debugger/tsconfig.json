@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+    "types": ["node", "vite/client"],
+    "paths": {
+      "$storybook/*": ["./.storybook/*"],
+      "#store": ["./src/client/store.ts"],
+      "#utils": ["./src/client/utils.ts"],
+      "#types": ["./src/types.ts"],
+      "#uitypes": ["./src/client/types.ts"],
+      "@assets/*": ["./src/client/assets/*"],
+      "@components/*": ["./src/client/components/*"],
+      "@composables/*": ["./src/client/composables/*"],
+      "@helpers/*": ["./src/client/helpers/*"],
+      "@layout/*": ["./src/client/layout/*"],
+      "@views/*": ["./src/client/views/*"],
+      "@pages/*": ["./src/client/pages/*"],
+      "@styles/*": ["./src/client/styles/*"]
+    }
+  },
+  "include": ["**/*", ".storybook/**/*"],
+  "exclude": ["coverage", "dist", "node_modules"]
+}

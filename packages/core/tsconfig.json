@@ -10,7 +10,10 @@
     "skipLibCheck": true,
     "types": ["node", "vitest/importMeta"],
     "paths": {
-      "@mocks/*": ["./tests/__mocks__/*"]
+      "@mocks/*": ["./tests/__mocks__/*"],
+      "@test-modules/*": ["./tests/__mocks__/modules/*"],
+      "@test-cases/*": ["./tests/cases/*"]
     }
-  }
+  },
+  "exclude": ["coverage", "dist", "node_modules"]
 }

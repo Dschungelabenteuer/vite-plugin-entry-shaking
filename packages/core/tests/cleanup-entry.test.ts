@@ -114,9 +114,9 @@ const mockedCleanedEntry = dedent(`
   };
 `);
 
-const getMockedExports = async () => {
+const getMockedExports = async (content?: string) => {
   await init;
-  const [, exports] = await parse(mockedRawEntry);
+  const [, exports] = await parse(content ?? mockedRawEntry);
   return exports;
 };
 
@@ -139,10 +139,16 @@ beforeAll(async () => {
   mockedExports = await getMockedExports();
 });
 
+describe('cleanupEntry', () => {
+  it('should correctly clean up entry file (integration)', () => {
+    const output = EntryCleaner.cleanupEntry(mockedRawEntry, mockedEntryMap, mockedExports);
+    expect(output).toStrictEqual(mockedCleanedEntry);
+  });
+});
+
 describe('reformatRemainingExports', () => {
   it('should correctly reformat remaining exports (integration)', () => {
     const output = EntryCleaner.reformatRemainingExports(mockedRemovedEmptyEntry);
-
     expect(output).toStrictEqual(mockedCleanedEntry);
   });
 });
@@ -150,7 +156,6 @@ describe('reformatRemainingExports', () => {
 describe('removeEmptyExports', () => {
   it('should correctly remove empty exports (integration)', () => {
     const output = EntryCleaner.removeEmptyExports(mockedRemovedResolvedEntry);
-
     expect(output).toStrictEqual(mockedRemovedEmptyEntry);
   });
 });
@@ -165,12 +170,15 @@ describe('removeResolvedExports', () => {
 
     expect(output).toStrictEqual(mockedRemovedResolvedEntry);
   });
-});
 
-describe('cleanupEntry', () => {
-  it('should correctly clean up entry file (integration)', () => {
-    const output = EntryCleaner.cleanupEntry(mockedRawEntry, mockedEntryMap, mockedExports);
+  it('should not remove self-defined exports', async () => {
+    const input = 'export const SomeDefinedCode = "value";';
+    const exports = await getMockedExports(input);
+    const entryExports: EntryExports = new Map([
+      ['SomeDefinedCode', { selfDefined: true, path: '/some/path', importDefault: false }],
+    ]);
+    const output = EntryCleaner.removeResolvedExports(input, entryExports, exports);
 
-    expect(output).toStrictEqual(mockedCleanedEntry);
+    expect(output).toStrictEqual(input);
   });
 });
