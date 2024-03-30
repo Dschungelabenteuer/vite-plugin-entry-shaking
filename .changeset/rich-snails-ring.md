@@ -20,6 +20,7 @@
   use-cases
 - Reworked tests to get even more coverage and confidence
 - Made names more consistent with options and docs (especially entry -> target)
+- Updated dependencies
 
 ### Fixes
 
