@@ -16,7 +16,7 @@
     "noImplicitReturns": true,
     "skipLibCheck": true,
     "paths": {
-      "@utils": ["./src/utils"]
+      "@folder": ["./src/folder"]
     }
   },
   "include": ["src"]
