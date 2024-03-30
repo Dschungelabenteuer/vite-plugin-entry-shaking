@@ -10,5 +10,6 @@ export function getChronologicalTime(count: number, index: number) {
   const out = start + Math.round(step * (index + 1));
   return out;
 }
+export const root = '~/path/to/project';
 
-export const getRandomProjectPath = () => `~/path/to/project/src${faker.system.filePath()}`;
+export const getRandomProjectPath = () => `${root}/src${faker.system.filePath()}`;

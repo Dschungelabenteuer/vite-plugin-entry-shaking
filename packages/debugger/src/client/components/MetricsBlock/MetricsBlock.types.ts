@@ -1,6 +1,6 @@
 import type { MetricProps } from '@components/Metric/Metric.types';
 
-export type MetricsProps = {
+export type MetricsBlockProps = {
   /** Header metric. */
   header: MetricProps;
   /** Content metrics. */

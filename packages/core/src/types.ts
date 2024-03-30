@@ -103,6 +103,18 @@ export interface TransformData {
   potentialRequestsAvoided: number;
 }
 
+/** Plugin diagnostic. */
+export interface Diagnostic {
+  /** Diagnostic source file. */
+  file?: string;
+  /** Diagnostic name. */
+  name: keyof DiagnosticsConfig;
+  /** Diagnostic message. */
+  message: string;
+  /** Diagnostic context data. */
+  data?: any;
+}
+
 /** Map of analyzed entries indexed by their absolute path. */
 export type PluginEntries = Map<EntryPath, EntryData>;
 

@@ -51,7 +51,8 @@ const icon = computed(() => {
   --toast-margin-block: var(--spacing-sm);
 
   z-index: 1090;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
   padding-block: var(--toast-padding-block);
   padding-inline: var(--toast-padding-inline);

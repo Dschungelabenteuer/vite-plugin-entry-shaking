@@ -1,5 +1,8 @@
 import { Bar } from './second';
 import { SomeContent as MyContent } from './some-file';
+import { Flyout as FlyoutBase } from './alias';
+
+export const Flyout = () => `!${FlyoutBase}`;
 
 /**
  * This is where Bar would be used, but what about Foo?
@@ -8,4 +11,4 @@ import { SomeContent as MyContent } from './some-file';
  * - where's that "undesired tree-shaking" happening?
  *
  */
-console.info(Bar, MyContent);
+console.info(MyContent, FlyoutBase, Bar);

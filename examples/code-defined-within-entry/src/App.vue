@@ -2,7 +2,5 @@
 </script>
 
 <template>
-  <BaseLayout>
-    <router-view />
-  </BaseLayout>
+  <div>Example</div>
 </template>

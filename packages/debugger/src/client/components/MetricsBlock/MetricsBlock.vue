@@ -2,10 +2,10 @@
 import Metric from '@components/Metric/Metric.vue';
 
 import { useClassNames } from '@composables/useClassNames';
-import type { MetricsProps } from './MetricsBlock.types';
+import type { MetricsBlockProps } from './MetricsBlock.types';
 
 const $class = useClassNames('metrics');
-const props = defineProps<MetricsProps>();
+const props = defineProps<MetricsBlockProps>();
 </script>
 
 <template>

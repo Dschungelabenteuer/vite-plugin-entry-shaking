@@ -20,6 +20,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
+      "@max-depth/*": ["./src/max-depth/*"],
       "@with-import/*": ["./src/with-import/*"],
       "@without-import/*": ["./src/without-import/*"]
     }

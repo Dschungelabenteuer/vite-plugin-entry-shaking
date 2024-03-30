@@ -12,7 +12,7 @@ const props = defineProps<Required<BrowserProps>>();
 const slots = defineSlots<Pick<BrowserSlots, 'filters'>>();
 const headerSearchRef = ref<HTMLElement | null>(null);
 const headerFilterButtonRef = ref<HTMLElement | null>(null);
-const transitions = useViewTransition({
+useViewTransition({
   names: {
     'browser-header-search': headerSearchRef,
     'browser-header-filter-button': headerFilterButtonRef,

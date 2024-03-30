@@ -56,6 +56,7 @@ const iconOnly = useMediaQuery('(max-width: 600px)');
       :min-content-width="tabsMinContentWidth"
       :icon-only="iconOnly"
       :tabs="tabs"
+      :active-tab-id="activeTabId"
     />
   </div>
 </template>

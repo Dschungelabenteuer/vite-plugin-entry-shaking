@@ -5,7 +5,7 @@ import { useClassNames } from '@composables/useClassNames';
 import type { CheckboxProps } from './Checkbox.types';
 
 const $class = useClassNames('checkbox');
-const props = withDefaults(defineProps<CheckboxProps>(), { id: randomId('checkbox') });
+const props = withDefaults(defineProps<CheckboxProps>(), { id: () => randomId('checkbox') });
 const model = defineModel<boolean | string[]>();
 </script>
 

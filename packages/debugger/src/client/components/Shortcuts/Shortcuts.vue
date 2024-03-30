@@ -10,7 +10,7 @@ import ShortcutsList from './ShortcutsList.vue';
 const $class = useClassNames('shortcuts-helper');
 const emit = defineEmits<ShortcutsEvents>();
 const props = withDefaults(defineProps<ShortcutsProps>(), {
-  id: randomId('shortcuts'),
+  id: () => randomId('shortcuts'),
 });
 
 const reference = ref<HTMLButtonElement | null>(null);

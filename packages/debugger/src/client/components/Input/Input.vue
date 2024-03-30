@@ -11,7 +11,7 @@ const $class = useClassNames('input');
 const slots = defineSlots<InputSlots>();
 const model = defineModel<string>();
 const props = withDefaults(defineProps<InputProps>(), {
-  id: randomId('input'),
+  id: () => randomId('input'),
 });
 
 const classes = computed(() => [$class('wrapper')]);

@@ -196,7 +196,7 @@ function cleanupEntry(
 
   if (requiresDiagnostic) {
     const diagnostic = DiagnosticKinds[diagnosticName](entryPath);
-    const diagnosticCtx = { path: entryPath };
+    const diagnosticCtx = { source: entryPath };
     const diagnosticIndex = ctx.diagnostics.add(diagnosticName, diagnostic.message, diagnosticCtx);
     diagnostics.add(diagnosticIndex);
   }
@@ -334,7 +334,7 @@ async function registerWildcardImportIfNeeded(
         ctx.logger.debug(diagnostic.base);
       } else {
         if (ctx.diagnostics.isEnabled(diagnosticName)) {
-          const diagnosticCtx = { path, importedFrom };
+          const diagnosticCtx = { path, importedFrom, source: importedFrom };
           const diagnosticIndex = ctx.diagnostics.add(
             diagnosticName,
             diagnostic.message,

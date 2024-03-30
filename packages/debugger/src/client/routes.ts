@@ -25,6 +25,15 @@ export const routes: RouteRecordRaw[] = [
     },
   },
   {
+    name: 'Entry',
+    path: '/entries/:path/:tab',
+    component: Entries,
+    meta: {
+      navItem: false,
+      icon: 'target-arrow',
+    },
+  },
+  {
     name: 'Transforms',
     path: '/transforms',
     component: Transforms,
@@ -52,7 +61,8 @@ export function createRouter() {
     routes,
   });
 
-  router.beforeResolve(async () => {
+  router.beforeResolve(async (a) => {
+    if (!a.meta.transition) return;
     setAllLazyTransitions(false);
     await doTransition(undefined, () => setAllLazyTransitions(true));
   });

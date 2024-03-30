@@ -1,5 +1,6 @@
 import type { PluginOption } from 'vite';
 import type {
+  Diagnostic,
   PluginMetrics,
   PluginEntries,
   PluginOptions,
@@ -17,6 +18,7 @@ import { mergeOptions } from './options';
 import { loadDebugger } from './utils';
 
 export type {
+  Diagnostic,
   PluginEntries,
   PluginMetrics,
   PluginOptions,
@@ -29,6 +31,8 @@ export type {
   Log,
   Context,
 };
+
+export { DiagnosticKinds } from './diagnostics';
 
 export const name = 'vite-plugin-entry-shaking';
 
@@ -56,7 +60,6 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
     },
 
     async load(id) {
-      console.log('@@@ load', id);
       return context.loadFile(id);
     },
 

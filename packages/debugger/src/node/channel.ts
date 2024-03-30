@@ -1,4 +1,4 @@
-import type { ViteDevServer, WebSocketServer } from 'vite';
+import type { HMRBroadcaster, ViteDevServer } from 'vite';
 import type { Context } from 'vite-plugin-entry-shaking';
 import type { ConsumerPackageInfo } from '../types';
 import { wsMessageName, READY } from '../shared';
@@ -12,17 +12,31 @@ const _ = wsMessageName;
  * @param ctx Detached plugin context.
  * @param consumer Information about consumer's `package.json` file.
  */
-export function createChannel({ ws }: ViteDevServer, ctx: Context, consumer: ConsumerPackageInfo) {
-  subscribeToEventBus(ws, ctx);
+export function createChannel(
+  { hot, config }: ViteDevServer,
+  ctx: Context,
+  consumer: ConsumerPackageInfo,
+) {
+  subscribeToEventBus(hot, ctx);
+  const { root } = config;
 
-  ws.on(READY, () => {
-    ws.send(
+  hot.on(READY, () => {
+    hot.send(
       READY,
       JSONMap.stringify({
-        metrics: ctx.metrics,
-        entries: ctx.entries,
-        logs: ctx.logger.logs,
+        root,
         consumer,
+        entries: ctx.entries,
+        metrics: ctx.metrics,
+        logs: ctx.logger.logs,
+        options: {
+          diagnostics: ctx.options.diagnostics,
+          debug: ctx.options.debug,
+        },
+        diagnostics: {
+          list: ctx.diagnostics.list,
+          listPerPath: ctx.diagnostics.listPerPath,
+        },
       }),
     );
   });
@@ -35,8 +49,8 @@ export function createChannel({ ws }: ViteDevServer, ctx: Context, consumer: Con
  * @param ws Vite's Web Socket server.
  * @param ctx Detached plugin context.
  */
-function subscribeToEventBus(ws: WebSocketServer, ctx: Context) {
+function subscribeToEventBus(hot: HMRBroadcaster, ctx: Context) {
   ctx.eventBus?.subscribe((event, data) => {
-    ws.send(_(event), JSONMap.stringify(data.length > 1 ? [...data] : data[0]));
+    hot.send(_(event), JSONMap.stringify(data.length > 1 ? [...data] : data[0]));
   });
 }

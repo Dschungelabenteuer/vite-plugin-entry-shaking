@@ -1,24 +1,11 @@
 <script setup lang="ts">
 import { computed, provide, reactive } from 'vue';
 
-import type { TransformData } from 'vite-plugin-entry-shaking';
-
 import type { VerticalTab } from '@views/VerticalTabs/VerticalTabs.types';
 import Details from '@views/Details/Details.vue';
+import type { TransformDetailsEvents, TransformDetailsProps } from './Transform.types';
 import TransformMetrics from './details/TransformMetrics.vue';
 import TransformDiffs from './details/TransformDiffs.vue';
-
-export type TransformDetailsProps = {
-  /** Transform path. */
-  path?: string;
-  /** Transform data. */
-  transform?: TransformData;
-};
-
-type TransformDetailsEvents = {
-  /** Emitted when the end of the tab list is reached. */
-  'end-reached': [];
-};
 
 const emit = defineEmits<TransformDetailsEvents>();
 const props = defineProps<TransformDetailsProps>();
@@ -45,8 +32,8 @@ provide('depth', 1);
 <template>
   <Details
     id="transform-details"
-    :absolute-path="String(path)"
-    :relative-path="String(path)"
+    :absolute-path
+    :relative-path
     :tabs
     tabs-label="Transform  details"
     tabs-width="200px"

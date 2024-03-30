@@ -1,18 +1,16 @@
-import { computed, ref, toValue } from 'vue';
 import type { ComputedRef, Ref } from 'vue';
-import type {
-  VirtualScrollViewEvents,
-  VirtualScrollViewProps,
-} from '@views/VirtualScroll/VirtualScroll.types';
-import type { ShortEmits } from '../../types';
-import { useViewTransition } from '../../composables/useViewTransition';
+import { computed, ref, toValue } from 'vue';
+
+import type { ShortEmits } from '#uitypes';
+import { useViewTransition } from '@composables/useViewTransition';
+import type { VirtualScrollEvents, VirtualScrollProps } from './VirtualScroll.types';
 import { useVirtualScroll } from './useVirtualScroll';
 
 export function useTransitionableVirtualScroll(
   containerRef: Ref<HTMLElement | null>,
   contentRef: Ref<HTMLElement | null>,
-  props: VirtualScrollViewProps,
-  emit: ShortEmits<VirtualScrollViewEvents>,
+  props: VirtualScrollProps,
+  emit: ShortEmits<VirtualScrollEvents>,
   beforeItemsCount: number | ComputedRef<number> = 0,
 ) {
   // Base virtual scroll behaviour.

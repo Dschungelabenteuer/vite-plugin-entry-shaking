@@ -21,7 +21,7 @@ const selfTime = computed(() => formatDuration(props.item.self));
       icon="eye"
       :tooltip-options="{ disabled: true }"
       :icon-only="true"
-      @click="emit('view', item.path)"
+      @click="emit('view', item.absolutePath)"
     />
   </div>
   <div :class="$class('time')">{{ totalTime }}</div>
@@ -35,7 +35,7 @@ const selfTime = computed(() => formatDuration(props.item.self));
     </div>
   </div>
   <div :class="$class('path')">
-    <span>{{ item.path }}</span>
+    <span>{{ item.relativePath }}</span>
   </div>
 </template>
 

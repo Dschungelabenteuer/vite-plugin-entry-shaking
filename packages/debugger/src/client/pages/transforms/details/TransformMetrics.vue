@@ -3,12 +3,12 @@ import { computed, inject } from 'vue';
 import { formatDuration } from '#utils';
 import Metric from '@components/Metric/Metric.vue';
 import { useClassNames } from '@composables/useClassNames';
-import type { TransformDetailsProps } from '../TransformDetails.vue';
+import type { TransformDetailsProps } from '../Transform.types';
 
 const $class = useClassNames('transform-metrics');
 const transformDetails = inject<TransformDetailsProps>('transform-details')!;
 const transformDuration = computed(() => formatDuration(transformDetails.transform?.time ?? 0));
-const entriesImported = computed(() => String(transformDetails.transform?.entriesMatched ?? 0));
+const entriesImported = computed(() => transformDetails.transform?.entriesMatched ?? 0);
 </script>
 
 <template>

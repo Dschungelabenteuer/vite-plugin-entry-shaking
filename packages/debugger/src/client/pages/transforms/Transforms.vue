@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, toRefs } from 'vue';
 import { useRoute } from 'vue-router';
-
 import type { TransformData } from 'vite-plugin-entry-shaking';
+
+import { relativePath } from '#utils';
 import { store } from '#store';
 import Button from '@components/Button/Button.vue';
 import Dialog from '@components/Dialog/Dialog.vue';
@@ -19,7 +20,8 @@ const ctxStore = toRefs(store);
 const source = computed(() =>
   [...ctxStore.transforms.value.entries()].map(([path, transform]) => ({
     ...transform,
-    path,
+    absolutePath: path,
+    relativePath: relativePath(store.root, path),
   })),
 );
 
@@ -69,6 +71,7 @@ const total = computed(() => store.transforms?.size ?? 0);
 const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.icon as string }));
 const activeTransform = ref<TransformData | undefined>(undefined);
 const activePath = ref<string | undefined>(undefined);
+const activeRelativePath = computed(() => relativePath(store.root, activePath.value ?? ''));
 const handleTransformView = (path: string) => {
   activePath.value = path;
   activeTransform.value = store.transforms?.get(path);
@@ -111,7 +114,8 @@ const handleTransformView = (path: string) => {
   >
     <TransformDetails
       :transform="activeTransform"
-      :path="activePath"
+      :relative-path="activeRelativePath"
+      :absolute-path="activePath ?? ''"
       @end-reached="() => dialogRef?.focusFirst()"
     />
 

@@ -59,6 +59,9 @@ function mockExports(): EntryExports {
   );
 }
 
+// eslint-disable-next-line import/no-mutable-exports
+export let diagnosticsCount = 0;
+
 export const entries: Context['entries'] = new Map(
   new Array(mockedEntryCount).fill(0).map((): [string, EntryData] => {
     const timeOne = faker.number.float({ min: 0, max: 100, fractionDigits: 15 });
@@ -66,6 +69,11 @@ export const entries: Context['entries'] = new Map(
     const wildcardExports = mockWildcardExports();
     const exports = mockExports();
     const depth = faker.number.int({ min: 0, max: 1 });
+    const diagnostics = new Array(faker.number.int({ min: 0, max: 3 })).fill(0).map(() => {
+      diagnosticsCount += 1;
+      return diagnosticsCount;
+    });
+
     return [
       getRandomProjectPath(),
       {
@@ -75,7 +83,7 @@ export const entries: Context['entries'] = new Map(
         depth,
         exports,
         isImplicit: faker.datatype.boolean({ probability: 0.12 }),
-        diagnostics: new Set(),
+        diagnostics: new Set(diagnostics),
         importsCount: faker.number.int({ min: 0, max: 12 }),
         hits: faker.number.int({ min: 0, max: 8 }),
         time: Math.max(timeOne, timeTwo),

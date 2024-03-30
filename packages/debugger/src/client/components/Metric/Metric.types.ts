@@ -4,7 +4,9 @@ export type MetricProps = {
   /** Metric label. */
   label: string;
   /** Metric value. */
-  value: string;
+  value: string | number;
   /** Metric type. */
-  type: 'duration' | 'count';
+  type: 'duration' | 'count' | 'raw';
+  /** Is the metric clickable? */
+  clickable?: boolean;
 };

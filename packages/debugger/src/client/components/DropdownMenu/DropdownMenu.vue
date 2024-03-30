@@ -50,6 +50,18 @@ const { handleKeydown } = useDropdownMenu(props, emit, menuItemRefs);
     .button {
       justify-content: flex-start;
       width: 100%;
+
+      &.active {
+        outline: solid 2px transparent;
+        outline-color: var(--accent-color);
+        box-shadow:
+          inset 0 0 0 1px var(--button-outline-color),
+          inset 0 0 0 4px var(--background-color);
+      }
+
+      &:focus {
+        color: var(--accent-color);
+      }
     }
   }
 }

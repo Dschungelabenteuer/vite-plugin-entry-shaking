@@ -13,7 +13,7 @@ const props = defineProps<RouterButtonProps>();
     custom
   >
     <Button
-      :label="String(label)"
+      :label="label"
       :icon="icon"
       :class="{ active: isActive }"
       @click="navigate"
@@ -24,7 +24,7 @@ const props = defineProps<RouterButtonProps>();
       >
         <Badge
           v-if="count !== undefined"
-          :content="String(count)"
+          :content="count"
         />
       </template>
     </Button>

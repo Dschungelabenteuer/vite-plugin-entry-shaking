@@ -2,7 +2,6 @@
 import { ref } from 'vue';
 
 import Navigation from '@layout/Navigation/Navigation.vue';
-import Button from '@components/Button/Button.vue';
 import RouterButton from '@components/RouterButton/RouterButton.vue';
 import { useClassNames } from '@composables/useClassNames';
 import { useViewTransition } from '@composables/useViewTransition';
@@ -15,7 +14,7 @@ const props = withDefaults(defineProps<HeaderProps>(), {
 });
 
 const headerRef = ref<HTMLElement | null>(null);
-const transition = useViewTransition({ names: { 'layout-header': headerRef } });
+useViewTransition({ names: { 'layout-header': headerRef } });
 </script>
 
 <template>

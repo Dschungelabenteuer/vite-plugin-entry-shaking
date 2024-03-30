@@ -4,15 +4,26 @@ import { inject, nextTick, ref, watch } from 'vue';
 import MetricsBlock from '@components/MetricsBlock/MetricsBlock.vue';
 import Button from '@components/Button/Button.vue';
 
+import { useClassNames } from '@composables/useClassNames';
 import type { Panel } from '@views/Panel/Panel.types';
 import PanelView from '@views/Panel/Panel.vue';
-import DiagnosticsOverview from './DiagnosticsOverview.vue';
+import Diagnostics from './Diagnostics.vue';
 import { useMetricsPanel } from './useMetricsPanel';
 
+const $class = useClassNames('metrics');
 const closeBtnRef = ref<InstanceType<typeof Button> | null>(null);
 const metricsPanel = inject<Panel>('metricsPanel')!;
 const { toggle, openBtnId, isOpen } = metricsPanel;
-const { timeHeader, timeDetails, requestsHeader, requestsDetails } = useMetricsPanel();
+const {
+  timeHeader,
+  timeDetails,
+  requestsHeader,
+  requestsDetails,
+  diagnosticsHeader,
+  diagnosticsDetails,
+  optionsHeader,
+  optionsDetails,
+} = useMetricsPanel();
 
 watch(isOpen, (open) => {
   nextTick(() => {
@@ -28,7 +39,7 @@ watch(isOpen, (open) => {
     title="Metrics"
     close-panel-label="Close metrics panel"
   >
-    <div>
+    <div :class="$class('content')">
       <MetricsBlock
         :header="timeHeader"
         :details="timeDetails"
@@ -37,7 +48,14 @@ watch(isOpen, (open) => {
         :header="requestsHeader"
         :details="requestsDetails"
       />
-      <DiagnosticsOverview />
+      <Diagnostics
+        :header="diagnosticsHeader"
+        :details="diagnosticsDetails"
+      />
+      <MetricsBlock
+        :header="optionsHeader"
+        :details="optionsDetails"
+      />
     </div>
     <template #footer>
       <Button
@@ -61,5 +79,14 @@ watch(isOpen, (open) => {
 <style lang="scss">
 #metrics-panel {
   z-index: 1000;
+}
+
+.metrics {
+  &__content {
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    overflow: hidden;
+  }
 }
 </style>

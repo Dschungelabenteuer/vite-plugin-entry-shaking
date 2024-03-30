@@ -9,8 +9,14 @@ export function useVerticalTabs(
   props: VerticalTabsProps,
   tabs: Ref<(ButtonInstance | HTMLButtonElement | null)[]>,
 ) {
+  const activeTabId = props.activeTabId
+    ? Math.max(
+        0,
+        props.tabs.findIndex((tab) => tab.id === props.activeTabId),
+      )
+    : 0;
   const menuItems = ref<(HTMLButtonElement | null)[]>([]);
-  const menu = useMenu('y', menuItems);
+  const menu = useMenu('y', menuItems, activeTabId);
   const ids = useVerticalTabsIds(props);
   const tablistWidth = computed(() => (props.iconOnly ? 'auto' : props.width));
 

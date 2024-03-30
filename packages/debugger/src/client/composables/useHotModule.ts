@@ -57,9 +57,12 @@ function getInitialState(hotContext: ViteHotContext) {
   hotContext.send(READY);
   hotContext.on(READY, (res) => {
     const data = JSONMap.parse(res);
+    store.root = data.root;
     store.logs = data.logs ?? [];
     store.entries = data.entries;
     store.metrics = data.metrics;
+    store.diagnostics = data.diagnostics;
+    store.options = data.options;
     store.transforms = data.transforms ?? new Map();
     store.status = 'connected';
   });

@@ -55,3 +55,25 @@ export const formatDuration = (duration: number) => {
 };
 
 export const mergeKeyVal = ([key, val]: [key: string, col: any]) => ({ key, ...val });
+
+export function relativePath(from: string, to: string) {
+  const fromParts = from.split('/');
+  const toParts = to.split('/');
+
+  let i = 0;
+  while (i < fromParts.length && i < toParts.length && fromParts[i] === toParts[i]) i += 1;
+  let output = '';
+  if (i === fromParts.length) {
+    output += './';
+  } else {
+    for (let j = i; j < fromParts.length; j += 1) output += '../';
+  }
+  for (let k = i; k < toParts.length; k += 1) {
+    output += toParts[k];
+    if (k < toParts.length - 1) {
+      output += '/';
+    }
+  }
+
+  return output;
+}

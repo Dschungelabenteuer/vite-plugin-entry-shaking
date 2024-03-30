@@ -7,6 +7,8 @@ export type DialogProps = {
   width?: string;
   /** Dialog height. */
   height?: string;
+  /** Should dialog content be removed its default padding? */
+  unpad?: boolean;
 };
 
 export type DialogEvents = {

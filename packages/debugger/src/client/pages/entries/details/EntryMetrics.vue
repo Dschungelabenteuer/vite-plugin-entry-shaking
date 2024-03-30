@@ -10,8 +10,8 @@ const $class = useClassNames('entry-metrics');
 const entryDetails = inject<EntryDetailsProps>('entry-details')!;
 const totalDuration = computed(() => formatDuration(entryDetails.entry?.time ?? 0));
 const selfDuration = computed(() => formatDuration(entryDetails.entry?.self ?? 0));
-const importsAnalyzed = computed(() => String(entryDetails.entry?.importsCount ?? 0));
-const hits = computed(() => String(entryDetails.entry?.hits ?? 0));
+const importsAnalyzed = computed(() => entryDetails.entry?.importsCount ?? 0);
+const hits = computed(() => entryDetails.entry?.hits ?? 0);
 </script>
 
 <template>

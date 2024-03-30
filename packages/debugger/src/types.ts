@@ -1,4 +1,11 @@
-import type { Log, PluginEntries, PluginMetrics, TransformData } from 'vite-plugin-entry-shaking';
+import type {
+  Log,
+  PluginEntries,
+  Diagnostic,
+  PluginMetrics,
+  TransformData,
+  PluginOptions,
+} from 'vite-plugin-entry-shaking';
 
 /** Information about the consuming package. */
 export interface ConsumerPackageInfo {
@@ -28,6 +35,8 @@ export type ChannelStatus =
  * This represents data shared between both debugger and the consuming Vite-based applciation.
  */
 export interface ChannelStore {
+  /** Vite server's root directory. */
+  root: string;
   /** Name of the debugged package. */
   name: string;
   /** Version of the debugged package. */
@@ -38,12 +47,18 @@ export interface ChannelStore {
   consumer: ConsumerPackageInfo;
   /** Plugin metrics. */
   metrics: PluginMetrics;
+  /** Plugin diagnostics. */
+  diagnostics: { list: Diagnostic[]; listPerPath: Map<string, number[]> };
   /** List of transforms. */
   transforms: Map<string, TransformData>;
   /** List of targets. */
   entries: PluginEntries;
   /** List of logs. */
   logs: Log[];
+  /** List of options. */
+  options: PluginOptions & {
+    diagnostics: Required<Exclude<PluginOptions['diagnostics'], boolean>>;
+  };
   /** Channel status. */
   status: 'disconnected' | 'connected' | 'connecting';
 }
@@ -72,4 +87,12 @@ export interface ChannelMessages {
 /** Returns known keys of a given object type/interface. */
 export type KnownKeys<T> = {
   -readonly [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K];
+};
+
+/** Paths to a file. */
+export type Paths = {
+  /** Entry's absolute path. */
+  absolutePath: string;
+  /** Entry's absolute path. */
+  relativePath: string;
 };

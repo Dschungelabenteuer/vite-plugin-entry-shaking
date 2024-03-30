@@ -14,6 +14,8 @@ export type DetailsProps = {
   tabsLabel: string;
   /** Details tabs width. */
   tabsWidth: string;
-  /** Detilas tabs' min content width */
+  /** Details tabs' min content width */
   tabsMinContentWidth: string;
+  /** ID of the default active tab. */
+  activeTabId?: string;
 };

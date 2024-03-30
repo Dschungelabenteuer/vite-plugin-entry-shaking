@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, toRefs } from 'vue';
-import { useRoute } from 'vue-router';
+import { watch, computed, onMounted, ref, toRefs } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import type { EntryData } from 'vite-plugin-entry-shaking';
 
+import { relativePath } from '#utils';
 import { store } from '#store';
 import Button from '@components/Button/Button.vue';
 import Dialog from '@components/Dialog/Dialog.vue';
@@ -14,13 +15,15 @@ import Entry from './Entry.vue';
 import EntriesFilters from './EntriesFilters.vue';
 import EntryDetails from './EntryDetails.vue';
 
+const router = useRouter();
 const route = useRoute();
 const dialogRef = ref<InstanceType<typeof Dialog> | null>(null);
 const ctxStore = toRefs(store);
 const source = computed(() =>
   [...ctxStore.entries.value.entries()].map(([path, entry]) => ({
     ...entry,
-    path,
+    absolutePath: path,
+    relativePath: relativePath(store.root, path),
   })),
 );
 
@@ -76,11 +79,29 @@ const total = computed(() => store.entries?.size);
 const page = computed(() => ({ name: route.name as string, pageIcon: route.meta.icon as string }));
 const activeEntry = ref<EntryData | undefined>(undefined);
 const activePath = ref<string | undefined>(undefined);
+const activeRelativePath = computed(() => relativePath(store.root, activePath.value ?? ''));
 const handleEntryView = (path: string) => {
   activePath.value = path;
   activeEntry.value = store.entries?.get(path);
   dialogRef.value?.element?.showModal();
 };
+
+const handleRouteParams = () => {
+  if (route.params.path) {
+    handleEntryView(route.params.path as string);
+  }
+};
+
+const handleDetailsClose = () => {
+  activeEntry.value = undefined;
+  router.push({ name: 'Entries' });
+};
+
+watch(route, handleRouteParams);
+
+onMounted(() => {
+  handleRouteParams();
+});
 </script>
 
 <template>
@@ -118,11 +139,12 @@ const handleEntryView = (path: string) => {
     title="Entry data"
     width="960px"
     height="640px"
-    @close="activeEntry = undefined"
+    @close="handleDetailsClose"
   >
     <EntryDetails
       :entry="activeEntry"
-      :path="activePath"
+      :relative-path="activeRelativePath"
+      :absolute-path="activePath ?? ''"
       @end-reached="() => dialogRef?.focusFirst()"
     />
 

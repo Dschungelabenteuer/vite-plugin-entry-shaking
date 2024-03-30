@@ -1,15 +1,4 @@
-import type { DiagnosticsConfig, FinalPluginOptions } from './types';
-
-export interface Diagnostic {
-  /** Diagnostic source file. */
-  file?: string;
-  /** Diagnostic name. */
-  name: keyof DiagnosticsConfig;
-  /** Diagnostic message. */
-  message: string;
-  /** Diagnostic context data. */
-  data?: any;
-}
+import type { Diagnostic, DiagnosticsConfig, FinalPluginOptions } from './types';
 
 /** Plugin's diagnostics. */
 export class Diagnostics {
@@ -31,11 +20,11 @@ export class Diagnostics {
     this.list.push({ name, message, data });
     const diagnosticIndex = this.list.length - 1;
 
-    if (data.path) {
-      if (!this.listPerPath.has(data.path)) {
-        this.listPerPath.set(data.path, []);
+    if (data.source) {
+      if (!this.listPerPath.has(data.source)) {
+        this.listPerPath.set(data.source, [diagnosticIndex]);
       } else {
-        this.listPerPath.get(data.path)?.push(diagnosticIndex);
+        this.listPerPath.get(data.source)?.push(diagnosticIndex);
       }
     }
 
@@ -55,30 +44,24 @@ export const DiagnosticKinds = {
   definedWithinEntry: (entryPath: string) => {
     const name: keyof DiagnosticsConfig = 'definedWithinEntry';
     const base = `Entry file "${entryPath}" exports code it defines and imports code from other modules.`;
-    return {
-      base,
-      name,
-      message:
-        `${base} Such imports are never cleaned up because they could have side-effects and be consumed by` +
-        ` code defined by the entry file. Determining whether such imports are unused could be expensive.` +
-        ` This means that if you were to import any entity defined by that entry file, it could result in unnecessary requests.` +
-        `\n` +
-        `You may ignore this warning by setting the \`diagnostics.definedWithinEntry\` option to false.`,
-    };
+    const message =
+      `${base} Such imports are never cleaned up because they could have side-effects and be consumed by` +
+      ` code defined by the entry file. Determining whether such imports are unused could be expensive.` +
+      ` This means that if you were to import any entity defined by that entry file, it could result in unnecessary requests.` +
+      `\n` +
+      `You may ignore this warning by setting the \`diagnostics.definedWithinEntry\` option to false.`;
+    return { base, name, message };
   },
 
   maxDepthReached: (path: string, importedFrom: string) => {
     const name: keyof DiagnosticsConfig = 'maxDepthReached';
     const base = `Max depth reached at path "${importedFrom}", skipping wildcard import analysis of "${path}"…`;
-    return {
-      base,
-      name,
-      message:
-        `${base} Such imports are never cleaned up because they could have side-effects and be consumed by` +
-        ` code defined by the entry file. Determining whether such imports are unused could be expensive.` +
-        ` This means that if you were to import any entity defined by that entry file, it could result in unnecessary requests.` +
-        `\n` +
-        `You may ignore this warning by setting the \`diagnostics.definedWithinEntry\` option to false.`,
-    };
+    const message =
+      `${base} Such imports are never cleaned up because they could have side-effects and be consumed by` +
+      ` code defined by the entry file. Determining whether such imports are unused could be expensive.` +
+      ` This means that if you were to import any entity defined by that entry file, it could result in unnecessary requests.` +
+      `\n` +
+      `You may ignore this warning by setting the \`diagnostics.definedWithinEntry\` option to false.`;
+    return { base, name, message };
   },
 };

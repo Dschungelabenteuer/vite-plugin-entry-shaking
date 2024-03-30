@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import Button from '@components/Button/Button.vue';
 import type { ButtonInstance } from '@components/Button/Button.types';
+import Badge from '@components/Badge/Badge.vue';
 import { useClassNames } from '@composables/useClassNames';
 import type { VerticalTabsProps } from './VerticalTabs.types';
 import { useVerticalTabs } from './useVerticalTabs';
@@ -30,13 +31,23 @@ const { menu, ids, tablistWidth, setActiveTab } = useVerticalTabs(props, tabButt
         :label="tab.label"
         :icon="tab.icon"
         :icon-only="iconOnly"
-        :badge="tab.count ? String(tab.count) : undefined"
+        :badge="tab.count ? tab.count : undefined"
         :aria-controls="ids.getTabPanelId(tab.id)"
         :aria-selected="menu.isActiveIndex(index)"
         role="tab"
         @click="setActiveTab(index)"
         @keydown="menu.handleKeydown"
-      />
+      >
+        <template
+          v-if="tab.count"
+          #after
+        >
+          <Badge
+            :content="tab.count"
+            :max="99"
+          />
+        </template>
+      </Button>
       <div class="sep" />
     </div>
     <div :class="$class('content')">

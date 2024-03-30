@@ -10,6 +10,7 @@ import {
 import Toaster from '@components/Toast/Toaster.vue';
 import { useClassNames } from '@composables/useClassNames';
 import { FLOATING_CONTAINER_CLASS, FLOATING_CONTAINER_ID_VAR } from '@composables/useFloating';
+import { useViewTransition } from '@composables/useViewTransition';
 import type { DialogEvents, DialogProps, DialogSlots } from './Dialog.types';
 import { useDialog } from './useDialog';
 
@@ -17,7 +18,7 @@ const $class = useClassNames('dialog');
 const emit = defineEmits<DialogEvents>();
 const slots = defineSlots<DialogSlots>();
 const props = withDefaults(defineProps<DialogProps>(), {
-  id: randomId('dialog'),
+  id: () => randomId('dialog'),
   title: undefined,
   width: 'auto',
   height: 'auto',
@@ -25,10 +26,11 @@ const props = withDefaults(defineProps<DialogProps>(), {
 
 const element = ref<HTMLDialogElement | null>(null)!;
 const toasterRef = ref<InstanceType<typeof Toaster> | null>(null);
-const classes = computed(() => [$class()]);
-const dialog = useDialog(emit, element);
+const classes = computed(() => [$class(), { unpad: props.unpad }]);
+const dialog = useDialog(props, emit, element);
 const toaster = useToaster(toasterRef);
 const { trap, close, handleClick, handleClose, handleOpen, teleport } = dialog;
+const { dialogTransitionName, backdropTransitionName, isOpen } = dialog;
 const enableTeleports = ref(false);
 
 provide(TOASTER_CONTAINER_ID_VAR, `${props.id}-toaster`);
@@ -40,6 +42,11 @@ onMounted(() => {
   enableTeleports.value = true;
 });
 
+useViewTransition({
+  names: {
+    [dialogTransitionName.value]: element,
+  },
+});
 defineExpose({
   element,
   refreshFocusTrap: trap.refresh,
@@ -60,23 +67,25 @@ defineExpose({
       @close="handleClose"
       @open="handleOpen"
     >
-      <div :class="$class('header')">
-        <h2>{{ title }}</h2>
-        <Button
-          :class="$class('close')"
-          autofocus
-          label="Close"
-          icon="x"
-          :icon-only="true"
-          @click="close"
-        />
-      </div>
-      <div :class="$class('content')">
-        <slot />
-      </div>
-      <div :class="$class('footer')">
-        <slot name="footer" />
-      </div>
+      <template v-if="isOpen">
+        <div :class="$class('header')">
+          <h2>{{ title }}</h2>
+          <Button
+            :class="$class('close')"
+            autofocus
+            label="Close"
+            icon="x"
+            :icon-only="true"
+            @click="close"
+          />
+        </div>
+        <div :class="$class('content')">
+          <slot />
+        </div>
+        <div :class="$class('footer')">
+          <slot name="footer" />
+        </div>
+      </template>
       <div
         :id="`${id}-floating`"
         :class="FLOATING_CONTAINER_CLASS"
@@ -124,7 +133,9 @@ defineExpose({
     2.7px 4.8px 6.2px -1.7px hsl(var(--shadow-color) / 22%),
     6.5px 11.4px 14.8px -2.5px hsl(var(--shadow-color) / 22%);
   opacity: 0;
-  transition: all var(--easing-backwards) var(--transition-duration-short);
+  transition:
+    transform var(--easing-backwards) var(--transition-duration-short),
+    opacity var(--easing-backwards) var(--transition-duration-short);
   transform: translateY(-0.8rem);
   transform-origin: top center;
   view-transition-name: dialog;
@@ -132,8 +143,14 @@ defineExpose({
   &[open] {
     pointer-events: inherit;
     opacity: 1;
-    transition: all var(--easing-forwards) var(--transition-duration-medium);
+    transition:
+      transform var(--easing-forwards) var(--transition-duration-medium),
+      opacity var(--easing-forwards) var(--transition-duration-medium);
     transform: translateY(0);
+  }
+
+  &:focus {
+    outline: 1px solid var(--accent-color);
   }
 
   &::backdrop {
@@ -178,6 +195,22 @@ defineExpose({
 
   .icon-button {
     margin-inline-start: auto;
+  }
+
+  &.unpad {
+    .dialog {
+      &__content {
+        padding: 1px;
+      }
+    }
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+.dialog {
+  &::backdrop {
+    view-transition-name: v-bind(backdropTransitionName);
   }
 }
 </style>

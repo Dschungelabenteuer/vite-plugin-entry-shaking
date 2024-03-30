@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/assets/16818271/85f20faf-0e76-4339-a703-0f4ef1252de9">
+    <img src="https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/assets/16818271/6af66867-ffea-4f7d-9f56-3801ffd17659" alt="Vite-plugin-entry-shaking illustration" width="600" />
+  </picture>
+</p>
+
 <h1 align="center">vite-plugin-entry-shaking</h1>
 
 <p align="center">
@@ -72,13 +79,49 @@ export default defineConfig({
       <td>maxWildcardDepth</td>
       <td><code>number</code></td>
       <td><code>0</code></td>
-      <td>How deep should this plugin run static analysis when encountering wildcards? <a href="">Read more</a></td>
+      <td>How deep should this plugin run static analysis when encountering wildcards?</td>
+    </tr>
+    <tr>
+      <td>diagnostics</td>
+      <td><code>boolean | DiagnosticsConfig</code></td>
+      <td><code>true</code></td>
+      <td>Toggles all diagnostics when set as a boolean, or specific diagnostics when set as an object.</td>
     </tr>
     <tr>
       <td>debug</td>
       <td><code>boolean</code></td>
       <td><code>false</code></td>
-      <td>Turns on debug mode. This will print debug logs if Vite's <code>logLevel</code> is set to any other value than <code>'silent'</code></td>
+      <td>Toggles debug mode. This will print debug logs if Vite's <code>logLevel</code> is set to any other value than <code>'silent'</code></td>
+    </tr>
+  </tbody>
+</table>
+
+### Diagnostics configuration
+
+Diagnostics are recommendations/warnings emitted by the plugin as it analyzes the specified entry
+files. They aim to help you improve the plugin's efficiency by suggesting changes and provide
+explanation on why they were emitted. See
+[RESOURCES](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/RESOURCES.md)
+for a more in-depth insight about possible diagnostics.
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>definedWithinEntry</td>
+      <td><code>true</code></td>
+      <td>Emit warning if an entry file defines code that may prevent tree-shaking.</td>
+    </tr>
+    <tr>
+      <td>maxDepthReached</td>
+      <td><code>true</code></td>
+      <td>Emits a warning when max analysis depth was reached when handling wildcard imports.</td>
     </tr>
   </tbody>
 </table>
@@ -90,6 +133,26 @@ Examples illustrating usage and benefits can be found
 free to fork and play around. For instance, you can toggle the plugin on and off their respective
 vite config file while serving in development mode and see how it affects the amount of requests
 made by your browser.
+
+This repository provides a simple CLI to help you quickly scaffold a new example, simply run the
+following command from the project's root to get started:
+
+```bash
+pnpm generate-example
+```
+
+## Debugger
+
+Version `0.4.0` introduces
+[a debugger](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/packages/debugger)
+as an optional dependency. When installed and attached to the plugin, a debugger application will
+open alongside your actual application in dev mode. This can help you get an overall idea of what
+the plugin is processing and its impacts on performances.
+
+![debugger preview](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/assets/16818271/78d533df-b59f-457e-ba21-17430f40795b)
+
+> [!NOTE] This requires installing `vite-plugin-entry-shaking-debugger` and setting the `debug`
+> option to `true`.
 
 ## Motivation
 
@@ -168,6 +231,8 @@ which could therefore trigger unnecessary requests, as described earlier. To pre
 scenario, any import of an entry point is caught and is forced to serve its mutated version we
 stored while parsing the entry point file. This ensures the entry point only imports what it needs
 to make the code it explicitly defines work.
+
+[Please refer to RESOURCES.md for a more precise overview of what happens under the hood](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/RESOURCES.md).
 
 ## Limitations
 

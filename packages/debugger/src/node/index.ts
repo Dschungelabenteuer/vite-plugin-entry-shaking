@@ -50,7 +50,10 @@ function printUrls(server: ViteDevServer, debuggerRoute: string, consumer: Consu
       const baseUrl = url.endsWith('/') && debuggerRoute.startsWith('/') ? url.slice(0, -1) : url;
       const debugPath = debuggerRoute.endsWith('/') ? debuggerRoute : `${debuggerRoute}/`;
       const debugUrl = `${baseUrl}${debugPath}`;
-      if (!i) openBrowser(debugUrl);
+      if (!i) {
+        openBrowser(baseUrl);
+        openBrowser(debugUrl, 300);
+      }
 
       server.config.logger.info(
         colors.dim(colors.green('  ➜')) +
@@ -69,15 +72,16 @@ function printUrls(server: ViteDevServer, debuggerRoute: string, consumer: Consu
 /**
  * Opens a browser window with the given address.
  * @param address Target address to open.
+ * @param delay Delay before opening the browser.
  */
-async function openBrowser(address: string) {
+async function openBrowser(address: string, delay = 0) {
   setTimeout(async () => {
     await import('open')
       .then((r) => r.default(address, { newInstance: true }))
       .catch(() => {
         // Silent error, debugger should still be accessible from printed url.
       });
-  }, 200);
+  }, delay);
 }
 
 export default attachDebugger;

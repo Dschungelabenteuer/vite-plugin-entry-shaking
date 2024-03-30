@@ -35,7 +35,8 @@ const props = defineProps<MetricProps>();
   }
 
   .duration,
-  .count {
+  .count,
+  .raw {
     font-family: monospace;
     font-size: var(--font-size-xs);
   }
