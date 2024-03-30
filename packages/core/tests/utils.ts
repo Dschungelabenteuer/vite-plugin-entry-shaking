@@ -194,7 +194,9 @@ export async function createTestContext(options: PluginOptions) {
   } as ResolvedConfig;
 
   const finalOptions = mergeOptions(options);
-  return new Context(finalOptions, config);
+  const context = new Context(finalOptions, config);
+  await context['registerTargets']();
+  return context;
 }
 
 /**

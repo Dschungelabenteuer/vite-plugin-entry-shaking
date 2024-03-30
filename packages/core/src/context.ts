@@ -13,7 +13,7 @@ import { Logger } from './logger';
 import EntryAnalyzer from './analyze-entry';
 import { parseId } from './urls';
 import { transformIfNeeded } from './transform';
-import { loadEventBus } from './utils';
+import Utils, { loadEventBus } from './utils';
 import { extensions } from './options';
 import { Diagnostics } from './diagnostics';
 import { Timer } from './timer';
@@ -59,7 +59,6 @@ export class Context {
     public options: Required<FinalPluginOptions>,
     public config: ResolvedConfig,
   ) {
-    this.registerTargets();
     this.resolver = config.createResolver();
     this.logger = new Logger(config.logger, false);
     this.logger.info('Plugin configuration resolved');
@@ -69,6 +68,7 @@ export class Context {
 
   /**  Initializes the plugin context. */
   public async init() {
+    await this.registerTargets();
     this.entries = (await EntryAnalyzer.analyzeEntries(this)) ?? new Map();
 
     if (this.options.debug) {
@@ -127,7 +127,8 @@ export class Context {
   }
 
   /** Registers targets from the plugin options. */
-  private registerTargets() {
-    this.targets = new Map(this.options.targets.map((target) => [target, 0]));
+  private async registerTargets() {
+    const paths = await Utils.getAllTargetPaths(this.options.targets);
+    this.targets = new Map(paths.map((path) => [path, 0]));
   }
 }

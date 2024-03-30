@@ -1,5 +1,6 @@
 import { normalizePath } from 'vite';
 import type { DiagnosticsConfig, FinalPluginOptions, PluginOptions } from './types';
+import { isObjectDefinition } from './utils';
 
 /** Default `extensions` option value. */
 export const extensions = ['js', 'mjs', 'ts', 'mts'];
@@ -30,7 +31,11 @@ export const mergeOptions = (userOptions: PluginOptions): FinalPluginOptions => 
   ignorePatterns: mergeIgnorePatterns(userOptions),
   diagnostics: setDiagnosticsOption(userOptions),
   maxWildcardDepth: userOptions.maxWildcardDepth ?? 0,
-  targets: userOptions.targets.map(normalizePath),
+  targets: userOptions.targets.map((target) => {
+    if (typeof target === 'string') return normalizePath(target);
+    if (isObjectDefinition(target)) return normalizePath(target.path);
+    return target;
+  }),
 });
 
 /**

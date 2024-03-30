@@ -39,7 +39,15 @@ import EntryShakingPlugin from 'vite-plugin-entry-shaking';
 export default defineConfig({
   plugins: [
     EntryShakingPlugin({
-      targets: [resolve(__dirname, 'src/entry-a')],
+      targets: [
+        // Using direct paths.
+        resolve(__dirname, 'src/entry-a')
+        // Or using glob patterns.
+        {
+          glob: 'src/utils/*.ts',
+          globOptions: { ignore: ['excluded.ts'] },
+        }
+      ],
     }),
   ],
 });
@@ -59,7 +67,7 @@ export default defineConfig({
   <tbody>
     <tr>
       <td>targets <em>(required)</em></td>
-      <td><code>string[]</code></td>
+      <td><code>string[] | { path: string } | { glob: string; globOptions: import('fast-glob').Options</code></td>
       <td>N/A</td>
       <td>You need to list all of the entry points you want this plugin to process.</td>
     </tr>
@@ -151,8 +159,8 @@ the plugin is processing and its impacts on performances.
 
 ![debugger preview](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/assets/16818271/916fbccd-8463-4b45-b028-7dcb4da677b5)
 
-> [!NOTE]
-> This requires installing `vite-plugin-entry-shaking-debugger` and setting the `debug` option to `true`.
+> [!NOTE] This requires installing `vite-plugin-entry-shaking-debugger` and setting the `debug`
+> option to `true`.
 
 ## Motivation
 

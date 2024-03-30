@@ -1,3 +1,4 @@
+import type { Options as FastGlobOptions } from 'fast-glob';
 import type { Logger as ViteLogger } from 'vite';
 
 /** Vite plugin options. */
@@ -176,8 +177,17 @@ export type TargetPath = string;
 /** Resolved absolute path of target. */
 export type EntryPath = string;
 
+/** Target definition through an object. */
+export type TargetObject = { path: EntryPath };
+
+/** Tagret definition through Glob patterns. */
+export type TargetGlobPattern = { glob: string; globOptions?: FastGlobOptions };
+
+/** Entry target passed to plugin options. */
+export type EntryTarget = EntryPath | TargetObject | TargetGlobPattern;
+
 /** List of targets being processed by the plugin. */
-export type PluginTargets = EntryPath[];
+export type PluginTargets = EntryTarget[];
 
 /** List of extended targets being processed by the plugin. */
 export type ExtendedTargets = Map<EntryPath, number>;

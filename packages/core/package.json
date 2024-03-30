@@ -56,6 +56,7 @@
     "magic-string": "^0.30.8"
   },
   "optionalDependencies": {
+    "fast-glob": "^3.3.2",
     "vite-plugin-entry-shaking-debugger": "workspace:*"
   },
   "devDependencies": {
@@ -64,6 +65,7 @@
     "@yungezeit/eslint-config-typescript": "^0.0.14",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
+    "fast-glob": "^3.3.2",
     "ts-dedent": "^2.2.0",
     "typescript": "^5.4.2",
     "unbuild": "^2.0.0",
