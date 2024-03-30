@@ -18,7 +18,7 @@
   },
   "scripts": {
     "postinstall": "pnpm build",
-    "build": "pnpm --filter \"./packages/core\" build",
+    "build": "pnpm --filter \"./packages/**\" build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
     "format": "prettier . --write",
