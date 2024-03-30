@@ -2,7 +2,7 @@
 import { inject, nextTick, provide, ref, watch } from 'vue';
 import type Button from '@components/Button/Button.vue';
 import { useClassNames } from '@composables/useClassNames';
-import { type PanelProps, type Panel, PanelSlots } from './Panel.types';
+import type { PanelSlots, PanelProps, Panel } from './Panel.types';
 import PanelHeader from './PanelHeader.vue';
 import PanelFooter from './PanelFooter.vue';
 

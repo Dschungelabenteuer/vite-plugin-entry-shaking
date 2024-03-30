@@ -2,7 +2,7 @@
 import { inject } from 'vue';
 
 import type { ClassNameFn } from '@composables/useClassNames';
-import { PanelSlots } from './Panel.types';
+import type { PanelSlots } from './Panel.types';
 
 const $class = inject<ClassNameFn>('$class')!;
 const slots = defineSlots<Pick<PanelSlots, 'footer'>>();
