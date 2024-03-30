@@ -1,4 +1,11 @@
 {
   "extends": ["@yungezeit/base", "prettier"],
-  "ignorePatterns": ["README.md", "RESOURCES.md", "_template_", "scripts", "examples/syntaxes/src/data"]
+  "ignorePatterns": [
+    "README.md",
+    "RESOURCES.md",
+    "_template_",
+    "scripts",
+    "examples/syntaxes/src/data",
+    ".github"
+  ]
 }
