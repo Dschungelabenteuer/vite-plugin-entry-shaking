@@ -276,6 +276,12 @@ describe('createReexportStatement', () => {
     expect(out).toStrictEqual('export { A_MODULE_A };');
   });
 
+  it('should filter out default export', () => {
+    const exports = [{ n: 'default' }, { n: 'A_MODULE_A' }] as ExportSpecifier[];
+    const out = Transformer.createReexportStatement(exports);
+    expect(out).toStrictEqual('export { A_MODULE_A };');
+  });
+
   it('should return an empty string if there are no named exports', () => {
     const exports = [{}, {}, {}] as ExportSpecifier[];
     const out = Transformer.createReexportStatement(exports);

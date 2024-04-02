@@ -170,7 +170,7 @@ export async function getEntryImports(
  */
 export function createReexportStatement(exports: readonly ExportSpecifier[]) {
   const namedExports = exports
-    .filter((e) => e.n !== undefined && e.ln === undefined)
+    .filter((e) => e.n !== undefined && e.n !== 'default' && e.ln === undefined)
     .map(({ n }) => n);
   if (namedExports.length === 0) return '';
   return `export { ${namedExports.join(',')} };`;

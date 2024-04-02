@@ -1,0 +1,23 @@
+{
+  "name": "vite-plugin-entry-shaking-example-vue-sfc",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@yungezeit/eslint-config-vue": "^0.0.14",
+    "sass": "^1.71.1",
+    "typescript": "^5.4.2",
+    "vite": "^5.1.5",
+    "vite-plugin-entry-shaking": "workspace:*",
+    "vue-tsc": "^1.8.22"
+  }
+}
