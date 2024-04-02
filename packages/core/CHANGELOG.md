@@ -1,5 +1,11 @@
 # vite-plugin-entry-shaking
 
+## 0.4.2
+
+### Patch Changes
+
+- 713383a: Fixed invalid default re-export not being filtered out (#43)
+
 ## 0.4.1
 
 ## 0.4.0
