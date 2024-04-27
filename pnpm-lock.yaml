@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 packageExtensionsChecksum: faf366a8badd550672234262ec335f56
 
 importers:
@@ -39,6 +35,34 @@ importers:
         version: 2.4.2
 
   examples/_template_:
+    dependencies:
+      vue:
+        specifier: ^3.4.21
+        version: 3.4.21(typescript@5.4.3)
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^5.0.4
+        version: 5.0.4(vite@5.2.7)(vue@3.4.21)
+      '@yungezeit/eslint-config-vue':
+        specifier: ^0.0.14
+        version: 0.0.14(eslint@8.57.0)(typescript@5.4.3)
+      sass:
+        specifier: ^1.72.0
+        version: 1.72.0
+      typescript:
+        specifier: ^5.4.3
+        version: 5.4.3
+      vite:
+        specifier: ^5.2.7
+        version: 5.2.7(sass@1.72.0)
+      vite-plugin-entry-shaking:
+        specifier: workspace:*
+        version: link:../../packages/core
+      vue-tsc:
+        specifier: ^2.0.7
+        version: 2.0.7(typescript@5.4.3)
+
+  examples/async-import:
     dependencies:
       vue:
         specifier: ^3.4.21
@@ -3772,7 +3796,7 @@ packages:
       ts-dedent: 2.2.0
       type-fest: 2.19.0
       vue: 3.4.21(typescript@5.4.3)
-      vue-component-type-helpers: 2.0.7
+      vue-component-type-helpers: 2.0.14
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -12131,6 +12155,10 @@ packages:
       vue-component-type-helpers: 2.0.7
     dev: true
 
+  /vue-component-type-helpers@2.0.14:
+    resolution: {integrity: sha512-DInfgOyXlMyliyqAAD9frK28tTfch0+tMi4qoWJcZlRxUf+NFAtraJBnAsKLep+FOyLMiajkhfyEb3xLK08i7w==}
+    dev: true
+
   /vue-component-type-helpers@2.0.7:
     resolution: {integrity: sha512-7e12Evdll7JcTIocojgnCgwocX4WzIYStGClBQ+QuWPinZo/vQolv2EMq4a3lg16TKfwWafLimG77bxb56UauA==}
     dev: true
@@ -12528,3 +12556,7 @@ packages:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
     dev: true
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
