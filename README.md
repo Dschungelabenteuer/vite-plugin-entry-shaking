@@ -11,8 +11,9 @@
   Mimic tree-shaking behaviour when importing code from an entry file in development mode.
 </p>
 
-> **Note** The main execution logic of this plugin only applies to development mode because it
-> addresses an issue which is specific to development mode.
+> [!NOTE]
+> The main execution logic of this plugin only applies to development mode because it
+> addresses an issue which is specific to development mode. It _may_ be used in test environments that rely on Vite (e.g. Vitest) but should be used with caution as stated in [limitations](#limitations).
 
 ## Install
 
@@ -250,8 +251,10 @@ to make the code it explicitly defines work.
 
 ## Limitations
 
-- See `es-module-lexer`'s
+See `es-module-lexer`'s
   [own limitations](https://github.com/guybedford/es-module-lexer#limitations).
+
+### Behaviour
 
 - Import statements are not cleaned up from analyzed targets. This means if you import code that was
   defined **within** a target, you might still load unnecessary modules. This is by design because
@@ -262,12 +265,21 @@ to make the code it explicitly defines work.
   Other wildcard imports may be handled by setting the `maxWildcardDepth` option.
   [Read more](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/blob/main/RESOURCES.md#wildcardExports)
 
-- The following syntaxes are not handled:
-  - dynamic imports
-  - `import json from './json.json' assert { type: 'json' }`
+### Unsupported syntaxes
 
-> **Note** This does not mean you should expect errors using these. Instead, it just means the
-> content they intend to import won't be tree-shaken by the plugin.
+You should not expect errors using these. Instead, it just means the content they
+intend to import won't be tree-shaken by the plugin:
+
+- dynamic imports
+- `import json from './json.json' assert { type: 'json' }`
+
+### Using with Vite-based test runners
+
+As a Vite user, you may be using a test runner that relies on Vite's dev server and your usual `vite.config` file. Vitest, for example, would - by default - still use this plugin when running tests. This means tested/imported modules and even test files themselves may be transformed. **This could be an issue when some of your tests rely on mocks whose references are affected by this plugin [(read more on this)](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/discussions/47#discussioncomment-9248007)**.
+
+> To properly benefit from this plugin within test files, one have to understand how the plugin behaves, how vite's resolver behaves and have a clear overview of their codebase.
+
+Unless you're confident about the above statement, it is recommended to disable this plugin when running tests.
 
 ## Useful links
 
