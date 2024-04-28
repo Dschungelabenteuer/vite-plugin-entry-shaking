@@ -1,5 +1,11 @@
 # vite-plugin-entry-shaking
 
+## 0.4.3
+
+### Patch Changes
+
+- 7c205c8: Fixed an issue with dynamic/async imports (#37)
+
 ## 0.4.2
 
 ### Patch Changes
