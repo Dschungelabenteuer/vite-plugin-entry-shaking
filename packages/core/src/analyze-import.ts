@@ -10,6 +10,9 @@ import Parsers from './parse';
 import Utils from './utils';
 
 const WILDCARD_IMPORT_PREFIX = 'import *';
+const DYNAMIC_IMPORT_PREFIX = 'import(';
+// https://github.com/vitejs/vite/blob/main/packages/vite/src/node/plugins/importAnalysis.ts#L83
+const VITE_IGNORE_REGEX = /\/\*\s*@vite-ignore\s*\*\//;
 
 /**
  * Analyzes and transforms a single target import.
@@ -32,6 +35,9 @@ export async function analyzeImportStatement(
 ) {
   const isWildCardImport = catchWildcardImport(src, code, startPosition, endPosition, entryPath);
   if (isWildCardImport) return;
+
+  const isDynamicImport = catchDynamicImport(src, code, startPosition, endPosition, entryPath);
+  if (isDynamicImport) return;
 
   const imports = methods.getImportedEntryExports(code, startPosition, endPosition);
   const imported = await methods.getImportsMap(ctx, entry, entryPath, imports);
@@ -323,7 +329,7 @@ function formatImportReplacement({ name, alias, originalName, importDefault }: I
 }
 
 /**
- * Catches and handles import statement is a wildcard import.
+ * Catches and handles wildcard import statement.
  * @param src MagicString instance to prepare transforms.
  * @param code Source code of the file.
  * @param startPosition Start position of the import statement.
@@ -352,6 +358,34 @@ function catchWildcardImport(
   return isWildCardImport;
 }
 
+/**
+ * Catches and handles a dynamic/async import statement.
+ * @param src MagicString instance to prepare transforms.
+ * @param code Source code of the file.
+ * @param startPosition Start position of the import statement.
+ * @param endPosition End position of the import statement.
+ * @param entryPath Absolute path to the target entry.
+ */
+function catchDynamicImport(
+  src: MagicString,
+  code: string,
+  startPosition: number,
+  endPosition: number,
+  entryPath: EntryPath,
+) {
+  const source = code.slice(startPosition, endPosition);
+  const flatSource = source.replace(/\s/gm, '');
+  const isViteIgnored = VITE_IGNORE_REGEX.test(flatSource);
+  const isDynamicImport = flatSource.startsWith(DYNAMIC_IMPORT_PREFIX);
+  const updatedPath = addSourceQuerySuffix(entryPath);
+
+  if (isDynamicImport && !isViteIgnored) {
+    src.overwrite(startPosition, endPosition, `import('${updatedPath}')`);
+  }
+
+  return isDynamicImport;
+}
+
 const methods = {
   analyzeImportStatement,
   getImportedEntryExports,
@@ -365,6 +399,7 @@ const methods = {
   resolveImportedCircularEntities,
   formatImportReplacement,
   catchWildcardImport,
+  catchDynamicImport,
 };
 
 export default methods;

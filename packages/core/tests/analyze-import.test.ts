@@ -752,3 +752,46 @@ describe('catchWildcardImport', () => {
     expect(src.toString()).toStrictEqual(input);
   });
 });
+
+describe('catchDynamicImport', () => {
+  const entryPath = 'path/to/entry';
+
+  /**
+   * Next two suites suppose the following statement:
+   * `const { Utils } = await import('path/to/entry');`
+   */
+
+  it('should return true and rewrite if the import is a dynamic import', () => {
+    const input = `import('${entryPath}')`;
+    const src = new MagicString(input);
+    const output = ImportAnalyzer.catchDynamicImport(src, input, 0, input.length, entryPath);
+    expect(output).toStrictEqual(true);
+    expect(src.toString()).toStrictEqual(`import('${entryPath}?source=1')`);
+  });
+
+  const commentCases = {
+    before: `import(/* @vite-ignore */ '${entryPath}')`,
+    after: `import(/* @vite-ignore */ '${entryPath}')`,
+    multiline: `import(
+      /* @vite-ignore */
+      '${entryPath}'
+    )`,
+  };
+
+  Object.entries(commentCases).forEach(([name, input]) => {
+    it(`should return true but not rewrite if the import is a dynamic import with a vite-ignore comment ${name}`, () => {
+      const src = new MagicString(input);
+      const output = ImportAnalyzer.catchDynamicImport(src, input, 0, input.length, entryPath);
+      expect(output).toStrictEqual(true);
+      expect(src.toString()).toStrictEqual(input);
+    });
+  });
+
+  it('should return false and not rewrite if the import is not a dynamic import', () => {
+    const input = `import { Something as Utils } from './somewhere';`;
+    const src = new MagicString(input);
+    const output = ImportAnalyzer.catchDynamicImport(src, input, 0, input.length - 1, entryPath);
+    expect(output).toStrictEqual(false);
+    expect(src.toString()).toStrictEqual(input);
+  });
+});
