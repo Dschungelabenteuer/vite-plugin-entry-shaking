@@ -42,7 +42,7 @@ export default defineConfig({
     EntryShakingPlugin({
       targets: [
         // Using direct paths.
-        resolve(__dirname, 'src/entry-a')
+        resolve(__dirname, 'src/entry-a'),
         // Or using glob patterns.
         {
           glob: 'src/utils/*.ts',

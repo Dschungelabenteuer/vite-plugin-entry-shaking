@@ -11,7 +11,7 @@ const pathToEntries = resolve(__dirname, './src/entries');
 
 export default defineConfig(async () => ({
   plugins: [
-    await EntryShakingPlugin({
+    EntryShakingPlugin({
       targets: [pathToLib, {
         glob: 'src/entries/**/*.ts',
         globOptions: { ignore: ['**/node_modules/**', '**/baz.ts'] },

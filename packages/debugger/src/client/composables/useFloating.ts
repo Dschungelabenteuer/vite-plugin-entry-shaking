@@ -45,7 +45,7 @@ export const FLOATING_CONTAINER_CLASS = 'floating-container';
 export const useFloating: UseFloating = (reference, floatingEl, options) => {
   const middleware = ref([flip(), shift(), offset({ crossAxis: 0 })]);
   const isOpen = ref(false);
-  const a = useFloatingUi(reference, floatingEl, {
+  const base = useFloatingUi(reference, floatingEl, {
     whileElementsMounted: autoUpdate,
     middleware,
     ...options,
@@ -55,5 +55,5 @@ export const useFloating: UseFloating = (reference, floatingEl, options) => {
   const close = () => (isOpen.value = false);
   const toggle = () => (isOpen.value = !isOpen.value);
 
-  return { isOpen, open, close, toggle, styles: a.floatingStyles };
+  return { isOpen, open, close, toggle, styles: base.floatingStyles };
 };

@@ -13,7 +13,7 @@ const pathToThird = resolve(__dirname, 'src/third/');
 
 export default defineConfig(async () => ({
   plugins: [
-    await EntryShakingPlugin({
+    EntryShakingPlugin({
       targets: ['@first/', pathToSecond, pathToThird],
       debug: true,
     }),
