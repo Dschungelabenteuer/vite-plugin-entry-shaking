@@ -281,6 +281,13 @@ As a Vite user, you may be using a test runner that relies on Vite's dev server 
 
 Unless you're confident about the above statement, it is recommended to disable this plugin when running tests.
 
+### JSX
+
+> [!WARNING]
+> This feature is still experimental
+
+This plugin supports JSX and TSX syntaxes but requires `esbuild` as an optional peer dependency. Note that Vite already uses `esbuild` to support JSX out of the box.
+
 ## Useful links
 
 - [Vite's documentation](https://vitejs.dev/guide/api-plugin.html#plugin-ordering)
