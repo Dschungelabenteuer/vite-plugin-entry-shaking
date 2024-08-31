@@ -1,6 +1,4 @@
 import type { ExportSpecifier } from 'es-module-lexer';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import { init, parse } from 'es-module-lexer';
 
 import type { Context } from './context';
@@ -18,7 +16,7 @@ import type {
 
 import EntryCleaner from './cleanup-entry';
 import Parsers from './parse';
-import Utils from './utils';
+import Utils, { getCodeFromPath } from './utils';
 import { DiagnosticKinds } from './diagnostics';
 
 /**
@@ -90,7 +88,7 @@ async function doAnalyzeEntry(
     `Analysis of entry "${entryPath}"`,
     async (nonselfTime) => {
       await init;
-      source = readFileSync(resolve(entryPath), 'utf-8');
+      source = await getCodeFromPath(entryPath);
       const defaultImport: ImportParams = { path: entryPath, importDefault: true };
       const analyzedImports: EntryImports = new Map([['default', defaultImport]]);
       const [imports, exportList] = parse(source);

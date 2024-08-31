@@ -3,7 +3,7 @@ import type { DiagnosticsConfig, FinalPluginOptions, PluginOptions } from './typ
 import { isObjectDefinition } from './utils';
 
 /** Default `extensions` option value. */
-export const extensions = ['js', 'mjs', 'ts', 'mts'];
+export const extensions = ['js', 'mjs', 'ts', 'mts', 'jsx', 'tsx'];
 
 /** Default `ignorePatterns` option value. */
 const ignorePatterns = [/node_modules/];

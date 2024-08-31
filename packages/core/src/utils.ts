@@ -1,4 +1,7 @@
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import type { EntryPath, EntryTarget, TargetGlobPattern, TargetObject } from './types';
+import { transformJsx } from './transform';
 
 export type Parallel = <T extends any[]>(items: T, cb: ParallelCb<T>) => Promise<any[] | void>;
 export type ParallelCb<T> = (
@@ -47,6 +50,16 @@ export const getAllTargetPaths = async (targets: EntryTarget[]) => {
 
   return paths;
 };
+
+/** Determines whether provided path is a JSX/TSX file. */
+export const isJsxFile = (path: string) => path.endsWith('.jsx') || path.endsWith('.tsx');
+
+export const getCodeFromPath = async (path: string) => {
+  const code = readFileSync(resolve(path), 'utf-8');
+  return getCode(code, path);
+};
+
+export const getCode = async (code: string, path: string) => isJsxFile(path) ? transformJsx(code) : code;
 
 const loadFastGlob = async () => {
   const {
