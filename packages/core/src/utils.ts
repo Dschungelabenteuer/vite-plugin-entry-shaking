@@ -1,8 +1,6 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import type { EntryPath, EntryTarget, TargetGlobPattern, TargetObject } from './types';
-import { transformJsx, transformTs } from './transform';
-import { extname } from 'path';
 
 export type Parallel = <T extends any[]>(items: T, cb: ParallelCb<T>) => Promise<any[] | void>;
 export type ParallelCb<T> = (
