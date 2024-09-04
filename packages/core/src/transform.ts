@@ -1,10 +1,11 @@
 import type { ExportSpecifier, ImportSpecifier } from 'es-module-lexer';
 import MagicString from 'magic-string';
 import { init, parse } from 'es-module-lexer';
+import { extname } from 'path';
+import { transformWithEsbuild } from 'vite';
 
 import type { Context } from './context';
 import ImportAnalyzer from './analyze-import';
-import { getCode } from './utils';
 
 /**
  * Transforms a candidate file only if needed.
@@ -26,8 +27,8 @@ export async function transformIfNeeded(
       if (!isCandidate) {
         ctx.logger.debug(`Ignored by options: ${id}`, undefined);
       } else {
-        const source = await getCode(code, id);
-        return await methods.transformImportsIfNeeded(ctx, id, source);
+        // needn't to normalize code, because it's already normalized in vite
+        return await methods.transformImportsIfNeeded(ctx, id, code);
       }
     },
     true,
@@ -178,25 +179,32 @@ export function createReexportStatement(exports: readonly ExportSpecifier[]) {
   return `export { ${namedExports.join(',')} };`;
 }
 
-
 /**
- * Transforms JSX code to es-module-lexable code.
- * @param code JSX/TSX code (both use the tsx loader).
+ * Transforms TX code to es-module-lexable code.
+ * @param code TS code
  * @param loader Loader type.
  */
-export async function transformJsx(code: string) {
-  const MISSING_ESBUILD = 'missing-esbuild';
-  const missingEsbuild = () => { throw new Error(MISSING_ESBUILD); }
+export async function transformTs(code: string, path: string) {
   try {
-    const { transform } = await import('esbuild').catch(missingEsbuild);
-    const jsx = 'preserve' // consider using tsconfig option (but shouldn't change anything?)
-    const result = await transform(code, { jsx, loader: 'tsx' })
+    const result = await transformWithEsbuild(code, path);
     return result.code;
   } catch (e) {
     if (!(e instanceof Error)) throw e;
-    throw e.message === MISSING_ESBUILD
-      ? new Error('JSX supports requires esbuild to be installed.')
-      : new Error(`Something went wrong while transforming JSX: ${e?.message}`);
+    throw new Error(
+      `Something went wrong while transforming file:${path} with error:${e?.message}`,
+    );
+  }
+}
+
+export function normalizeCode(code: string, path: string) {
+  const ext = extname(path);
+  switch (ext) {
+    case '.tsx':
+    case '.jsx':
+    case '.ts':
+      return transformTs(code, path);
+    default:
+      return code;
   }
 }
 

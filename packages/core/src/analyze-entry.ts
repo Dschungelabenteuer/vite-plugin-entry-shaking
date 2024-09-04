@@ -16,6 +16,7 @@ import type {
 
 import EntryCleaner from './cleanup-entry';
 import Parsers from './parse';
+import { normalizeCode } from './transform';
 import Utils, { getCodeFromPath } from './utils';
 import { DiagnosticKinds } from './diagnostics';
 
@@ -88,7 +89,7 @@ async function doAnalyzeEntry(
     `Analysis of entry "${entryPath}"`,
     async (nonselfTime) => {
       await init;
-      source = await getCodeFromPath(entryPath);
+      source = await normalizeCode(await getCodeFromPath(entryPath), entryPath);
       const defaultImport: ImportParams = { path: entryPath, importDefault: true };
       const analyzedImports: EntryImports = new Map([['default', defaultImport]]);
       const [imports, exportList] = parse(source);

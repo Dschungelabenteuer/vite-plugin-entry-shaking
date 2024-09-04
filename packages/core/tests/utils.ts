@@ -4,6 +4,7 @@ import { resolveConfig, createLogger } from 'vite';
 import { init, parse } from 'es-module-lexer';
 import { expect, vi } from 'vitest';
 import dedent from 'ts-dedent';
+import { format } from 'prettier';
 
 import type { EntryData, PluginOptions, WildcardExports } from '../src/types';
 import type { Parallel } from '../src/utils';
@@ -117,6 +118,13 @@ export const setupCase = (target: CaseTarget, middleTarget?: CaseTarget) => ({
 });
 
 /**
+ * Format code with Prettier to remove discrepancies
+ */
+export function formatCode(code: string) {
+  return format(code, { parser: 'babel' });
+}
+
+/**
  * This function mimics the plugin's logic based on the `tests/cases` folder.
  * @param main File/module content, as it would be processed by Vite's transform hook.
  * @param options Plugin options.
@@ -176,7 +184,7 @@ export async function testCase(
 
       // Target should only contain code it defines.
       const targetContentEnd = lines.slice(remainsLength * -1).join('\n');
-      expect(targetContentEnd).toStrictEqual(targetRemains);
+      expect(formatCode(targetContentEnd)).toStrictEqual(formatCode(targetRemains));
     }
   });
 }
