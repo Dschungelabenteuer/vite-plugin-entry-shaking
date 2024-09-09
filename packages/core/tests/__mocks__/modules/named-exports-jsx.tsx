@@ -1,6 +1,6 @@
-export const NamedExportTsxOne = () => {
+export const NamedExportJSXOne = () => {
   return <div>NamedExportTsxOne</div>;
 };
-export function NamedExportTsxTwo() {
+export function NamedExportJSXTwo() {
   return <div>NamedExportTsxTwo</div>;
 }

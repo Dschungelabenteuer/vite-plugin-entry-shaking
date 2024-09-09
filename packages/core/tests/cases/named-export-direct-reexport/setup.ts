@@ -110,11 +110,29 @@ export function testNamedExportDirectReexportMultiple(middleTarget?: CaseTarget)
       const resolved = await resolveModule(sourceModule);
       const target = await createCaseTarget(targetName, 0);
       const { importPath, targetList } = setupCase(target, middleTarget);
-      const input = `import { NamedExportOne, NamedExportTwo } from '${importPath}';\n`;
-      const output = `import { NamedExportOne as NamedExportOne, NamedExportTwo as NamedExportTwo } from '${resolved}';\n`;
+      const input = `import { NamedExportOne, NamedExportTwo, NamedExportFunction } from '${importPath}';\n`;
+      const output = `import { NamedExportOne as NamedExportOne, NamedExportTwo as NamedExportTwo, NamedExportFunction as NamedExportFunction } from '${resolved}';\n`;
       await testCase(targetList, input, output);
     });
 
+    it(`should work when target directly exports multiple modules with enums. ${COMMON_EXPECTATION}`, async () => {
+      const resolved = await resolveModule(sourceModule);
+      const target = await createCaseTarget(targetName, 0);
+      const { importPath, targetList } = setupCase(target, middleTarget);
+      const input = `import { NamedExportOne, NamedExportEnum, NamedExportConstEnum } from '${importPath}';\n`;
+      const output = `import { NamedExportOne as NamedExportOne, NamedExportEnum as NamedExportEnum, NamedExportConstEnum as NamedExportConstEnum } from '${resolved}';\n`;
+      await testCase(targetList, input, output);
+    });
+
+    it(`should work when target directly exports multiple modules with type. ${COMMON_EXPECTATION}`, async () => {
+      const resolved = await resolveModule(sourceModule);
+      const target = await createCaseTarget(targetName, 0);
+      const { importPath, targetList } = setupCase(target, middleTarget);
+      const input = `import { NamedExportOne, NamedExportType, NamedExportTypeDupe } from '${importPath}';\n`;
+      const output = `import { NamedExportOne as NamedExportOne, NamedExportType as NamedExportType, NamedExportType as NamedExportTypeDupe } from '${resolved}';\n`;
+      await testCase(targetList, input, output);
+    });
+    
     it(DUPE_EXPORT_EXPECTATION, async () => {
       const resolved = await resolveModule(sourceModule);
       const target = await createCaseTarget(targetName, 0);

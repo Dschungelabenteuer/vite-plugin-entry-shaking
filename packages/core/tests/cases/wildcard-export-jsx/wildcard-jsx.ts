@@ -1,4 +1,4 @@
-export * from '@test-modules/named-exports-tsx'
+export * from '@test-modules/named-exports-jsx'
 
 /** Below content should not be removed from the transformed target. */
 import "@test-modules/sideffect-module";
