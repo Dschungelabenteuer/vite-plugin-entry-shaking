@@ -111,6 +111,8 @@ export async function transformImports(
 
   // Analyze the imported entities of the file.
   for (const { n: path, ss: startPosition, se: endPosition } of imports) {
+    // type-only imports will be removed by vite, so we don't need to transform them
+    if (ImportAnalyzer.isTypeOnlyImport(code, startPosition)) continue;
     const resolvedImport = path && (await ctx.resolver(path, id));
     const entry = resolvedImport && ctx.entries.get(resolvedImport);
     // If the active import is one of the targets, let's analyze it.

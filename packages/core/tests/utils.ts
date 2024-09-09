@@ -84,8 +84,8 @@ export const DUPE_EXPORT_EXPECTATION = 'should also work when using a dupe expor
 export const ALIAS_IMPORT_EXPECTATION = 'should also work when using an alias import';
 
 /** Target remains (this should be the only remaining content in targets). */
+/** comments will removed by esbuild */
 export const targetRemains = dedent(`
-  /** Below content should not be removed from the transformed target. */
   import "@test-modules/sideffect-module";
   import { ConsumedExport } from '@test-modules/consumed-export';
   export const ExportDefinedFromTarget = 'ExportDefinedFromTarget';
@@ -121,7 +121,7 @@ export const setupCase = (target: CaseTarget, middleTarget?: CaseTarget) => ({
  * Format code with Prettier to remove discrepancies
  */
 export function formatCode(code: string) {
-  return format(code, { parser: 'babel' });
+  return format(code, { parser: 'babel-ts' });
 }
 
 /**
@@ -170,23 +170,25 @@ export async function testCase(
   const remainsLength = targetRemains.split('\n').length;
 
   // It should have direct import and not import target.
-  expect(res.transformed).toStrictEqual(output);
+  expect(await formatCode(res.transformed || '')).toStrictEqual(await formatCode(output));
 
-  targets.forEach(({ path, expectedImportRemainsCount }) => {
-    const targetContent = getCaseTarget(res, path);
-    const lines = targetContent!.split('\n');
+  await Promise.all(
+    targets.map(async ({ path, expectedImportRemainsCount }) => {
+      const targetContent = getCaseTarget(res, path);
+      const lines = targetContent!.split('\n');
 
-    if (expectedImportRemainsCount !== undefined) {
-      // Imports should be kept in entry in case they are used by defining code.
-      // Let's count them (but ignore both imports used in targetRemains).
-      const [imports] = parse(targetContent!);
-      expect(imports.length - 2).toStrictEqual(expectedImportRemainsCount);
+      if (expectedImportRemainsCount !== undefined) {
+        // Imports should be kept in entry in case they are used by defining code.
+        // Let's count them (but ignore both imports used in targetRemains).
+        const [imports] = parse(targetContent!);
+        expect(imports.length - 2).toStrictEqual(expectedImportRemainsCount);
 
-      // Target should only contain code it defines.
-      const targetContentEnd = lines.slice(remainsLength * -1).join('\n');
-      expect(formatCode(targetContentEnd)).toStrictEqual(formatCode(targetRemains));
-    }
-  });
+        // Target should only contain code it defines.
+        const targetContentEnd = lines.slice(remainsLength * -1).join('\n');
+        expect(await formatCode(targetContentEnd)).toStrictEqual(await formatCode(targetRemains));
+      }
+    }),
+  );
 }
 
 /**

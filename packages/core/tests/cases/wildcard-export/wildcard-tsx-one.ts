@@ -1,0 +1,1 @@
+export * from './wildcard-tsx-two'

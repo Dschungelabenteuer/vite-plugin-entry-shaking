@@ -11,6 +11,7 @@ import Utils from './utils';
 
 const WILDCARD_IMPORT_PREFIX = 'import *';
 const DYNAMIC_IMPORT_PREFIX = 'import(';
+const TYPE_ONLY_IMPORT_PREFIX = 'import type';
 // https://github.com/vitejs/vite/blob/main/packages/vite/src/node/plugins/importAnalysis.ts#L83
 const VITE_IGNORE_REGEX = /\/\*\s*@vite-ignore\s*\*\//;
 
@@ -358,6 +359,10 @@ function catchWildcardImport(
   return isWildCardImport;
 }
 
+function isTypeOnlyImport(code: string, startPosition: number) {
+  return code.slice(startPosition, TYPE_ONLY_IMPORT_PREFIX.length) === TYPE_ONLY_IMPORT_PREFIX;
+}
+
 /**
  * Catches and handles a dynamic/async import statement.
  * @param src MagicString instance to prepare transforms.
@@ -400,6 +405,7 @@ const methods = {
   formatImportReplacement,
   catchWildcardImport,
   catchDynamicImport,
+  isTypeOnlyImport,
 };
 
 export default methods;

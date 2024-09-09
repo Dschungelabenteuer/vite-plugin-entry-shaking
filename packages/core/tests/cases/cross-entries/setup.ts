@@ -81,6 +81,13 @@ export function testCrossEntriesImportsExports() {
       testWithDefaultImportReexport(await createCaseTarget(`${baseCasePath}-with-default-import-reexport`));
       testWithDestructuredDefaultImport(await createCaseTarget(`${baseCasePath}-with-destructured-default-import`));
     })
+
+    // describe('wildcard export', async () => {
+    //   const baseCasePath = `${casePath}/wildcard-export`;
+    //   testWithDefaultDirectReexport(await createCaseTarget(`${baseCasePath}-with-default-direct-reexport`));
+    //   testWithDefaultImportReexport(await createCaseTarget(`${baseCasePath}-with-default-import-reexport`));
+    //   testWithDestructuredDefaultImport(await createCaseTarget(`${baseCasePath}-with-destructured-default-import`));
+    // })
   });
 }
 
