@@ -63,6 +63,7 @@
   "devDependencies": {
     "@types/node": "^22.5.1",
     "@vitest/coverage-istanbul": "^2.0.5",
+    "@vue/runtime-dom": "^3.5.1",
     "@yungezeit/eslint-config-typescript": "^0.0.14",
     "esbuild": "^0.23.1",
     "eslint": "^8.57.0",

@@ -1,5 +1,19 @@
-export { NamedExportOne, NamedExportTwo } from '@test-modules/named-exports';
-export { NamedExportOne as NamedExportOneDupe, NamedExportTwo as NamedExportTwoDupe } from '@test-modules/named-exports';
+export {
+  NamedExportOne,
+  NamedExportTwo,
+  NamedExportFunction,
+  NamedExportEnum,
+  NamedExportConstEnum,
+  NamedExportType,
+} from '@test-modules/named-exports';
+export {
+  NamedExportOne as NamedExportOneDupe,
+  NamedExportTwo as NamedExportTwoDupe,
+  NamedExportFunction as NamedExportFunctionDupe,
+  NamedExportEnum as NamedExportEnumDupe,
+  NamedExportConstEnum as NamedExportConstEnumDupe,
+  NamedExportType as NamedExportTypeDupe,
+} from '@test-modules/named-exports';
 
 /** Below content should not be removed from the transformed target. */
 import "@test-modules/sideffect-module";

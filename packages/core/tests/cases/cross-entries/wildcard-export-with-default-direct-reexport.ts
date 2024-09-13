@@ -1,0 +1,1 @@
+export * from '@test-cases/default-export/with-default-direct-reexport';

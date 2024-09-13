@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "paths": {
+      "@mocks/*": ["./__mocks__/*"],
+      "@test-modules/*": ["./__mocks__/modules/*"],
+      "@test-cases/*": ["./cases/*"],
+      "vue/jsx-runtime": ["./jsx-runtime.d.ts"]
+    }
+  }
+}
