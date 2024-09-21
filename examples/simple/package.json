@@ -9,9 +9,9 @@
   },
   "devDependencies": {
     "@yungezeit/eslint-config-typescript": "^0.0.14",
-    "sass": "^1.77.8",
-    "typescript": "^5.5.4",
-    "vite": "^5.4.2",
+    "sass": "^1.79.3",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.7",
     "vite-plugin-entry-shaking": "workspace:*"
   }
 }
