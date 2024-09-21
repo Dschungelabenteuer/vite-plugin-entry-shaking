@@ -2,9 +2,7 @@
   "$schema": "../examples.schema.json",
   "examples": {
     "import-default-export-of-target": {
-      "description": [
-        "`DefaultImport` is the default export of the entry"
-      ],
+      "description": ["`DefaultImport` is the default export of the entry"],
       "content": "import DefaultImport from \"./entries/has-default-export\";",
       "print": ["DefaultImport"]
     },

@@ -18,7 +18,8 @@ const pathToTestCases = resolve(pathToTests, 'cases');
 
 const rdir = (path) => readdir(path, { withFileTypes: true });
 const _log = (v) => `console.log(${v});`;
-const copyMockModules = async () => await cp(pathToMockModules, pathToSyntaxesExampleModules, { recursive: true });
+const copyMockModules = async () =>
+  await cp(pathToMockModules, pathToSyntaxesExampleModules, { recursive: true });
 const getCasesGroups = async () => (await rdir(pathToTestCases)).filter((a) => a.isDirectory());
 const getGroupFiles = async (groupPath) => (await rdir(groupPath)).filter((f) => f.isFile());
 const getExampleContent = (data) => [data.content, _log(data.print?.join(', '))].join('\n');
@@ -27,7 +28,6 @@ const getEntryContent = async (entryPath) =>
     .replaceAll('@test-modules', '../../../modules')
     .replaceAll('@test-cases', '../..');
 
-
 (async () => {
   await cleanupExample();
   await Promise.all([copyMockModules(), createCasesEntries()]);
@@ -35,7 +35,7 @@ const getEntryContent = async (entryPath) =>
 })();
 
 async function cleanupExample() {
-  await rm(pathToSyntaxesExample, { recursive: true }).catch((e) => { });
+  await rm(pathToSyntaxesExample, { recursive: true }).catch((e) => {});
   await mkdir(pathToSyntaxesExample);
 }
 
@@ -95,24 +95,25 @@ async function createCasesEntries() {
 }
 
 function parseGroupFiles(files) {
-  return files.reduce((out, file) => {
-    if (file.name === 'setup.ts' || file.name.includes('test.ts')) return out;
-    if (file.name === 'examples.json') {
-      const exampleContent = readFileSync(resolve(file.path, file.name), 'utf-8');
-      const exampleMap = Object.entries(JSON.parse(exampleContent).examples);
-      out.examples = exampleMap.map(([exampleName, exampleData]) => ({
-        exampleName,
-        exampleContent: getExampleContent(exampleData),
-        exampleDescription: exampleData.description.join(' '),
-        requiresModules: exampleData.requiresModules,
-        requiresEntries: exampleData.requiresEntries,
-      }));
-    } else {
-      out.entries.push(file);
-    }
+  return files.reduce(
+    (out, file) => {
+      if (file.name === 'setup.ts' || file.name.includes('test.ts')) return out;
+      if (file.name === 'examples.json') {
+        const exampleContent = readFileSync(resolve(file.path, file.name), 'utf-8');
+        const exampleMap = Object.entries(JSON.parse(exampleContent).examples);
+        out.examples = exampleMap.map(([exampleName, exampleData]) => ({
+          exampleName,
+          exampleContent: getExampleContent(exampleData),
+          exampleDescription: exampleData.description.join(' '),
+          requiresModules: exampleData.requiresModules,
+          requiresEntries: exampleData.requiresEntries,
+        }));
+      } else {
+        out.entries.push(file);
+      }
 
-    return out;
-  }, { entries: [], examples: [] });
+      return out;
+    },
+    { entries: [], examples: [] },
+  );
 }
-
-

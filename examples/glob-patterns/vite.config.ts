@@ -12,10 +12,13 @@ const pathToEntries = resolve(__dirname, './src/entries');
 export default defineConfig(async () => ({
   plugins: [
     EntryShakingPlugin({
-      targets: [pathToLib, {
-        glob: 'src/entries/**/*.ts',
-        globOptions: { ignore: ['**/node_modules/**', '**/baz.ts'] },
-      }],
+      targets: [
+        pathToLib,
+        {
+          glob: 'src/entries/**/*.ts',
+          globOptions: { ignore: ['**/node_modules/**', '**/baz.ts'] },
+        },
+      ],
       debug: true,
     }),
     vue(),

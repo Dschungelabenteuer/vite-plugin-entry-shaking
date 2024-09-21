@@ -1,8 +1,3 @@
 {
-  "recommendations": [
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
-    // Only needed if you're working on the example wrapper app.
-    "Vue.volar",
-  ]
+  "recommendations": ["dbaeumer.vscode-eslint"]
 }

@@ -21,13 +21,14 @@
     "build": "pnpm --filter \"./packages/core\" build && pnpm --filter \"./packages/debugger\" build",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
-    "format": "prettier . --write",
+    "format": "biome format . --fix",
     "generate-example": "node scripts/generate-example",
     "check": "pnpm format && pnpm lint && pnpm test",
     "changeset:release": "pnpm build && changeset publish",
     "changeset:version": "changeset version && pnpm install --lockfile-only"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.2",
     "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.27.8",
     "@types/prompts": "^2.4.9",
@@ -35,7 +36,6 @@
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "ora": "^8.1.0",
-    "prettier": "^3.3.3",
     "prompts": "^2.4.2"
   },
   "pnpm": {

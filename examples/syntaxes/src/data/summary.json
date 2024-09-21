@@ -1,8 +1,5 @@
 [
-  [
-    "cross-entries",
-    []
-  ],
+  ["cross-entries", []],
   [
     "default-export",
     [

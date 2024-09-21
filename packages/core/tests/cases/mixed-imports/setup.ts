@@ -13,7 +13,6 @@ const casePath = '@test-cases/mixed-imports';
  * ```
  */
 export function testMixedImportsInTarget(middleTarget?: CaseTarget) {
-
   describe('Some file imports from a target named exports that were imported using mixed import syntax', () => {
     const targetName = `${casePath}/mixed`;
 
@@ -43,9 +42,10 @@ export function testMixedImportsOfTarget(middleTarget?: CaseTarget) {
       const target = await createCaseTarget(targetName, 1);
       const { importPath, targetList } = setupCase(target, middleTarget);
       const input = `import Entry, { MixedDefault } from '${importPath}';\n`;
-      const output = ''
-        + `import { default as MixedDefault } from '${resolved}';\n`
-        + `import { default as Entry } from '${importPath}';\n`
+      const output =
+        '' +
+        `import { default as MixedDefault } from '${resolved}';\n` +
+        `import { default as Entry } from '${importPath}';\n`;
       await testCase(targetList, input, output);
     });
   });

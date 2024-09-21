@@ -1,8 +1,10 @@
 {
+  "editor.defaultFormatter": "biomejs.biome",
   // DX.
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
-    "source.fixAll.stylelint": "explicit"
+    "source.fixAll.stylelint": "explicit",
+    "quickfix.biome": "explicit"
   },
   // ESLint.
   "eslint.validate": ["javascript", "javascriptreact", "yaml", "json", "jsonc", "json5"],
@@ -12,9 +14,5 @@
   "less.validate": false,
   "scss.validate": false,
   "stylelint.enable": true,
-  "stylelint.validate": ["css", "scss", "postcss", "vue"],
-  // Formatters.
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "stylelint.validate": ["css", "scss", "postcss", "vue"]
 }

@@ -14,13 +14,7 @@
   "bugs": {
     "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
   },
-  "keywords": [
-    "vite",
-    "vite-plugin",
-    "entry",
-    "tree shaking",
-    "debugger"
-  ],
+  "keywords": ["vite", "vite-plugin", "entry", "tree shaking", "debugger"],
   "exports": {
     ".": {
       "require": {

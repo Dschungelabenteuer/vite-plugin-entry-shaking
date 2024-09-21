@@ -16,10 +16,7 @@
           "type": "object",
           "properties": {
             "description": {
-              "oneOf": [
-                { "type": "string" },
-                { "$ref": "#/$defs/arrayOfStrings" }
-              ]
+              "oneOf": [{ "type": "string" }, { "$ref": "#/$defs/arrayOfStrings" }]
             },
             "content": { "type": "string" },
             "print": { "$ref": "#/$defs/arrayOfStrings" }

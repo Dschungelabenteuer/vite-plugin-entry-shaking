@@ -1,2 +1,2 @@
-export const MixedImportNamed = "MixedImportNamed";
-export default "MixedImportDefault";
+export const MixedImportNamed = 'MixedImportNamed';
+export default 'MixedImportDefault';

@@ -1,2 +1,2 @@
-import { DefaultImport } from "./entries/with-default-import-reexport";
+import { DefaultImport } from './entries/with-default-import-reexport';
 console.log(DefaultImport);

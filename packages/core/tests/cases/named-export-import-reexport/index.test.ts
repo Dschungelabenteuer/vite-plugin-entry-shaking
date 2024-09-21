@@ -1,3 +1,3 @@
-import { testNamedExportImportReexport } from "./setup";
+import { testNamedExportImportReexport } from './setup';
 
 testNamedExportImportReexport();

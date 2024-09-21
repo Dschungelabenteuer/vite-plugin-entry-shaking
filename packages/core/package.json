@@ -13,12 +13,7 @@
   "bugs": {
     "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
   },
-  "keywords": [
-    "vite",
-    "vite-plugin",
-    "entry",
-    "tree shaking"
-  ],
+  "keywords": ["vite", "vite-plugin", "entry", "tree shaking"],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -28,9 +23,7 @@
   },
   "main": "src/index.ts",
   "types": "src/index.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "engines": {
     "node": "^14.18.0 || >=16.0.0"
   },
