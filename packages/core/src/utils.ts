@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import { transformWithEsbuild } from 'vite';
 import type { EntryPath, EntryTarget, TargetGlobPattern, TargetObject } from './types';
-import { transformJsx } from './transform';
 
 export type Parallel = <T extends any[]>(items: T, cb: ParallelCb<T>) => Promise<any[] | void>;
 export type ParallelCb<T> = (
@@ -51,6 +51,8 @@ export const getAllTargetPaths = async (targets: EntryTarget[]) => {
   return paths;
 };
 
+/** Determines whether provided file requires an esbuild pre-transform. */
+const requiresEsbuildTransform = (path: string) => isJsxFile(path);
 /** Determines whether provided path is a JSX/TSX file. */
 export const isJsxFile = (path: string) => path.endsWith('.jsx') || path.endsWith('.tsx');
 
@@ -59,7 +61,8 @@ export const getCodeFromPath = async (path: string) => {
   return getCode(code, path);
 };
 
-export const getCode = async (code: string, path: string) => isJsxFile(path) ? transformJsx(code) : code;
+export const getCode = async (code: string, path: string) =>
+  requiresEsbuildTransform(path) ? (await transformWithEsbuild(code, path)).code : code;
 
 const loadFastGlob = async () => {
   const {

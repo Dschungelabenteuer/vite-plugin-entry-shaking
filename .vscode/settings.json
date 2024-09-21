@@ -12,5 +12,9 @@
   "less.validate": false,
   "scss.validate": false,
   "stylelint.enable": true,
-  "stylelint.validate": ["css", "scss", "postcss", "vue"]
+  "stylelint.validate": ["css", "scss", "postcss", "vue"],
+  // Formatters.
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

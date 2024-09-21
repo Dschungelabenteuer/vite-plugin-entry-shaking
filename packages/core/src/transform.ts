@@ -178,28 +178,6 @@ export function createReexportStatement(exports: readonly ExportSpecifier[]) {
   return `export { ${namedExports.join(',')} };`;
 }
 
-
-/**
- * Transforms JSX code to es-module-lexable code.
- * @param code JSX/TSX code (both use the tsx loader).
- * @param loader Loader type.
- */
-export async function transformJsx(code: string) {
-  const MISSING_ESBUILD = 'missing-esbuild';
-  const missingEsbuild = () => { throw new Error(MISSING_ESBUILD); }
-  try {
-    const { transform } = await import('esbuild').catch(missingEsbuild);
-    const jsx = 'preserve' // consider using tsconfig option (but shouldn't change anything?)
-    const result = await transform(code, { jsx, loader: 'tsx' })
-    return result.code;
-  } catch (e) {
-    if (!(e instanceof Error)) throw e;
-    throw e.message === MISSING_ESBUILD
-      ? new Error('JSX supports requires esbuild to be installed.')
-      : new Error(`Something went wrong while transforming JSX: ${e?.message}`);
-  }
-}
-
 const methods = {
   transformIfNeeded,
   transformImportsIfNeeded,
