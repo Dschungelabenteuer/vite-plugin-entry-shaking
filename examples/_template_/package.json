@@ -18,6 +18,7 @@
     "typescript": "^5.5.4",
     "vite": "^5.4.2",
     "vite-plugin-entry-shaking": "workspace:*",
-    "vue-tsc": "^2.1.2"
+    "vue-tsc": "^2.1.2",
+    "@types/node": "^22.5.1"
   }
 }

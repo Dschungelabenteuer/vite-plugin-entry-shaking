@@ -56,12 +56,6 @@ provide('search', search);
   --padding-page-header: var(--spacing-lg) var(--spacing-md);
   --font-size-page-header: var(--font-size-sm);
 
-  &.condensed {
-    --size-page-header: 2.85rem;
-    --padding-page-header: var(--spacing-md) var(--spacing-sm);
-    --font-size-page-header: var(--font-size-xs);
-  }
-
   position: relative;
   display: grid;
   grid-template-rows: var(--size-page-header) 1fr;
@@ -70,6 +64,12 @@ provide('search', search);
   max-height: 100%;
   overflow: hidden;
   background: var(--browser-background-color);
+
+  &.condensed {
+    --size-page-header: 2.85rem;
+    --padding-page-header: var(--spacing-md) var(--spacing-sm);
+    --font-size-page-header: var(--font-size-xs);
+  }
 
   &__content {
     height: var(--size-page-content);
