@@ -96,3 +96,4 @@ export function testWildcardExport(middleTarget?: CaseTarget) {
   testWildcardExportWithoutAlias(middleTarget);
   testWildcardExportWithAlias(middleTarget);
 }
+

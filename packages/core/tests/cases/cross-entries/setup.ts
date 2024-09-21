@@ -21,7 +21,10 @@ import {
   testNamedExportImportReexportAliasViaImportMultiple,
 } from '../named-export-import-reexport-alias-via-import/setup';
 
-import { testMixedImportsInTarget, testMixedImportsOfTarget } from '../mixed-imports/setup';
+import {
+  testMixedImportsInTarget,
+  testMixedImportsOfTarget
+} from '../mixed-imports/setup';
 
 import {
   testHasDefaultExport,
@@ -55,22 +58,14 @@ export function testCrossEntriesImportsExports() {
 
     describe('import then re-export an alias set via export', async () => {
       const baseCasePath = `${casePath}/named-export-import-reexport-alias-via-export`;
-      testNamedExportImportReexportAliasViaExportSingle(
-        await createCaseTarget(`${baseCasePath}-single`),
-      );
-      testNamedExportImportReexportAliasViaExportMultiple(
-        await createCaseTarget(`${baseCasePath}-multiple`),
-      );
+      testNamedExportImportReexportAliasViaExportSingle(await createCaseTarget(`${baseCasePath}-single`));
+      testNamedExportImportReexportAliasViaExportMultiple(await createCaseTarget(`${baseCasePath}-multiple`));
     });
 
     describe('import then re-export an alias set via import', async () => {
       const baseCasePath = `${casePath}/named-export-import-reexport-alias-via-import`;
-      testNamedExportImportReexportAliasViaImportSingle(
-        await createCaseTarget(`${baseCasePath}-single`),
-      );
-      testNamedExportImportReexportAliasViaImportMultiple(
-        await createCaseTarget(`${baseCasePath}-multiple`),
-      );
+      testNamedExportImportReexportAliasViaImportSingle(await createCaseTarget(`${baseCasePath}-single`));
+      testNamedExportImportReexportAliasViaImportMultiple(await createCaseTarget(`${baseCasePath}-multiple`));
     });
 
     describe('mixed imports', async () => {
@@ -82,15 +77,10 @@ export function testCrossEntriesImportsExports() {
     describe('default export', async () => {
       const baseCasePath = `${casePath}/default-export`;
       testHasDefaultExport(await createCaseTarget(`${baseCasePath}-has-default-export`));
-      testWithDefaultDirectReexport(
-        await createCaseTarget(`${baseCasePath}-with-default-direct-reexport`),
-      );
-      testWithDefaultImportReexport(
-        await createCaseTarget(`${baseCasePath}-with-default-import-reexport`),
-      );
-      testWithDestructuredDefaultImport(
-        await createCaseTarget(`${baseCasePath}-with-destructured-default-import`),
-      );
-    });
+      testWithDefaultDirectReexport(await createCaseTarget(`${baseCasePath}-with-default-direct-reexport`));
+      testWithDefaultImportReexport(await createCaseTarget(`${baseCasePath}-with-default-import-reexport`));
+      testWithDestructuredDefaultImport(await createCaseTarget(`${baseCasePath}-with-destructured-default-import`));
+    })
   });
 }
+

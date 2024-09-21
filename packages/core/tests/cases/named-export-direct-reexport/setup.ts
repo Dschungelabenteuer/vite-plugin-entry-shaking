@@ -3,7 +3,7 @@ import { describe, it } from 'vitest';
 import type { CaseTarget } from '../../utils';
 import { resolveModule } from '../../utils';
 import { createCaseTarget, setupCase, testCase } from '../../utils';
-import { DUPE_EXPORT_EXPECTATION, ALIAS_IMPORT_EXPECTATION, COMMON_EXPECTATION } from '../../utils';
+import { DUPE_EXPORT_EXPECTATION, ALIAS_IMPORT_EXPECTATION, COMMON_EXPECTATION, } from '../../utils';
 
 const casePath = '@test-cases/named-export-direct-reexport';
 

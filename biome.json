@@ -10,7 +10,7 @@
     "indentWidth": 2,
     "lineWidth": 100,
     "lineEnding": "lf",
-    "ignore": ["dist"]
+    "ignore": ["dist", "tests/__mocks__", "tests/cases"]
   },
   "javascript": {
     "formatter": {
