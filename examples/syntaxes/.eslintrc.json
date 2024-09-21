@@ -1,4 +1,0 @@
-{
-  "extends": ["@yungezeit/vue"],
-  "rules": { "import/order": "off" }
-}

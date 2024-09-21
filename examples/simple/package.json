@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@yungezeit/eslint-config-typescript": "^0.0.14",
+    "@yungezeit/eslint-typescript": "^0.0.12",
     "sass": "^1.79.3",
     "typescript": "^5.6.2",
     "vite": "^5.4.7",
