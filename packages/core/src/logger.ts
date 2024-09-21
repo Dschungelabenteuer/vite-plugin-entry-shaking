@@ -38,7 +38,7 @@ export class Logger implements BaseLogger {
    * @param options Log options.
    */
   public debug = (content: string, options?: LogOptions) => {
-    if (this.debugMode) this.baseLogger?.info?.(content, options);
+    if (this.debugMode) this.baseLogger.info(content, options);
     this.addLog(content, 'debug');
   };
 
@@ -50,7 +50,7 @@ export class Logger implements BaseLogger {
    */
   public info = (content: string, options?: LogOptions, faded = false) => {
     const msg = formatMessage(faded ? paint('gray', content) : content);
-    if (this.debugMode) this.baseLogger?.info?.(msg, options);
+    if (this.debugMode) this.baseLogger.info(msg, options);
     this.addLog(content, 'info');
   };
 
@@ -61,7 +61,7 @@ export class Logger implements BaseLogger {
    */
   public warn: ViteLogger['warn'] = (content, options) => {
     const msg = formatMessage(content);
-    if (this.debugMode) this.baseLogger?.warn?.(msg, options);
+    if (this.debugMode) this.baseLogger.warn(msg, options);
     this.addLog(content, 'warn');
   };
 
@@ -72,7 +72,7 @@ export class Logger implements BaseLogger {
    */
   public error: ViteLogger['error'] = (content, options) => {
     const msg = formatMessage(content);
-    if (this.debugMode) this.baseLogger?.error?.(msg, options);
+    if (this.debugMode) this.baseLogger.error(msg, options);
     this.addLog(content, 'error');
   };
 
@@ -83,7 +83,7 @@ export class Logger implements BaseLogger {
    */
   public success: ViteLogger['info'] = (content, options) => {
     const msg = formatMessage(content);
-    if (this.debugMode) this.baseLogger?.info?.(msg, options);
+    if (this.debugMode) this.baseLogger.info(msg, options);
     this.addLog(content, 'success');
   };
 

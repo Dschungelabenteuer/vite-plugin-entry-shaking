@@ -59,7 +59,6 @@ function mockExports(): EntryExports {
   );
 }
 
-// eslint-disable-next-line import/no-mutable-exports
 export let diagnosticsCount = 0;
 
 export const entries: Context['entries'] = new Map(

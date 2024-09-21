@@ -51,15 +51,18 @@ export function useDialog(
     const delay = duration.endsWith('ms')
       ? Number(duration.slice(0, -2))
       : Number(duration.slice(0, -1)) * 1000;
+
     // Wait for the closing animation to finish before emitting the close event.
-    timeout.value = setTimeout(() => emit('close'), delay);
+    timeout.value = setTimeout(() => {
+      emit('close');
+    }, delay);
   };
 
   const dialogTransitionName = computed(() => `dialog-${props.id}-transition`);
   const backdropTransitionName = computed(() => `dialog-backdrop-${props.id}-transition`);
-  const isOpen = ref(element?.value?.open ?? false);
+  const isOpen = ref(element.value?.open ?? false);
 
-  let observer: MutationObserver;
+  let observer: MutationObserver | undefined;
   onMounted(() => {
     observer = new MutationObserver(() => {
       isOpen.value = element.value?.open ?? false;
@@ -71,7 +74,9 @@ export function useDialog(
     });
   });
 
-  onUnmounted(() => observer && observer.disconnect());
+  onUnmounted(() => {
+    observer?.disconnect();
+  });
 
   return {
     trap,

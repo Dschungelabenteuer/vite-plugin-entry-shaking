@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 type T = any;
 const TYPE = 't';
 const MAP = 'm';

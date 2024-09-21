@@ -5,7 +5,7 @@ import type { ClassNameFn } from '@composables/useClassNames';
 import type { PanelSlots } from './Panel.types';
 
 const $class = inject<ClassNameFn>('$class')!;
-const slots = defineSlots<Pick<PanelSlots, 'footer'>>();
+const _slots = defineSlots<Pick<PanelSlots, 'footer'>>();
 </script>
 
 <template>

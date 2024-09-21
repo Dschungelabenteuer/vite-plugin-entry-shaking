@@ -19,7 +19,9 @@ export const metricsDecorator = () => ({
       closeBtnId: 'metrics-panel-close-btn-id',
       openBtnId: 'metrics-panel-open-btn-id',
       isOpen: ref(false),
-      toggle: () => {},
+      toggle: () => {
+        /** no-op */
+      },
     });
   },
   template: '<div><story /><router-view /></div>',

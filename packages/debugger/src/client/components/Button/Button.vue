@@ -10,7 +10,7 @@ import { useButton } from './useButton';
 
 const $class = useClassNames('button');
 const emit = defineEmits<ButtonEvents>();
-const slots = defineSlots<ButtonSlots>();
+const _slots = defineSlots<ButtonSlots>();
 const props = withDefaults(defineProps<ButtonProps>(), {
   disabled: false,
   tooltipOptions: () => ({

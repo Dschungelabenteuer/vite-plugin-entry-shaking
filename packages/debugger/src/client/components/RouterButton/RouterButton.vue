@@ -3,7 +3,7 @@ import Button from '@components/Button/Button.vue';
 import Badge from '@components/Badge/Badge.vue';
 import type { RouterButtonProps } from './RouterButton.types';
 
-const props = defineProps<RouterButtonProps>();
+const _props = defineProps<RouterButtonProps>();
 </script>
 
 <template>

@@ -1,4 +1,3 @@
-/* eslint-disable no-return-assign */
 import type { Ref } from 'vue';
 import { ref } from 'vue';
 import type { UseFloatingOptions } from '@floating-ui/vue';
@@ -22,10 +21,7 @@ export type UseFloatingReturn = {
   handlers?: UseFloatingHandlers;
 };
 
-export type UseFloating = <
-  Reference extends Ref<HTMLButtonElement | null>,
-  Floating extends Ref<any | null>,
->(
+export type UseFloating = <Reference extends Ref<HTMLButtonElement | null>, Floating extends Ref>(
   reference: Reference,
   floatingEl: Floating,
   options?: UseFloatingOptions,

@@ -129,7 +129,7 @@ export type ImportName = string;
 export type ImportPath = string;
 
 /** Import parameters. */
-export type ImportParams<T = string> = {
+export interface ImportParams<T = string> {
   /** Imported path. */
   path: T;
   /** Is it a default import? */
@@ -140,15 +140,15 @@ export type ImportParams<T = string> = {
   alias?: string;
   /** Determines whether the export represents some code defined within the file. */
   selfDefined?: boolean;
-};
+}
 
 /** Caught wildcard exports. */
-export type WildcardExports = {
+export interface WildcardExports {
   /** Named wildcard exports (e.g. `import * as Something` or `export * as Something`). */
   named: Map<string, EntryPath>;
   /** Direct wildcard exports (e.g. `export * from './somewhere'`). */
   direct: string[];
-};
+}
 
 /** Import inputs. */
 export type ImportInput = Omit<ImportParams, 'path'> & {
@@ -157,7 +157,7 @@ export type ImportInput = Omit<ImportParams, 'path'> & {
 };
 
 /** Entry imports map. */
-export type EntryImports = Map<ImportName, ImportParams<ImportPath>>;
+export type EntryImports = Map<ImportName, ImportParams>;
 
 /** Named export. */
 export type ExportName = string;
@@ -166,7 +166,7 @@ export type ExportName = string;
 export type ExportOriginPath = string;
 
 /** Entry exports map. */
-export type EntryExports = Map<ExportName, ImportParams<ExportOriginPath>>;
+export type EntryExports = Map<ExportName, ImportParams>;
 
 /** Target imports map */
 export type TargetImports = Map<string, ImportInput[]>;
@@ -178,10 +178,15 @@ export type TargetPath = string;
 export type EntryPath = string;
 
 /** Target definition through an object. */
-export type TargetObject = { path: EntryPath };
+export interface TargetObject {
+  path: EntryPath;
+}
 
 /** Tagret definition through Glob patterns. */
-export type TargetGlobPattern = { glob: string; globOptions?: FastGlobOptions };
+export interface TargetGlobPattern {
+  glob: string;
+  globOptions?: FastGlobOptions;
+}
 
 /** Entry target passed to plugin options. */
 export type EntryTarget = EntryPath | TargetObject | TargetGlobPattern;
@@ -193,7 +198,10 @@ export type PluginTargets = EntryTarget[];
 export type ExtendedTargets = Map<EntryPath, number>;
 
 /** Extended target. */
-export type ExtendedTarget = { path: EntryPath; depth: number };
+export interface ExtendedTarget {
+  path: EntryPath;
+  depth: number;
+}
 
 /** Parsed import statement output. */
 export interface ParsedImportStatement {
@@ -230,7 +238,7 @@ export interface Log {
 export type BaseLogger = Pick<ViteLogger, Exclude<LogLevel, 'debug' | 'success'>>;
 
 /** Available debugger events and their payload. */
-export type DebuggerEvents = {
+export interface DebuggerEvents {
   increaseProcessTime: [number];
   increaseTransformTime: [number];
   incrementJsRequests: [];
@@ -238,4 +246,4 @@ export type DebuggerEvents = {
   increaseEntryHits: [EntryPath];
   registerTransform: [TransformData];
   registerLog: [Log];
-};
+}

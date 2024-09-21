@@ -12,7 +12,7 @@ import GridHeader from './GridHeader.vue';
 const $class = useClassNames('grid');
 const emit = defineEmits<GridEvents>();
 const props = defineProps<GridProps<Cols, Items>>();
-const slots = defineSlots<GridSlots<Items>>();
+const _slots = defineSlots<GridSlots<Items>>();
 
 const onSort: GridSortFn = (column) => emit('sort', column.key);
 const classes = computed(() => [$class(), props.condensed ? 'condensed' : '']);

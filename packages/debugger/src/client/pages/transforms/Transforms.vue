@@ -30,7 +30,7 @@ const { id, title, sort, columns, items, matched, methods } = useBrowserData({
   id: 'transforms',
   title: 'List of transforms',
   source,
-  filterFn: (item, f) => true,
+  filterFn: () => true,
   defaultFilters,
   columns: {
     icon: {

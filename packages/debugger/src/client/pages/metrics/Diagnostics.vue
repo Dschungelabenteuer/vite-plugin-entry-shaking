@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { store } from '#store';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { randomId } from '#utils';
 import Button from '@components/Button/Button.vue';
@@ -11,7 +11,7 @@ import type { DiagnosticsProps } from './Metrics.types';
 import DiagnosticsOverview from './details/DiagnosticsOverview.vue';
 
 const $class = useClassNames('diagnostics');
-const props = defineProps<DiagnosticsProps>();
+const _props = defineProps<DiagnosticsProps>();
 const dialogRef = ref<InstanceType<typeof Dialog> | null>(null);
 const route = useRoute();
 const router = useRouter();

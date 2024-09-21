@@ -6,7 +6,7 @@ export type ColorScheme = 'light' | 'dark';
 export function useColorScheme() {
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const defaultScheme = prefersDark ? 'dark' : 'light';
-  const resolvedScheme = (localStorage.getItem('colorScheme') as ColorScheme) || defaultScheme;
+  const resolvedScheme = (localStorage.getItem('colorScheme') ?? defaultScheme) as ColorScheme;
   const colorScheme = ref<ColorScheme>(resolvedScheme);
 
   const swapColorScheme = () => {

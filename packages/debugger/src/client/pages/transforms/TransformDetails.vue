@@ -7,7 +7,7 @@ import type { TransformDetailsEvents, TransformDetailsProps } from './Transform.
 import TransformMetrics from './details/TransformMetrics.vue';
 import TransformDiffs from './details/TransformDiffs.vue';
 
-const emit = defineEmits<TransformDetailsEvents>();
+const _emit = defineEmits<TransformDetailsEvents>();
 const props = defineProps<TransformDetailsProps>();
 provide('transform-details', reactive(props));
 

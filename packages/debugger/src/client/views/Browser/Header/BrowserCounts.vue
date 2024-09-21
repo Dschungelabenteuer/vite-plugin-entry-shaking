@@ -6,10 +6,10 @@ import { useViewTransition } from '@composables/useViewTransition';
 import type { BrowserProps } from '../Browser.types';
 
 const $class = inject<ClassNameFn>('$class')!;
-const props = defineProps<Required<BrowserProps>>();
+const _props = defineProps<Required<BrowserProps>>();
 
 const headerCountsRef = ref<HTMLElement | null>(null);
-const transitions = useViewTransition({
+const _transitions = useViewTransition({
   names: {
     'browser-header-counts': headerCountsRef,
   },

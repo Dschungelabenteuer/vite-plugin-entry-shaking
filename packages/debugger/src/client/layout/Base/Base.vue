@@ -12,7 +12,7 @@ import { usePanel } from '@views/Panel/usePanel';
 import Metrics from '@pages/metrics/Metrics.vue';
 import type { BaseSlots } from './Base.types';
 
-const slots = defineSlots<BaseSlots>();
+const _slots = defineSlots<BaseSlots>();
 const dialogContainerId = inject<string>(DIALOG_CONTAINER_ID_VAR)!;
 const floatingContainerId = inject<string>(FLOATING_CONTAINER_ID_VAR)!;
 

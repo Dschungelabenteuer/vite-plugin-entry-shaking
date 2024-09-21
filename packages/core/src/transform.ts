@@ -161,7 +161,7 @@ export async function getEntryImports(
       },
       Promise.resolve([] as string[]),
     );
-  } catch (e) {
+  } catch {
     return [];
   }
 }
@@ -172,6 +172,7 @@ export async function getEntryImports(
  */
 export function createReexportStatement(exports: readonly ExportSpecifier[]) {
   const namedExports = exports
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     .filter((e) => e.n !== undefined && e.n !== 'default' && e.ln === undefined)
     .map(({ n }) => n);
   if (namedExports.length === 0) return '';

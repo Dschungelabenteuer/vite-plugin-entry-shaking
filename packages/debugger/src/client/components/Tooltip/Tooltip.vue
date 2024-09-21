@@ -4,7 +4,7 @@ import { useClassNames } from '@composables/useClassNames';
 import type { TooltipProps, TooltipSlots } from './Tooltip.types';
 
 const $class = useClassNames('tooltip');
-const slots = defineSlots<TooltipSlots>();
+const _slots = defineSlots<TooltipSlots>();
 const props = defineProps<TooltipProps>();
 
 const stateClass = computed(() => (props.isOpen ? 'open' : ''));

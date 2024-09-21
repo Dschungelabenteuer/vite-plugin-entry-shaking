@@ -14,23 +14,23 @@ import { Context } from '../src/context';
 import utils from '../src/utils';
 
 /** Case structure. */
-export type Case = {
+export interface Case {
   /** Input string. */
   input: string;
   /** List of targets' paths. */
   targetsPaths: string;
-};
+}
 
 /** Case target structure. */
-export type CaseTarget = {
+export interface CaseTarget {
   /** Path to target. */
   path: string;
   /** Expected number of imports remaining in the target (see limitations). */
   expectedImportRemainsCount?: number;
-};
+}
 
 /** Vite resolver for tests. */
-let testResolver: Awaited<ReturnType<typeof getTestResolver>>;
+let testResolver: Awaited<ReturnType<typeof getTestResolver>> | undefined;
 
 /** Mock folder name. */
 export const MOCKS_FOLDER = '__mocks__';
@@ -108,7 +108,7 @@ export const getTestResolver = async () =>
 
 /** Returns the updated target content. */
 export const getCaseTarget = (res: Awaited<ReturnType<typeof runCase>>, target: string) =>
-  res.entries?.get(target)?.updatedSource.trim();
+  res.entries.get(target)?.updatedSource.trim();
 
 /** Prepares some target case data. */
 export const setupCase = (target: CaseTarget, middleTarget?: CaseTarget) => ({

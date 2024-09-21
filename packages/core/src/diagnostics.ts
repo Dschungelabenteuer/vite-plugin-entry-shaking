@@ -6,7 +6,7 @@ export class Diagnostics {
   public list: Diagnostic[] = [];
 
   /** Map of all emitted diagnostics indices indexed by file path. */
-  public listPerPath: Map<string, number[]> = new Map();
+  public listPerPath = new Map<string, number[]>();
 
   constructor(public options: Required<FinalPluginOptions>) {}
 
@@ -36,7 +36,7 @@ export class Diagnostics {
    * @param name Diagnostic name.
    */
   isEnabled(name: keyof DiagnosticsConfig) {
-    return this.options.diagnostics?.[name] === true;
+    return this.options.diagnostics[name] === true;
   }
 }
 

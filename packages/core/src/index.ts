@@ -59,7 +59,7 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin {
       }
     },
 
-    async load(id) {
+    load(id) {
       return context.loadFile(id);
     },
 

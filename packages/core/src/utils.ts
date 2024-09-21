@@ -3,7 +3,10 @@ import { resolve } from 'path';
 import { transformWithEsbuild } from 'vite';
 import type { EntryPath, EntryTarget, TargetGlobPattern, TargetObject } from './types';
 
-export type Parallel = <T extends any[]>(items: T, cb: ParallelCb<T>) => Promise<any[] | void>;
+export type Parallel = <T extends any[]>(
+  items: T,
+  cb: ParallelCb<T>,
+) => Promise<any[]> | Promise<void>;
 export type ParallelCb<T> = (
   item: T extends (infer A)[] ? A : never,
   index: number,

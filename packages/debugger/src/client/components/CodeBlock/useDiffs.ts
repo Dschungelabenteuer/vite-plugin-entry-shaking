@@ -1,6 +1,6 @@
 import type { DiffsRequestPayload, DiffsResponsePayload } from './diffs';
 
-let worker: Worker;
+let worker: Worker | undefined;
 const queue = new Map();
 
 /** Composable used to compute and get diffs between two strings. */

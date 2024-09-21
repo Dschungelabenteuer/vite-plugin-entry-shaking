@@ -12,7 +12,7 @@ import EntryExportsFilters from './EntryExportsFilters.vue';
 const $class = useClassNames('entry-exports');
 const entryDetails = inject<EntryDetailsProps>('entry-details')!;
 const source = computed(() =>
-  [...(entryDetails.entry?.exports.entries() ?? new Map())].map(([name, exp], index) => ({
+  [...(entryDetails.entry?.exports.entries() ?? new Map())].map(([name, exp]) => ({
     ...exp,
     name,
     id: name,

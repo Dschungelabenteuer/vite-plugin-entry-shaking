@@ -20,7 +20,7 @@ export function useVerticalTabs(
   const ids = useVerticalTabsIds(props);
   const tablistWidth = computed(() => (props.iconOnly ? 'auto' : props.width));
 
-  const setActiveTab = async (index: number) => {
+  const setActiveTab = (index: number) => {
     menu.setNthItem(index);
   };
 

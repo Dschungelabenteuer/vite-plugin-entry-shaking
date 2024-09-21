@@ -69,7 +69,7 @@ export class Context {
   /**  Initializes the plugin context. */
   public async init() {
     await this.registerTargets();
-    this.entries = (await EntryAnalyzer.analyzeEntries(this)) ?? new Map();
+    this.entries = await EntryAnalyzer.analyzeEntries(this);
 
     if (this.options.debug) {
       const { EventBus } = await loadEventBus();

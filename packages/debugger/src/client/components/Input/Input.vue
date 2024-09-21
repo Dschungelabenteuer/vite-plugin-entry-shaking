@@ -48,7 +48,7 @@ defineOptions({ inheritAttrs: false });
         :readonly="readonly"
         type="text"
         :placeholder="placeholder"
-      />
+      >
 
       <Kbd
         v-if="shortcut"

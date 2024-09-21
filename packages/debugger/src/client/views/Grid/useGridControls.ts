@@ -1,5 +1,5 @@
 import type { Ref } from 'vue';
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watchEffect } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { getElementBoundaries } from '#utils';
 import type { ShortcutGroup } from '@components/Shortcuts/Shortcuts.types';
 import { getFocusableChildren } from '../../composables/useFocusTrap';
@@ -7,11 +7,15 @@ import type { Column, GridProps, UseGridDataReturn, UseGridLayoutReturn } from '
 import { renderCallback } from './useGridLayout';
 
 /** I like to rove it, rove it. */
-export const rove = (el: HTMLElement) => el.setAttribute('tabindex', '-1');
+export const rove = (el: HTMLElement) => {
+  el.setAttribute('tabindex', '-1');
+};
 /** So much that I'd do it on every single focusable element. */
 export const roveFocusableChildren = (el: HTMLElement) => getFocusableChildren(el)?.forEach(rove);
 /** Nevermind I don't like it that much… */
-export const unrove = (el: HTMLElement) => el.setAttribute('tabindex', '0');
+export const unrove = (el: HTMLElement) => {
+  el.setAttribute('tabindex', '0');
+};
 
 /**
  * Augments grid's keyboard navigation.
@@ -90,7 +94,10 @@ export function useGridControls<Cols extends Record<string, Column>, Items exten
     return (
       getCell() ??
       (await new Promise((resolve, reject) => {
-        if (awaitRowRender) return resolve(undefined);
+        if (awaitRowRender) {
+          resolve(undefined);
+          return;
+        }
         renderCallback.value = { resolve, reject, row: data.activeRow.value };
       })
         .then(() => getCell())
@@ -115,12 +122,11 @@ export function useGridControls<Cols extends Record<string, Column>, Items exten
       return el;
     };
 
-    const target =
-      focusableChildren && focusableChildren.length
-        ? // Reset native tabindex for cell's focusable elements…
-          [...focusableChildren].map((el) => restoreTabindices(el))[0]
-        : // …or the cell itself as part of the navigation.
-          restoreTabindices(cell);
+    const target = focusableChildren?.length
+      ? // Reset native tabindex for cell's focusable elements…
+        [...focusableChildren].map((el) => restoreTabindices(el))[0]
+      : // …or the cell itself as part of the navigation.
+        restoreTabindices(cell);
 
     if (autoscroll) {
       const { bottom, top } = getElementBoundaries(cell);
@@ -138,7 +144,7 @@ export function useGridControls<Cols extends Record<string, Column>, Items exten
       }
     }
 
-    target?.focus({
+    target.focus({
       preventScroll: !autoscroll,
     });
   }
@@ -165,24 +171,42 @@ export function useGridControls<Cols extends Record<string, Column>, Items exten
     }
 
     switch (e.key) {
-      case 'ArrowDown':
-        return focusNextRow();
-      case 'ArrowUp':
-        return focusPreviousRow();
-      case 'ArrowRight':
-        return focusNextCol();
-      case 'ArrowLeft':
-        return focusPreviousCol();
-      case 'PageUp':
-        return focusPreviousRow(data.pageSize.value);
-      case 'PageDown':
-        return focusNextRow(data.pageSize.value);
-      case 'Home':
-        return focusFirstRow();
-      case 'End':
-        return focusLastRow();
-      case 'Escape':
-        return resetFocus();
+      case 'ArrowDown': {
+        focusNextRow();
+        return;
+      }
+      case 'ArrowUp': {
+        focusPreviousRow();
+        return;
+      }
+      case 'ArrowRight': {
+        focusNextCol();
+        return;
+      }
+      case 'ArrowLeft': {
+        focusPreviousCol();
+        return;
+      }
+      case 'PageUp': {
+        focusPreviousRow(data.pageSize.value);
+        return;
+      }
+      case 'PageDown': {
+        focusNextRow(data.pageSize.value);
+        return;
+      }
+      case 'Home': {
+        focusFirstRow();
+        return;
+      }
+      case 'End': {
+        focusLastRow();
+        return;
+      }
+      case 'Escape': {
+        resetFocus();
+        return;
+      }
       case 'h':
         data.isShortcutListOpen.value = !data.isShortcutListOpen.value;
         break;
@@ -278,8 +302,6 @@ export function useGridControls<Cols extends Record<string, Column>, Items exten
     gridRef.value?.removeEventListener('focus', setGridFocus);
     gridRef.value?.removeEventListener('blur', unsetGridFocus);
   });
-
-  watchEffect(() => {});
 
   return {
     /** List of shortcuts. */
