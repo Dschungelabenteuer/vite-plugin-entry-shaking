@@ -41,7 +41,9 @@ export class EventBus {
    */
   public subscribe(cb: (event: keyof DebuggerEvents, data: any) => void) {
     events.forEach((event) => {
-      this.on(event, (...args) => cb(event, args));
+      this.on(event, (...args) => {
+        cb(event, args);
+      });
     });
   }
 }

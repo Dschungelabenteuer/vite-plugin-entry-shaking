@@ -8,7 +8,7 @@ import BrowserCounts from './BrowserCounts.vue';
 import BrowserActions from './BrowserActions.vue';
 
 const $class = inject<ClassNameFn>('$class')!;
-const slots = defineSlots<Pick<BrowserSlots, 'filters'>>();
+const _slots = defineSlots<Pick<BrowserSlots, 'filters'>>();
 const props = defineProps<Required<BrowserProps>>();
 </script>
 

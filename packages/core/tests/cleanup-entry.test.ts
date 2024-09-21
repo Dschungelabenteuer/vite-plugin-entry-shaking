@@ -116,7 +116,7 @@ const mockedCleanedEntry = dedent(`
 
 const getMockedExports = async (content?: string) => {
   await init;
-  const [, exports] = await parse(content ?? mockedRawEntry);
+  const [, exports] = parse(content ?? mockedRawEntry);
   return exports;
 };
 

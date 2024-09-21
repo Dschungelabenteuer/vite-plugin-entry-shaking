@@ -66,7 +66,8 @@ function concatDiffs(diffs: DiffDefinition[]) {
     if (text === '\n') {
       if (incrementalRemoval) addLine(Diff.DIFF_DELETE, incrementalRemoval);
       if (incrementalAddition) addLine(Diff.DIFF_INSERT, incrementalAddition);
-      return addLine(op, '');
+      addLine(op, '');
+      return;
     }
     const lines = text.split('\n');
     const lastLineIndex = lines.length - 1;

@@ -1,4 +1,3 @@
-/* eslint-disable no-return-assign */
 import type { Ref } from 'vue';
 import { ref } from 'vue';
 import type { UseFloatingOptions } from '@floating-ui/vue';
@@ -22,10 +21,7 @@ export type UseFloatingReturn = {
   handlers?: UseFloatingHandlers;
 };
 
-export type UseFloating = <
-  Reference extends Ref<HTMLButtonElement | null>,
-  Floating extends Ref<any | null>,
->(
+export type UseFloating = <Reference extends Ref<HTMLButtonElement | null>, Floating extends Ref>(
   reference: Reference,
   floatingEl: Floating,
   options?: UseFloatingOptions,
@@ -45,7 +41,7 @@ export const FLOATING_CONTAINER_CLASS = 'floating-container';
 export const useFloating: UseFloating = (reference, floatingEl, options) => {
   const middleware = ref([flip(), shift(), offset({ crossAxis: 0 })]);
   const isOpen = ref(false);
-  const a = useFloatingUi(reference, floatingEl, {
+  const base = useFloatingUi(reference, floatingEl, {
     whileElementsMounted: autoUpdate,
     middleware,
     ...options,
@@ -55,5 +51,5 @@ export const useFloating: UseFloating = (reference, floatingEl, options) => {
   const close = () => (isOpen.value = false);
   const toggle = () => (isOpen.value = !isOpen.value);
 
-  return { isOpen, open, close, toggle, styles: a.floatingStyles };
+  return { isOpen, open, close, toggle, styles: base.floatingStyles };
 };

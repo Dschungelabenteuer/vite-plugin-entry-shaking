@@ -104,7 +104,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
       it('should correctly parse import statement when only importing default export', () => {
         const defaultImports = ['User'];
         const parsed = Parsers.parseImportStatement(
-          createStatementVariant(`import ${defaultImports} from '@model/user';`),
+          createStatementVariant(`import ${defaultImports.join(',')} from '@model/user';`),
         );
         expect(parsed).toMatchObject({
           namedImports: [],

@@ -5,7 +5,7 @@ import { useClassNames } from '@composables/useClassNames';
 import type { MetricProps } from './Metric.types';
 
 const $class = useClassNames('metric');
-const props = defineProps<MetricProps>();
+const _props = defineProps<MetricProps>();
 </script>
 
 <template>

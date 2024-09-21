@@ -62,8 +62,10 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     it('should throw error if anything went wrong while analyzing entry file', async () => {
       const ctx = await createTestContext({ targets: [path] });
       ctx.entries = new Map([]) as any;
-      vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementationOnce(() => Promise.reject());
-      expect(async () => {
+      vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementationOnce(() =>
+        Promise.reject(new Error()),
+      );
+      await expect(async () => {
         await EntryAnalyzer.analyzeEntry(ctx, path, 0);
       }).rejects.toThrowError();
     });
@@ -259,11 +261,11 @@ describe.each([true, false])('with or without new line characters', (newLineChar
       vi.restoreAllMocks();
     });
 
-    const run = (input: string) => {
+    const run = async (input: string) => {
       const analyzedImports: EntryImports = new Map([]);
       const startPosition = 0;
       const endPosition: number = input.length;
-      EntryAnalyzer.analyzeEntryImport(
+      await EntryAnalyzer.analyzeEntryImport(
         ctx,
         input,
         new Set(),
@@ -284,9 +286,11 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     };
 
     describe('aggregated export statements', () => {
-      it('should feed the `analyzedImports` map if this is an aggregated export', () => {
+      it('should feed the `analyzedImports` map if this is an aggregated export', async () => {
         const originalName = 'UserId';
-        const output = run(createStatementVariant(`export { ${originalName} } from '${path}'`));
+        const output = await run(
+          createStatementVariant(`export { ${originalName} } from '${path}'`),
+        );
 
         expect(output.analyzedImports.size).toStrictEqual(1);
         expect(output.analyzedImports.get('UserId')).toStrictEqual({
@@ -296,9 +300,11 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         });
       });
 
-      it('should feed the `analyzedImports` map if this is an aggregated default export with alias', () => {
+      it('should feed the `analyzedImports` map if this is an aggregated default export with alias', async () => {
         const alias = 'User';
-        const output = run(createStatementVariant(`export { default as ${alias} } from '${path}'`));
+        const output = await run(
+          createStatementVariant(`export { default as ${alias} } from '${path}'`),
+        );
 
         expect(output.analyzedImports.size).toStrictEqual(1);
         expect(output.analyzedImports.get(alias)).toStrictEqual({
@@ -307,10 +313,10 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         });
       });
 
-      it('should feed the `analyzedImports` map if this is an aggregated export with alias', () => {
+      it('should feed the `analyzedImports` map if this is an aggregated export with alias', async () => {
         const originalName = 'UserId';
         const alias = 'User';
-        const output = run(
+        const output = await run(
           createStatementVariant(`export { ${originalName} as ${alias} } from '${path}'`),
         );
 
@@ -324,9 +330,11 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     });
 
     describe('import statements', () => {
-      it('should feed the `analyzedImports` map if it imports named exports', () => {
+      it('should feed the `analyzedImports` map if it imports named exports', async () => {
         const originalName = `GroupId`;
-        const output = run(createStatementVariant(`import { ${originalName} } from "${path}"`));
+        const output = await run(
+          createStatementVariant(`import { ${originalName} } from "${path}"`),
+        );
 
         expect(output.analyzedImports.size).toStrictEqual(1);
         expect(output.analyzedImports.get(originalName)).toStrictEqual({
@@ -336,9 +344,9 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         });
       });
 
-      it('should feed the `analyzedImports` map if it imports a module', () => {
+      it('should feed the `analyzedImports` map if it imports a module', async () => {
         const moduleImport = `User`;
-        const output = run(createStatementVariant(`import ${moduleImport} from "${path}"`));
+        const output = await run(createStatementVariant(`import ${moduleImport} from "${path}"`));
 
         expect(output.analyzedImports.size).toStrictEqual(1);
         expect(output.analyzedImports.get(moduleImport)).toStrictEqual({
@@ -347,11 +355,13 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         });
       });
 
-      it('should feed the `analyzedImports` map if it imports a named export with an alias', () => {
+      it('should feed the `analyzedImports` map if it imports a named export with an alias', async () => {
         const originalName = `User`;
         const alias = `MyUser`;
         const importString = `${originalName} as ${alias}`;
-        const output = run(createStatementVariant(`import { ${importString} } from "${path}"`));
+        const output = await run(
+          createStatementVariant(`import { ${importString} } from "${path}"`),
+        );
 
         expect(output.analyzedImports.size).toStrictEqual(1);
         expect(output.analyzedImports.get(alias)).toStrictEqual({
@@ -361,9 +371,11 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         });
       });
 
-      it('should feed the `analyzedImports` map if it imports a default export with an alias', () => {
+      it('should feed the `analyzedImports` map if it imports a default export with an alias', async () => {
         const alias = `MyUser`;
-        const output = run(createStatementVariant(`import { default as ${alias} } from "${path}"`));
+        const output = await run(
+          createStatementVariant(`import { default as ${alias} } from "${path}"`),
+        );
 
         expect(output.analyzedImports.size).toStrictEqual(1);
         expect(output.analyzedImports.get(alias)).toStrictEqual({
@@ -374,14 +386,14 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     });
 
     describe('wildcard export', () => {
-      it('should not feed the `analyzedImports` map ', () => {
-        const output = run(`export * from "${path}"`);
+      it('should not feed the `analyzedImports` map ', async () => {
+        const output = await run(`export * from "${path}"`);
         expect(output.analyzedImports.size).toStrictEqual(0);
       });
 
-      it('should not call `registerWildcardImportIfNeeded`', () => {
+      it('should not call `registerWildcardImportIfNeeded`', async () => {
         vi.spyOn(EntryAnalyzer, 'registerWildcardImportIfNeeded');
-        run(`export * from "${path}"`);
+        await run(`export * from "${path}"`);
         expect(EntryAnalyzer.registerWildcardImportIfNeeded).toHaveBeenCalledWith(
           ctx,
           expect.any(Set),
@@ -393,14 +405,14 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     });
 
     describe('wildcard import', () => {
-      it('should not feed the `analyzedImports` map ', () => {
-        const output = run(`import * from "${path}"`);
+      it('should not feed the `analyzedImports` map ', async () => {
+        const output = await run(`import * from "${path}"`);
         expect(output.analyzedImports.size).toStrictEqual(0);
       });
 
-      it('should not call `registerWildcardImportIfNeeded`', () => {
+      it('should not call `registerWildcardImportIfNeeded`', async () => {
         vi.spyOn(EntryAnalyzer, 'registerWildcardImportIfNeeded');
-        run(`import * from "${path}"`);
+        await run(`import * from "${path}"`);
         expect(EntryAnalyzer.registerWildcardImportIfNeeded).toHaveBeenCalledWith(
           ctx,
           expect.any(Set),
@@ -499,7 +511,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
 
       it('should call `registerWildcardImport` even if `maxWildcardDepth` was not set', async () => {
         const ctx = await createTestContext({ targets: [entryOnePath, otherTargetEntryPath] });
-        EntryAnalyzer.registerWildcardImportIfNeeded(
+        await EntryAnalyzer.registerWildcardImportIfNeeded(
           ctx,
           new Set(),
           otherTargetEntryPath,
@@ -518,7 +530,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
       it('should call `registerWildcardImport` even if `maxWildcardDepth` was reached', async () => {
         const targets = [entryOnePath, otherTargetEntryPath];
         const ctx = await createTestContext({ targets, maxWildcardDepth: 2 });
-        EntryAnalyzer.registerWildcardImportIfNeeded(
+        await EntryAnalyzer.registerWildcardImportIfNeeded(
           ctx,
           new Set(),
           otherTargetEntryPath,
@@ -542,7 +554,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           diagnostics: { maxDepthReached: false },
         });
         const diagnostics = new Set<number>();
-        EntryAnalyzer.registerWildcardImportIfNeeded(
+        await EntryAnalyzer.registerWildcardImportIfNeeded(
           ctx,
           diagnostics,
           otherTargetEntryPath,
@@ -560,7 +572,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           diagnostics: { maxDepthReached: true },
         });
         const diagnostics = new Set<number>();
-        EntryAnalyzer.registerWildcardImportIfNeeded(
+        await EntryAnalyzer.registerWildcardImportIfNeeded(
           ctx,
           diagnostics,
           otherTargetEntryPath,
@@ -577,7 +589,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
 
       it('should not call `registerWildcardImport` if `maxWildcardDepth` was not set', async () => {
         const ctx = await createTestContext({ targets: [entryOnePath] });
-        EntryAnalyzer.registerWildcardImportIfNeeded(
+        await EntryAnalyzer.registerWildcardImportIfNeeded(
           ctx,
           new Set(),
           wildcardExportedPath,
@@ -589,7 +601,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
 
       it('should not call `registerWildcardImport` if `maxWildcardDepth` was reached', async () => {
         const ctx = await createTestContext({ targets: [entryOnePath], maxWildcardDepth: 2 });
-        EntryAnalyzer.registerWildcardImportIfNeeded(
+        await EntryAnalyzer.registerWildcardImportIfNeeded(
           ctx,
           new Set(),
           wildcardExportedPath,
@@ -601,7 +613,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
 
       it('should call `registerWildcardImport` if `maxWildcardDepth` was not reached', async () => {
         const ctx = await createTestContext({ targets: [entryOnePath], maxWildcardDepth: 2 });
-        EntryAnalyzer.registerWildcardImportIfNeeded(
+        await EntryAnalyzer.registerWildcardImportIfNeeded(
           ctx,
           new Set(),
           wildcardExportedPath,

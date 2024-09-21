@@ -41,7 +41,7 @@ pnpm -v
 This project also uses:
 
 - [ESLint](https://eslint.org/docs/latest/use/getting-started) as a linter
-- [Prettier](https://prettier.io/docs/en/index.html) as a formatter
+- [Biome](https://biomejs.dev/) as a formatter
 - [Vitest](https://vitest.dev) as a test framework
 
 It is recommended (but optional) to plug these tools into your IDE by using their respective
@@ -108,7 +108,7 @@ pnpm check
 
 This should trigger a series of actions that you may also launch manually:
 
-1. Running prettier to format code: `pnpm format`
+1. Running biome to format code: `pnpm format`
 2. Running ESLint to lint code: `pnpm lint`
 3. Running tests through Vitest: `pnpm test`
 

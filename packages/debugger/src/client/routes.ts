@@ -64,7 +64,9 @@ export function createRouter() {
   router.beforeResolve(async (a) => {
     if (!a.meta.transition) return;
     setAllLazyTransitions(false);
-    await doTransition(undefined, () => setAllLazyTransitions(true));
+    await doTransition(undefined, () => {
+      setAllLazyTransitions(true);
+    });
   });
 
   return router;

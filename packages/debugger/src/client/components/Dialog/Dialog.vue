@@ -16,7 +16,7 @@ import { useDialog } from './useDialog';
 
 const $class = useClassNames('dialog');
 const emit = defineEmits<DialogEvents>();
-const slots = defineSlots<DialogSlots>();
+const _slots = defineSlots<DialogSlots>();
 const props = withDefaults(defineProps<DialogProps>(), {
   id: () => randomId('dialog'),
   title: undefined,

@@ -9,7 +9,7 @@ import type {
 } from './VirtualScroll.types';
 
 const emit = defineEmits<VirtualScrollEvents>();
-const slots = defineSlots<VirtualScrollSlots>();
+const _slots = defineSlots<VirtualScrollSlots>();
 const props = withDefaults(defineProps<VirtualScrollProps>(), {
   prerenderedBeforeStart: 0,
   prerenderAfterEnd: 0,

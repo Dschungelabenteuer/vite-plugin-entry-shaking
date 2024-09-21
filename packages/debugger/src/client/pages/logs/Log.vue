@@ -25,9 +25,15 @@ const logIcon = computed(() => {
 </script>
 
 <template>
-  <div :class="$class('level')"><Icon :icon="`tabler:${logIcon}`" /></div>
-  <div :class="$class('time')">{{ new Date(item.timestamp ?? 0).toLocaleTimeString() }}</div>
-  <div :class="$class('content')">{{ item.content }}</div>
+  <div :class="$class('level')">
+    <Icon :icon="`tabler:${logIcon}`" />
+  </div>
+  <div :class="$class('time')">
+    {{ new Date(item.timestamp ?? 0).toLocaleTimeString() }}
+  </div>
+  <div :class="$class('content')">
+    {{ item.content }}
+  </div>
 </template>
 
 <style lang="scss">
@@ -61,6 +67,10 @@ const logIcon = computed(() => {
 
   @mixin log-status-color($status, $emphasize: false, $color-text: false) {
     &.#{$status} {
+      @if $emphasize {
+        font-weight: 600;
+      }
+
       @if $color-text {
         color: var(--status-color-#{$status});
       } @else {
@@ -71,13 +81,7 @@ const logIcon = computed(() => {
         }
       }
 
-      &::before {
-        background-color: var(--status-color-#{$status});
-      }
-
       @if $emphasize {
-        font-weight: 600;
-
         &::after {
           background: linear-gradient(
             60deg,
@@ -85,6 +89,10 @@ const logIcon = computed(() => {
             rgb(0 0 0 / 0%) 20%
           );
         }
+      }
+
+      &::before {
+        background-color: var(--status-color-#{$status});
       }
     }
   }

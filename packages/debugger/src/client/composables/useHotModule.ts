@@ -10,7 +10,7 @@ type DebuggerEventHandlers = {
   [Key in keyof DebuggerEvents]: (...args: DebuggerEvents[Key]) => void;
 };
 
-let hot: ViteHotContext;
+let hot: ViteHotContext | undefined;
 
 /** Uses the communication channel created between debugger's server and client. */
 export async function useHotModule(): Promise<ViteHotContext> {
@@ -19,9 +19,9 @@ export async function useHotModule(): Promise<ViteHotContext> {
   const { createHotContext } = await import(/* @vite-ignore */ pathToClient);
   hot = createHotContext();
 
-  watchServerStatus(hot);
-  getInitialState(hot);
-  getOnEventBus(hot, {
+  watchServerStatus(hot!);
+  getInitialState(hot!);
+  getOnEventBus(hot!, {
     increaseProcessTime: (a) => {
       store.metrics.process += a;
     },
@@ -46,7 +46,7 @@ export async function useHotModule(): Promise<ViteHotContext> {
     },
   });
 
-  return hot;
+  return hot!;
 }
 
 /**
@@ -76,7 +76,7 @@ function getOnEventBus(hotContext: ViteHotContext, handlers: DebuggerEventHandle
   const events = Object.keys(handlers) as (keyof DebuggerEvents)[];
   events.forEach((event) => {
     hotContext.on(wsMessageName(event), (payload) => {
-      handlers[event]?.(JSONMap.parse(payload));
+      handlers[event](JSONMap.parse(payload));
     });
   });
 }

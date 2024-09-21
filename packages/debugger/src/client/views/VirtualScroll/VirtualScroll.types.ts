@@ -1,4 +1,4 @@
-export interface VirtualScrollProps {
+export type VirtualScrollProps = {
   /** Items of the virtual scroll. */
   items: any[];
   /** Size (px) of the virtual scroll container. */
@@ -13,7 +13,7 @@ export interface VirtualScrollProps {
   padding?: number;
   /** Virtual scroll axis */
   axis?: 'x' | 'y';
-}
+};
 
 export type VirtualScrollEvents = {
   /** Emitted when virutal scroll container is resized. */

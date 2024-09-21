@@ -8,7 +8,7 @@ export function useTeleport(what: 'floating' | 'dialog' = 'floating') {
   const dialogContainerId = inject<string>(DIALOG_CONTAINER_ID_VAR)!;
   const enableTeleports = inject<Ref<boolean>>('enableTeleports')!;
 
-  const disabled = computed(() => enableTeleports.value !== true);
+  const disabled = computed(() => enableTeleports.value);
   const to = computed(() => {
     if (disabled.value) return 'body';
     return what === 'floating' ? `#${floatingContainerId}` : `#${dialogContainerId}`;

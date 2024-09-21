@@ -12,7 +12,7 @@ import EntryWildcards from './details/EntryWildcards.vue';
 import EntryDiagnostics from './details/EntryDiagnostics.vue';
 
 const route = useRoute();
-const emit = defineEmits<EntryDetailsEvents>();
+const _emit = defineEmits<EntryDetailsEvents>();
 const props = defineProps<EntryDetailsProps>();
 const tabs = computed<VerticalTab[]>(() => {
   const list = [

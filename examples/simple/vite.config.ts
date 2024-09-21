@@ -9,7 +9,7 @@ const pathToLib = resolve(__dirname, './src/lib');
 
 export default defineConfig(async () => ({
   plugins: [
-    await EntryShakingPlugin({
+    EntryShakingPlugin({
       targets: [pathToLib],
       debug: true,
     }),

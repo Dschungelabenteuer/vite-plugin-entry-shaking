@@ -4,7 +4,7 @@ import { useClassNames } from '@composables/useClassNames';
 import type { CheckboxesProps } from './Checkboxes.types';
 
 const $class = useClassNames('checkboxes');
-const props = defineProps<CheckboxesProps>();
+const _props = defineProps<CheckboxesProps>();
 const model = defineModel<string[]>({ default: () => [] });
 </script>
 

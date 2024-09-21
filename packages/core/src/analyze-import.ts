@@ -1,4 +1,3 @@
-/* eslint-disable no-continue */
 import type MagicString from 'magic-string';
 import { normalizePath } from 'vite';
 
@@ -103,7 +102,7 @@ async function resolveImport(
   path: EntryPath,
   map: TargetImports,
   name: string,
-  alias: string,
+  alias?: string,
 ) {
   const namedImport = await methods.findNamedImport(ctx, entry, path, map, name, alias);
   if (namedImport) return true;
@@ -131,7 +130,7 @@ export async function findNamedImport(
   entryPath: EntryPath,
   map: TargetImports,
   name: string,
-  alias: string,
+  alias?: string,
 ) {
   const namedImport = entry.exports.get(name);
   if (namedImport) {
@@ -188,7 +187,6 @@ export async function findNamedWildcard(
  * @param map _reference_ - Map of imports.
  * @param name Name of the import.
  * @param alias Alias of the import.
- * @param resolver Vite's resolve function.
  */
 export async function findDirectWildcardExports(
   ctx: Context,
@@ -196,7 +194,7 @@ export async function findDirectWildcardExports(
   entryPath: EntryPath,
   map: TargetImports,
   name: string,
-  alias: string,
+  alias?: string,
 ) {
   const wildcardExports = entry.wildcardExports?.direct ?? [];
   for (const wildcardExportPath of wildcardExports) {
@@ -212,7 +210,7 @@ export async function findDirectWildcardExports(
         return true;
       }
 
-      if (resolvedEntry && resolvedEntry.wildcardExports) {
+      if (resolvedEntry?.wildcardExports) {
         const found = await methods.resolveImport(
           ctx,
           resolvedEntry,

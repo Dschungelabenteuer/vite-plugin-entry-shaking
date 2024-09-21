@@ -1,4 +1,7 @@
-html, body, #storybook-root, #root {
+html,
+body,
+#storybook-root,
+#root {
   width: 100% !important;
   height: 100% !important;
 }
@@ -11,7 +14,6 @@ html, body, #storybook-root, #root {
   height: 100%;
   pointer-events: none;
 }
-
 
 .dialog-container {
   position: absolute;

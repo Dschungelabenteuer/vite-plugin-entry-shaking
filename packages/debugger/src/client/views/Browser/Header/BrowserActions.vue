@@ -8,11 +8,11 @@ import { useViewTransition } from '@composables/useViewTransition';
 import type { BrowserProps, BrowserSlots, BrowserSearchFn } from '../Browser.types';
 
 const $class = inject<ClassNameFn>('$class')!;
-const props = defineProps<Required<BrowserProps>>();
-const slots = defineSlots<Pick<BrowserSlots, 'filters'>>();
+const _props = defineProps<Required<BrowserProps>>();
+const _slots = defineSlots<Pick<BrowserSlots, 'filters'>>();
 const headerSearchRef = ref<HTMLElement | null>(null);
 const headerFilterButtonRef = ref<HTMLElement | null>(null);
-useViewTransition({
+const _transitions = useViewTransition({
   names: {
     'browser-header-search': headerSearchRef,
     'browser-header-filter-button': headerFilterButtonRef,

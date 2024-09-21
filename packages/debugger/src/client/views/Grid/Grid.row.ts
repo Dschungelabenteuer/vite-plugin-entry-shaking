@@ -3,7 +3,7 @@ import { defineComponent, h, inject, nextTick, onMounted, ref, watch } from 'vue
 import { rove, roveFocusableChildren, unrove } from './useGridControls';
 import { renderCallback } from './useGridLayout';
 
-const getColIndex = (el: HTMLElement) => Number(el.getAttribute('aria-colindex')) ?? 0;
+const getColIndex = (el: HTMLElement) => Number(el.getAttribute('aria-colindex'));
 
 /**
  * Functional grid row component.
@@ -14,7 +14,12 @@ const getColIndex = (el: HTMLElement) => Number(el.getAttribute('aria-colindex')
  * consistent.
  */
 export const Row = defineComponent({
-  props: ['columns', 'rowIndex', 'activeRow', 'activeCol'],
+  props: {
+    columns: { type: Array, required: true },
+    rowIndex: { type: Number, required: true },
+    activeRow: { type: Number, required: true },
+    activeCol: { type: Number, required: true },
+  },
   emits: ['cellClick'],
   setup(props, { slots, emit }) {
     const rowRef = ref<HTMLElement | undefined>();
@@ -37,11 +42,12 @@ export const Row = defineComponent({
       (children as HTMLElement[]).forEach((child, index) => {
         rove(child);
         roveFocusableChildren(child);
-        const className = props.columns[index].class;
+        const col = props.columns[index] as Record<string, any>;
+        const className = col.class;
         const colIndex = index + 1;
         child.removeEventListener('click', handleClick);
         child.setAttribute('aria-colindex', `${colIndex}`);
-        child.classList.add(props.columns[index].class);
+        child.classList.add(className);
         if (className) child.classList.add(className);
         child.addEventListener('click', handleClick, { capture: true });
       });
@@ -52,17 +58,15 @@ export const Row = defineComponent({
     /** Called whenever a row is updated/replaced (e.g. content pool update). */
     const updateRow = () => {
       // Update row index.
-      (rowRef.value as HTMLElement).setAttribute('aria-rowindex', `${props.rowIndex + 1}`);
+      rowRef.value!.setAttribute('aria-rowindex', `${props.rowIndex + 1}`);
 
       if (props.rowIndex + 1 === props.activeRow) {
-        const child = rowRef.value?.querySelector(
-          `[aria-colindex="${props.activeCol}"]`,
-        ) as HTMLElement;
-
-        if (child) {
+        const untypedChild = rowRef.value?.querySelector(`[aria-colindex="${props.activeCol}"]`);
+        if (untypedChild) {
+          const child = untypedChild as HTMLElement;
           unrove(child);
           nextTick(() => {
-            (child as HTMLElement).focus({
+            child.focus({
               preventScroll: true,
             });
           });
@@ -90,7 +94,9 @@ export const Row = defineComponent({
 
     watch(
       () => props.rowIndex,
-      () => updateRow(),
+      () => {
+        updateRow();
+      },
       { flush: 'post' },
     );
 

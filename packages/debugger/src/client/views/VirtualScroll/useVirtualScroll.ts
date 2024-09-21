@@ -3,15 +3,15 @@ import { ref, computed, onMounted } from 'vue';
 import { useResizeObserver } from '@vueuse/core';
 
 import type { ShortEmits } from '#uitypes';
-import type { VirtualScrollViewEvents, VirtualScrollViewProps } from './VirtualScroll.types';
+import type { VirtualScrollEvents, VirtualScrollProps } from './VirtualScroll.types';
 
 export const VIRTUAL_SCROLL_WRAPPER_CLASS = '__virtual-scroll-wrapper';
 
 export function useVirtualScroll(
   containerRef: Ref<HTMLElement | null>,
   contentRef: Ref<HTMLElement | null>,
-  props: VirtualScrollViewProps,
-  emit: ShortEmits<VirtualScrollViewEvents>,
+  props: VirtualScrollProps,
+  emit: ShortEmits<VirtualScrollEvents>,
 ) {
   const scroll = ref(0);
 

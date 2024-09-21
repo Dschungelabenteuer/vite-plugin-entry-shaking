@@ -9,7 +9,7 @@ import ShortcutsList from './ShortcutsList.vue';
 
 const $class = useClassNames('shortcuts-helper');
 const emit = defineEmits<ShortcutsEvents>();
-const props = withDefaults(defineProps<ShortcutsProps>(), {
+const _props = withDefaults(defineProps<ShortcutsProps>(), {
   id: () => randomId('shortcuts'),
 });
 

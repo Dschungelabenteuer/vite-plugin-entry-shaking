@@ -13,7 +13,7 @@ const pathToTestCases = resolve(pathToTests, 'cases');
 
 export default defineConfig(async () => ({
   plugins: [
-    await EntryShakingPlugin({
+    EntryShakingPlugin({
       targets: targets.map((target) => resolve(rootDir, target)),
       enableDiagnostics: true,
       maxWildcardDepth: 1,

@@ -92,6 +92,7 @@ function startViewTransition(callback?: () => Promise<void>): AugmentedViewTrans
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (document.startViewTransition) {
     const capturedPromise = new Promise<void>((resolve) => {
       const cb = async () => {

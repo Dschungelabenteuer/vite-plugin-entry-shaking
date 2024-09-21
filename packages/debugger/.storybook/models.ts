@@ -13,7 +13,7 @@ export function getModelRenderFunction(
       return { Component, args, model };
     },
     template: `${
-      customTemplate || '<component :is="Component" v-bind="args" v-model="model" />'
+      customTemplate ?? '<component :is="Component" v-bind="args" v-model="model" />'
     }<ValuePreviewer :value="model" />`,
   });
 }

@@ -42,7 +42,7 @@ export default defineConfig({
     EntryShakingPlugin({
       targets: [
         // Using direct paths.
-        resolve(__dirname, 'src/entry-a')
+        resolve(__dirname, 'src/entry-a'),
         // Or using glob patterns.
         {
           glob: 'src/utils/*.ts',
@@ -280,6 +280,13 @@ As a Vite user, you may be using a test runner that relies on Vite's dev server 
 > To properly benefit from this plugin within test files, one have to understand how the plugin behaves, how vite's resolver behaves and have a clear overview of their codebase.
 
 Unless you're confident about the above statement, it is recommended to disable this plugin when running tests.
+
+### JSX
+
+> [!WARNING]
+> This feature is still experimental
+
+This plugin supports JSX and TSX syntaxes by pre-transforming them using `esbuild` which is included by Vite.
 
 ## Useful links
 

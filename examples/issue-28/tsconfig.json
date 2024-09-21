@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-
     "target": "es2020",
     "module": "esnext",
     "strict": true,
@@ -14,16 +13,9 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
-    ],
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.vue"],

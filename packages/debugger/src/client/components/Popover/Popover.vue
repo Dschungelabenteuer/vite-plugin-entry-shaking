@@ -6,7 +6,7 @@ import type { PopoverSlots, PopoverEvents, PopoverProps } from './Popover.types'
 
 const $class = useClassNames('popover');
 const emit = defineEmits<PopoverEvents>();
-const slots = defineSlots<PopoverSlots>();
+const _slots = defineSlots<PopoverSlots>();
 const props = defineProps<PopoverProps>();
 
 const stateClass = computed(() => (props.isOpen ? 'open' : ''));

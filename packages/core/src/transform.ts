@@ -4,6 +4,7 @@ import { init, parse } from 'es-module-lexer';
 
 import type { Context } from './context';
 import ImportAnalyzer from './analyze-import';
+import { getCode } from './utils';
 
 /**
  * Transforms a candidate file only if needed.
@@ -25,7 +26,8 @@ export async function transformIfNeeded(
       if (!isCandidate) {
         ctx.logger.debug(`Ignored by options: ${id}`, undefined);
       } else {
-        return await methods.transformImportsIfNeeded(ctx, id, code);
+        const source = await getCode(code, id);
+        return await methods.transformImportsIfNeeded(ctx, id, source);
       }
     },
     true,
@@ -159,7 +161,7 @@ export async function getEntryImports(
       },
       Promise.resolve([] as string[]),
     );
-  } catch (e) {
+  } catch {
     return [];
   }
 }
@@ -170,6 +172,7 @@ export async function getEntryImports(
  */
 export function createReexportStatement(exports: readonly ExportSpecifier[]) {
   const namedExports = exports
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     .filter((e) => e.n !== undefined && e.n !== 'default' && e.ln === undefined)
     .map(({ n }) => n);
   if (namedExports.length === 0) return '';

@@ -1,4 +1,3 @@
-/* eslint-disable no-plusplus */
 import type { Ref } from 'vue';
 import { computed, reactive, ref } from 'vue';
 import { useResizeObserver } from '@vueuse/core';

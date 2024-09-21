@@ -18,7 +18,7 @@ export async function getConsumerPackageInfo(): Promise<ConsumerPackageInfo> {
     const packageJsonContent = await readFile(PATH_TO_CONSUMER_PACKAGE, 'utf-8');
     const { name, version } = JSON.parse(packageJsonContent);
     return { name, version };
-  } catch (error) {
+  } catch {
     return { name: 'Debugger' };
   }
 }

@@ -11,7 +11,7 @@ export default defineConfig({
   plugins: [vue(), dev()],
   resolve: {
     alias: {
-      '$storybook': fileURLToPath(new URL('../../.storybook', import.meta.url)),
+      $storybook: fileURLToPath(new URL('../../.storybook', import.meta.url)),
       '#store': fileURLToPath(new URL('./store.ts', import.meta.url)),
       '#utils': fileURLToPath(new URL('./utils.ts', import.meta.url)),
       '#types': fileURLToPath(new URL('../../types.ts', import.meta.url)),

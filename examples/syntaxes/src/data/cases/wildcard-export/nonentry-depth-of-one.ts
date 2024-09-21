@@ -1,2 +1,2 @@
-import { NamedExportOne } from "./entries/nonentry-depth-of-one";
+import { NamedExportOne } from './entries/nonentry-depth-of-one';
 console.log(NamedExportOne);

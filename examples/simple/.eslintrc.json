@@ -1,4 +1,0 @@
-{
-  "extends": ["@yungezeit/typescript"],
-  "rules": { "import/order": "off" }
-}

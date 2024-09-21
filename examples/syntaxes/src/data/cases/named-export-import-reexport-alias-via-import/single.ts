@@ -1,2 +1,2 @@
-import { AliasedNamedExportOne } from "./entries/single";
+import { AliasedNamedExportOne } from './entries/single';
 console.log(AliasedNamedExportOne);

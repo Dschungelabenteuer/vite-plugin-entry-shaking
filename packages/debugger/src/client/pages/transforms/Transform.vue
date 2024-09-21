@@ -21,9 +21,15 @@ const time = computed(() => formatDuration(props.item.time));
       @click="emit('view', item.absolutePath)"
     />
   </div>
-  <div :class="$class('time')">{{ new Date(item.timestamp ?? 0).toLocaleTimeString() }}</div>
-  <div :class="$class('duration')">{{ time }}</div>
-  <div :class="$class('path')">{{ item.relativePath }}</div>
+  <div :class="$class('time')">
+    {{ new Date(item.timestamp ?? 0).toLocaleTimeString() }}
+  </div>
+  <div :class="$class('duration')">
+    {{ time }}
+  </div>
+  <div :class="$class('path')">
+    {{ item.relativePath }}
+  </div>
 </template>
 
 <style lang="scss">

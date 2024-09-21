@@ -25,15 +25,13 @@ export function useNavigation() {
  * @param routeName Name of the route as specified through route's config.
  */
 function getLinkCount(routeName: RouteRecordName): number | undefined {
-  if (!store) return 0;
-
   switch (routeName) {
     case 'Logs':
       return store.logs.length;
     case 'Entries':
-      return store.entries.size ?? 0;
+      return store.entries.size;
     case 'Transforms':
-      return store.transforms.size ?? 0;
+      return store.transforms.size;
     default:
       return undefined;
   }

@@ -1,4 +1,4 @@
-import type { PluginOption } from 'vite';
+import type { Plugin } from 'vite';
 import type {
   Diagnostic,
   PluginMetrics,
@@ -36,7 +36,7 @@ export { DiagnosticKinds } from './diagnostics';
 
 export const name = 'vite-plugin-entry-shaking';
 
-export async function createEntryShakingPlugin(userOptions: PluginOptions): Promise<PluginOption> {
+export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin {
   /** Final options of the plugin. */
   const options = mergeOptions(userOptions);
   /** Plugin's context. */
@@ -59,7 +59,7 @@ export async function createEntryShakingPlugin(userOptions: PluginOptions): Prom
       }
     },
 
-    async load(id) {
+    load(id) {
       return context.loadFile(id);
     },
 

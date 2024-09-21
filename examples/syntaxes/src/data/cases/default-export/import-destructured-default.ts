@@ -1,2 +1,2 @@
-import { DefaultImport } from "./entries/with-destructured-default-import";
+import { DefaultImport } from './entries/with-destructured-default-import';
 console.log(DefaultImport);

@@ -21,7 +21,7 @@ export function useDropdownMenu(
   const handleKeydown = (event: KeyboardEvent) => {
     if (!NAVIGATION_KEYS.includes(event.key)) return;
     if (event.key === 'Escape') return emit('close');
-    return menu.handleKeydown(event);
+    menu.handleKeydown(event);
   };
 
   watchEffect(() => {

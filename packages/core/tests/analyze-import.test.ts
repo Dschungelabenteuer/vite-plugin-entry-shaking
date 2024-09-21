@@ -43,7 +43,7 @@ describe('analyzeImportStatement', () => {
 
   it('should ignore wildcard import statements', async () => {
     const entry = { exports: new Map() } as EntryData;
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-c'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-c')))!;
     const what = 'import * as Utils';
     const input = `${what} from "./entry-c";`;
     const output = `${what} from "${entryPath}?source=1";`;
@@ -69,7 +69,7 @@ describe('analyzeImportStatement', () => {
 
   it('should correctly mutate file', async () => {
     vi.restoreAllMocks();
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a')))!;
     const path = `@mocks/entry-a`;
     const imports = [
       'A_MODULE_A',
@@ -238,7 +238,7 @@ describe('getImportsMap', async () => {
 
   it('should correctly feed the import map when [importing with alias] a named entity [directly exported from entry]', async () => {
     const imports: string[] = ['A_MODULE_B as B'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a')))!;
     const output = await ImportAnalyzer.getImportsMap(ctx, entry, entryPath, imports);
     expect(output.size).toStrictEqual(1);
     expect(_(output)).toStrictEqual({
@@ -251,7 +251,7 @@ describe('getImportsMap', async () => {
 
   it('should correctly feed the import map when importing a named entity [exported from entry via an alias]', async () => {
     const imports: string[] = ['A_MODULE_G'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a')))!;
     const output = await ImportAnalyzer.getImportsMap(ctx, entry, entryPath, imports);
     expect(output.size).toStrictEqual(1);
     expect(_(output)).toStrictEqual({
@@ -264,7 +264,7 @@ describe('getImportsMap', async () => {
 
   it('should correctly feed the import map when [importing with alias] a named entity [exported from entry via an alias]', async () => {
     const imports: string[] = ['A_MODULE_J as JJ'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a')))!;
     const output = await ImportAnalyzer.getImportsMap(ctx, entry, entryPath, imports);
     expect(output.size).toStrictEqual(1);
     expect(_(output)).toStrictEqual({
@@ -278,7 +278,7 @@ describe('getImportsMap', async () => {
   it('should correctly feed the import map when importing a named entity [exported from entry via a path alias]', async () => {
     /** Note: this requires `resolver` to be set using the mocked vite configuration. */
     const imports: string[] = ['A_MODULE_D'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a')))!;
     const output = await ImportAnalyzer.getImportsMap(ctx, entry, entryPath, imports);
     expect(output.size).toStrictEqual(1);
     expect(_(output)).toStrictEqual({
@@ -291,7 +291,7 @@ describe('getImportsMap', async () => {
 
   it('should correctly feed the import map when importing a named entity [directly defined in entry]', async () => {
     const imports: string[] = ['test'];
-    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a'))) as string;
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a')))!;
     const output = await ImportAnalyzer.getImportsMap(ctx, entry, entryPath, imports);
     expect(output.size).toStrictEqual(1);
     expect(_(output)).toStrictEqual({
@@ -614,7 +614,7 @@ describe('getImportReplacements', () => {
   });
 });
 
-describe('resolveImportedEntities', async () => {
+describe('resolveImportedEntities', () => {
   const expectedFn = 'resolveImportedCircularEntities';
   const when = 'from different target entries';
   const imported: ImportInput[] = [MOCK_IMPORT_INPUT];
@@ -650,7 +650,9 @@ describe('resolveImportedEntities', async () => {
 });
 
 /** Let's rely on syntax-related integration tests for now, it seems exhausting testing this. */
-describe.todo('resolveImportedCircularEntities', () => {});
+describe.todo('resolveImportedCircularEntities', () => {
+  // …
+});
 
 describe('formatImportReplacement', () => {
   it('should correctly format import which resolves to the default export of the target module', () => {

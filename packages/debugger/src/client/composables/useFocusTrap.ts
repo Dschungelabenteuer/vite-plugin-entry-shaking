@@ -25,8 +25,7 @@ type ListenerParams = Parameters<Document['addEventListener']>;
 
 /** Returns all focusable elements of a HTMLElement. */
 export const getFocusableChildren = (element: HTMLElement) =>
-  (element instanceof HTMLElement && element.querySelectorAll<FocusableElement>(selector)) ||
-  undefined;
+  element instanceof HTMLElement ? element.querySelectorAll<FocusableElement>(selector) : undefined;
 
 /**
  * Creates a focus trap on passed item.
@@ -54,7 +53,7 @@ export function useFocusTrap<Reference extends Ref<HTMLElement | null>>(element:
   }) as EventListener;
 
   const listener: ListenerParams = ['keydown', keyHandler];
-  const clear = () => element.value?.removeEventListener?.(...listener);
+  const clear = () => element.value?.removeEventListener(...listener);
   const focusFirst = () => firstFocusable?.focus();
   const focusLast = () => lastFocusable?.focus();
 
@@ -63,7 +62,7 @@ export function useFocusTrap<Reference extends Ref<HTMLElement | null>>(element:
     if (element.value) {
       const focusableEls = getFocusableChildren(element.value);
       if (!focusableEls?.length) return;
-      // eslint-disable-next-line prefer-destructuring
+
       firstFocusable = focusableEls[0];
       lastFocusable = focusableEls[focusableEls.length - 1];
     }
@@ -72,7 +71,7 @@ export function useFocusTrap<Reference extends Ref<HTMLElement | null>>(element:
   watchEffect(() => {
     if (element.value) {
       refresh();
-      element.value?.addEventListener(...listener);
+      element.value.addEventListener(...listener);
       firstFocusable?.focus();
     }
   });

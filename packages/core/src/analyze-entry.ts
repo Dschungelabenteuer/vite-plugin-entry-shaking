@@ -1,6 +1,4 @@
 import type { ExportSpecifier } from 'es-module-lexer';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import { init, parse } from 'es-module-lexer';
 
 import type { Context } from './context';
@@ -18,7 +16,7 @@ import type {
 
 import EntryCleaner from './cleanup-entry';
 import Parsers from './parse';
-import Utils from './utils';
+import Utils, { getCodeFromPath } from './utils';
 import { DiagnosticKinds } from './diagnostics';
 
 /**
@@ -53,7 +51,7 @@ async function analyzeEntries(ctx: Context): Promise<PluginEntries> {
 async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number): Promise<Duration> {
   if (ctx.entries.has(entryPath)) return [0, 0];
 
-  return await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e) => {
+  return await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e: unknown) => {
     const message = `Could not analyze entry file "${entryPath}"`;
     console.error(e);
     ctx.logger.error(message);
@@ -90,7 +88,7 @@ async function doAnalyzeEntry(
     `Analysis of entry "${entryPath}"`,
     async (nonselfTime) => {
       await init;
-      source = readFileSync(resolve(entryPath), 'utf-8');
+      source = await getCodeFromPath(entryPath);
       const defaultImport: ImportParams = { path: entryPath, importDefault: true };
       const analyzedImports: EntryImports = new Map([['default', defaultImport]]);
       const [imports, exportList] = parse(source);
@@ -105,7 +103,7 @@ async function doAnalyzeEntry(
           wildcardExports,
           analyzedImports,
           entryPath,
-          path as string,
+          path!,
           startPosition,
           endPosition,
           depth,
@@ -144,6 +142,7 @@ async function doAnalyzeEntry(
       importsCount += analyzedImports.size - 1;
       updatedSource = cleanedUp.updatedSource;
       charactersDiff = cleanedUp.charactersDiff;
+
       ctx.logger.debug(`Cleaned-up entry "${entryPath}" (-${charactersDiff} chars)`);
 
       return nonselfTime;
@@ -242,7 +241,7 @@ async function analyzeEntryImport(
     if (imports.wildcardImport) {
       const method = methods.registerWildcardImportIfNeeded;
       const [t, s] = await method(ctx, diagnostics, path, entryPath, depth);
-      nonselfTime += t - (s ?? 0);
+      nonselfTime += t - s;
       const { alias } = Parsers.parseImportParams(imports.wildcardImport);
       if (alias) {
         wildcardExports.named.set(alias, path);
@@ -283,7 +282,7 @@ function analyzeEntryExport(
   analyzedImports: EntryImports,
   namedExport: string,
   localName?: string,
-): void | true {
+): undefined | true {
   if (namedExport && !wilcardExports.named.has(namedExport)) {
     if (analyzedImports.has(namedExport)) {
       const { path, importDefault, originalName } = analyzedImports.get(namedExport)!;
@@ -325,7 +324,7 @@ async function registerWildcardImportIfNeeded(
 ): Promise<Duration> {
   return await ctx.timer.time(`Wilcard import analysis`, async (nonselfTime) => {
     const importsEntry = ctx.targets.get(path) === 0;
-    const maxDepthReached = depth >= (ctx.options.maxWildcardDepth ?? 0);
+    const maxDepthReached = depth >= ctx.options.maxWildcardDepth;
 
     if (maxDepthReached) {
       const diagnosticName: keyof DiagnosticsConfig = 'maxDepthReached';

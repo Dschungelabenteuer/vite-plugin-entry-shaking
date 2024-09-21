@@ -17,9 +17,9 @@ export type ButtonProps = {
 
 export type ButtonEvents = {
   /** Emitted when clicking the button. */
-  'click': [];
+  click: [];
   /** Emitted when keydown is triggered. */
-  'keydown': [event: KeyboardEvent];
+  keydown: [event: KeyboardEvent];
   /** Emitted when pressing the Arrow Up key. */
   'arrow-up': [event: KeyboardEvent];
   /** Emitted when pressing the Arrow Down key. */
@@ -37,11 +37,11 @@ export type ButtonEvents = {
   /** Emitted when pressing the Arrow End key. */
   'key-end': [event: KeyboardEvent];
   /** Emitted when escaping. */
-  'escape': [event: KeyboardEvent];
+  escape: [event: KeyboardEvent];
   /** Emitted when shift+tabbing. */
   'shift-tab': [event: KeyboardEvent];
   /** Emitted when tabbing. */
-  'tab': [event: KeyboardEvent];
+  tab: [event: KeyboardEvent];
 };
 
 export type ButtonSlots = {

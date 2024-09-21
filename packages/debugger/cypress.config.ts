@@ -11,6 +11,5 @@ export default defineConfig({
   },
   e2e: {
     specPattern: '**/*.spec.ts',
-    setupNodeEvents(_on, _config) {},
   },
 });

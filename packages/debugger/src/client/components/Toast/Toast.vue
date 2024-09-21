@@ -5,7 +5,7 @@ import { useClassNames } from '@composables/useClassNames';
 import type { ToastProps, ToastSlots } from './Toast.types';
 
 const $class = useClassNames('toast');
-const slots = defineSlots<ToastSlots>();
+const _slots = defineSlots<ToastSlots>();
 const props = defineProps<ToastProps>();
 const classes = computed(() => [$class(), props.type]);
 const icon = computed(() => {

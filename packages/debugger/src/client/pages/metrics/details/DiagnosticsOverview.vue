@@ -24,7 +24,7 @@ const { id, title, sort, columns, items, matched, methods } = useBrowserData({
   id: 'diagnostics',
   title: 'Files with diagnostics',
   source,
-  filterFn: (item, f) => true,
+  filterFn: () => true,
   defaultFilters,
   columns: {
     icon: {
@@ -85,8 +85,12 @@ const page = {
             @click="emit('view', rowProps.item.path)"
           />
         </div>
-        <div :class="$class('count')">{{ rowProps.item.count }}</div>
-        <div :class="$class('path')">{{ rowProps.item.path }}</div>
+        <div :class="$class('count')">
+          {{ rowProps.item.count }}
+        </div>
+        <div :class="$class('path')">
+          {{ rowProps.item.path }}
+        </div>
       </template>
     </GridView>
   </BrowserView>

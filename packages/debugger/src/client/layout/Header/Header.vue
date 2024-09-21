@@ -8,7 +8,7 @@ import { useViewTransition } from '@composables/useViewTransition';
 import type { HeaderProps } from './Header.types';
 
 const $class = useClassNames('header');
-const props = withDefaults(defineProps<HeaderProps>(), {
+const _props = withDefaults(defineProps<HeaderProps>(), {
   showTitle: true,
   showNavigation: true,
 });

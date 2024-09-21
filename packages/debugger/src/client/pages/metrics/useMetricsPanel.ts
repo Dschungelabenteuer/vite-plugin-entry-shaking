@@ -8,7 +8,7 @@ export function useMetricsPanel() {
   const timeHeader = computed<MetricProps>(() => ({
     label: 'Total process',
     icon: 'clock',
-    value: formatDuration(store.metrics?.process ?? 0),
+    value: formatDuration(store.metrics.process),
     type: 'duration',
   }));
 
@@ -16,13 +16,13 @@ export function useMetricsPanel() {
     {
       label: 'Entries analysis',
       icon: 'target',
-      value: formatDuration(store.metrics?.analysis ?? 0),
+      value: formatDuration(store.metrics.analysis),
       type: 'duration',
     },
     {
       label: 'Transforms',
       icon: 'sparkles',
-      value: formatDuration(store.metrics?.transform ?? 0),
+      value: formatDuration(store.metrics.transform),
       type: 'duration',
     },
   ]);
@@ -30,7 +30,7 @@ export function useMetricsPanel() {
   const requestsHeader = computed<MetricProps>(() => ({
     label: 'Total requests',
     icon: 'http-get',
-    value: `${(store.metrics?.jsRequests ?? 0) + (store.metrics?.otherRequests ?? 0)}`,
+    value: `${store.metrics.jsRequests + store.metrics.otherRequests}`,
     type: 'count',
   }));
 
@@ -38,13 +38,13 @@ export function useMetricsPanel() {
     {
       label: 'JS/TS requests',
       icon: 'file-type-js',
-      value: `${store.metrics?.jsRequests ?? 0}`,
+      value: `${store.metrics.jsRequests}`,
       type: 'count',
     },
     {
       label: 'Other requests',
       icon: 'file',
-      value: `${store.metrics?.otherRequests ?? 0}`,
+      value: `${store.metrics.otherRequests}`,
       type: 'count',
     },
   ]);

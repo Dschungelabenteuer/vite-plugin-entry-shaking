@@ -70,8 +70,8 @@ export function testCrossEntriesImportsExports() {
 
     describe('mixed imports', async () => {
       const baseCasePath = `${casePath}/mixed-imports`;
-      testMixedImportsInTarget(await createCaseTarget(`${baseCasePath}`));
-      testMixedImportsOfTarget(await createCaseTarget(`${baseCasePath}`));
+      testMixedImportsInTarget(await createCaseTarget(baseCasePath));
+      testMixedImportsOfTarget(await createCaseTarget(baseCasePath));
     });
 
     describe('default export', async () => {

@@ -29,8 +29,16 @@ const selfDefinedTooltip = computed(() =>
       name="code-dots"
     />
   </div>
-  <div :class="$class('alias')">{{ item.alias }}</div>
-  <div :class="$class('name')">{{ item.name }}</div>
-  <div :class="$class('originalName')">{{ item.originalName }}</div>
-  <div :class="$class('path')">{{ item.path }}</div>
+  <div :class="$class('alias')">
+    {{ item.alias }}
+  </div>
+  <div :class="$class('name')">
+    {{ item.name }}
+  </div>
+  <div :class="$class('originalName')">
+    {{ item.originalName }}
+  </div>
+  <div :class="$class('path')">
+    {{ item.path }}
+  </div>
 </template>

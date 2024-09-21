@@ -36,7 +36,7 @@ export type SearchableColumn<T extends BrowserData> = keyof {
 export function useBrowserData<
   const T extends BrowserData,
   Source = UnwrapRef<T['source']>,
-  Item = Source extends Array<infer I> ? I : never,
+  Item = Source extends (infer I)[] ? I : never,
 >(data: T) {
   const sortDirection = ref<SortDirection>('asc');
   const sortColumn = ref<SortableColumn<T> | undefined>(undefined);
@@ -45,7 +45,7 @@ export function useBrowserData<
   const matched = computed<number>(() => items.value.length);
   const searchColumns = getSearchableColumns(data.columns);
   const items = computed<Item[]>(() => {
-    const list: Item[] = data.source?.value.reduce((out, item) => {
+    const list = data.source.value.reduce<Item[]>((out, item) => {
       if (!matchesSearch(item) || !matchesFilters(item)) return out;
       const index = out.length + 1;
       return [...out, { ...item, index, id: item.id ?? index }];
@@ -70,10 +70,10 @@ export function useBrowserData<
 
   const matchesSearch = (item: Item) =>
     !(
-      search?.value &&
+      search.value &&
       searchColumns.every((column) => {
         const value = String(item[column as keyof Item]).toLocaleLowerCase();
-        return !value?.includes(search.value?.toLocaleLowerCase() ?? '');
+        return !value.includes(search.value?.toLocaleLowerCase() ?? '');
       })
     );
 

@@ -12,7 +12,7 @@ const pathToWithoutImport = resolve(__dirname, './src/without-import');
 
 export default defineConfig(async () => ({
   plugins: [
-    await EntryShakingPlugin({
+    EntryShakingPlugin({
       targets: [pathToMaxDepth, pathToWithImport, pathToWithoutImport],
       debug: true,
     }),

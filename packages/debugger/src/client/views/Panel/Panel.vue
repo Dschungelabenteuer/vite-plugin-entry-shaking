@@ -7,8 +7,8 @@ import PanelHeader from './PanelHeader.vue';
 import PanelFooter from './PanelFooter.vue';
 
 const $class = useClassNames('panel');
-const slots = defineSlots<PanelSlots>();
-const props = defineProps<PanelProps>();
+const _slots = defineSlots<PanelSlots>();
+const _props = defineProps<PanelProps>();
 
 const closeBtnRef = ref<InstanceType<typeof Button> | null>(null);
 const metricsPanel = inject<Panel>('metricsPanel')!;

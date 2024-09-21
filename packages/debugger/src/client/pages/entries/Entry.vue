@@ -24,8 +24,12 @@ const selfTime = computed(() => formatDuration(props.item.self));
       @click="emit('view', item.absolutePath)"
     />
   </div>
-  <div :class="$class('time')">{{ totalTime }}</div>
-  <div :class="$class('self')">{{ selfTime }}</div>
+  <div :class="$class('time')">
+    {{ totalTime }}
+  </div>
+  <div :class="$class('self')">
+    {{ selfTime }}
+  </div>
   <div :class="$class('is-implicit')">
     <div v-show="item.isImplicit">
       <Icon

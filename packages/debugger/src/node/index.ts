@@ -37,6 +37,7 @@ export async function attachDebugger(server: ViteDevServer, ctx: Context) {
  * @param consumer Information about the consuming package.
  */
 function printUrls(server: ViteDevServer, debuggerRoute: string, consumer: ConsumerPackageInfo) {
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   const printViteUrls = server.printUrls;
 
   server.printUrls = () => {
@@ -74,9 +75,9 @@ function printUrls(server: ViteDevServer, debuggerRoute: string, consumer: Consu
  * @param address Target address to open.
  * @param delay Delay before opening the browser.
  */
-async function openBrowser(address: string, delay = 0) {
-  setTimeout(async () => {
-    await import('open')
+function openBrowser(address: string, delay = 0) {
+  setTimeout(() => {
+    import('open')
       .then((r) => r.default(address, { newInstance: true }))
       .catch(() => {
         // Silent error, debugger should still be accessible from printed url.

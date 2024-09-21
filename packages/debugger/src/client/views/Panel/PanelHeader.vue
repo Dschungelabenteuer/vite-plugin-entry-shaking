@@ -6,7 +6,7 @@ import type { ClassNameFn } from '@composables/useClassNames';
 import type { PanelHeaderProps } from './Panel.types';
 
 const $class = inject<ClassNameFn>('$class')!;
-const props = defineProps<PanelHeaderProps>();
+const _props = defineProps<PanelHeaderProps>();
 </script>
 
 <template>

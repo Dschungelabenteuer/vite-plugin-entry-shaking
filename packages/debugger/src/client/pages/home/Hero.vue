@@ -14,7 +14,9 @@ import Illustration from '@components/Illustration/Illustration.vue';
         <div v-html="viteLogo" />
         <div>vite-plugin-entry-shaking</div>
       </div>
-      <h1 class="hero__name">{{ store.name }} example</h1>
+      <h1 class="hero__name">
+        {{ store.name }} example
+      </h1>
     </div>
   </div>
 </template>

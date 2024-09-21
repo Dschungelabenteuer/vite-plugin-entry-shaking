@@ -24,24 +24,26 @@ export function useCodeBlock(props: CodeBlockProps) {
     return transformers;
   };
 
-  watchEffect(async () => {
-    if (props.source && props.target) {
-      const diffs = useDiffs();
-      await diffs.prepare();
-      diffs.compare('lol', props.source, props.target).then(async (val) => {
-        code.value = await codeToHtml(val, {
+  watchEffect(() => {
+    (async () => {
+      if (props.source && props.target) {
+        const diffs = useDiffs();
+        await diffs.prepare();
+        diffs.compare('lol', props.source, props.target).then(async (val) => {
+          code.value = await codeToHtml(val, {
+            lang: props.lang!,
+            theme: props.theme!,
+            transformers: await getTransformers(),
+          });
+        });
+      } else {
+        code.value = await codeToHtml(props.source, {
           lang: props.lang!,
           theme: props.theme!,
           transformers: await getTransformers(),
         });
-      });
-    } else {
-      code.value = await codeToHtml(props.source, {
-        lang: props.lang!,
-        theme: props.theme!,
-        transformers: await getTransformers(),
-      });
-    }
+      }
+    })();
   });
 
   return { code };
