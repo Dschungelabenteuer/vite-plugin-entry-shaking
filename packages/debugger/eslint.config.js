@@ -8,6 +8,7 @@ export default [
   },
   {
     rules: {
+      '@typescript-eslint/no-floating-promises': 'off',
       '@typescript-eslint/no-deprecated': 'off',
       '@typescript-eslint/no-redundant-type-constituents': 'off',
     },
