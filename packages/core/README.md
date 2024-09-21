@@ -286,7 +286,7 @@ Unless you're confident about the above statement, it is recommended to disable 
 > [!WARNING]
 > This feature is still experimental
 
-This plugin supports JSX and TSX syntaxes but requires `esbuild` as an optional peer dependency. Note that Vite already uses `esbuild` to support JSX out of the box.
+This plugin supports JSX and TSX syntaxes by pre-transforming them using `esbuild` which is included by Vite.
 
 ## Useful links
 
