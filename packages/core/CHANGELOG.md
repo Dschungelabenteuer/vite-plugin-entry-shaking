@@ -1,5 +1,17 @@
 # vite-plugin-entry-shaking
 
+## 0.5.0
+
+### Minor Changes
+
+- 859c28e: Bumped minor version
+
+### Patch Changes
+
+- cb7ecfe: Updated dependencies
+- cb7ecfe: Added experimental support for JSX and TSX files
+- 20b7981: Fixed cross-entry wildcard import issue
+
 ## 0.4.3
 
 ### Patch Changes
