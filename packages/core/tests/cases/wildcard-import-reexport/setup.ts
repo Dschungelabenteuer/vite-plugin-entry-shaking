@@ -1,7 +1,7 @@
 import { describe, it } from 'vitest';
 
 import type { CaseTarget } from '../../utils';
-import { resolveModule } from '../../utils';
+import { constructCircularImport, resolveModule } from '../../utils';
 import { createCaseTarget, setupCase, testCase } from '../../utils';
 
 const casePath = '@test-cases/wildcard-import-reexport';
@@ -16,7 +16,7 @@ export function testWildcardImportRexport(middleTarget?: CaseTarget) {
       const otherTarget = await createCaseTarget('@test-modules/named-exports');
       const { importPath, targetList } = setupCase(target, middleTarget);
       const input = `import { NamedExports } from '${importPath}';\n`;
-      const output = `import * as NamedExports from '${resolved}';\n`;
+      const output = constructCircularImport(resolved!, ['NamedExportOne', 'NamedExportTwo'], 'NamedExports')
       await testCase([...targetList, otherTarget], input, output);
     });
 
@@ -34,12 +34,13 @@ export function testWildcardImportRexport(middleTarget?: CaseTarget) {
       await testCase(targetList, input, input, { maxWildcardDepth: 0 });
     });
 
+
     it('should transform if maxWildcardDepth was set and not reached', async () => {
       const resolved = await resolveModule('named-exports');
       const target = await createCaseTarget(`${targetName}-one`);
       const { importPath, targetList } = setupCase(target, middleTarget);
       const input = `import { NamedExports } from '${importPath}';\n`;
-      const output = `import * as NamedExports from '${resolved}';\n`;
+      const output = constructCircularImport(resolved!, ['NamedExportOne', 'NamedExportTwo'], 'NamedExports')
       await testCase(targetList, input, output, { maxWildcardDepth: 2 });
     });
 

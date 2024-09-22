@@ -283,3 +283,13 @@ export async function resolveModule(relPath: string) {
   const resolver = await getResolver();
   return await resolver(`@test-modules/${relPath}`);
 }
+
+/** Constructs a circular import. */
+export function constructCircularImport(path: string, entities: string[], alias: string) {
+  const importedEntitied = entities.map((entity) => `${entity} as ${alias}${entity}`).join(', ');
+  const aliasContent = entities.map((entity) => `${entity}: ${alias}${entity}`).join(', ');
+  return [
+    `import { ${importedEntitied} } from '${path}'`,
+    `export const ${alias} = { ${aliasContent} };\n`,
+  ].join('\n');
+}

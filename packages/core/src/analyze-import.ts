@@ -241,7 +241,6 @@ async function getImportReplacements(
   for (const [importedPath, importedEntities] of imports) {
     const path = normalizePath(importedPath);
     const content = await methods.resolveImportedEntities(ctx, importedEntities, entryPath, path);
-
     replacement.push(content.join('\n') as ImportStatement);
   }
 
@@ -260,7 +259,7 @@ async function resolveImportedEntities(
   imported: ImportInput[],
   entryPath: EntryPath,
   path: string,
-): Promise<ImportStatement[]> {
+): Promise<string[]> {
   // If the imported item is part of another entry point, let's resolve it from analysis.
   if (path !== entryPath && ctx.entries.has(path)) {
     return methods.resolveImportedCircularEntities(ctx, imported, path);
@@ -283,13 +282,22 @@ async function resolveImportedCircularEntities(
 ) {
   const entityMap = new Map<string, string[]>();
   const originalEntry = ctx.entries.get(path)!;
-  const wildcardImports: ImportStatement[] = [];
+  const circularStatements: string[] = [];
 
   for (const entity of imported) {
     const { originalName, alias, name, importDefault } = entity;
 
     if (importDefault && name === '*') {
-      wildcardImports.push(`import * as ${alias} from '${path}'`);
+      const reexports: string[] = [];
+      const moduleExports = ctx.entries.get(path)!.exports;
+      const imports = [...moduleExports.entries()].map(([entityName, val]): ImportInput => {
+        const name = `${alias ?? ''}${entityName}`;
+        reexports.push(`${entityName}: ${name}`);
+        return { ...val, name, alias: name };
+      });
+
+      const reimports = await resolveImportedEntities(ctx, imports, '.', path);
+      circularStatements.push(...reimports, `export const ${alias} = { ${reexports.join(', ')} }`);
       continue;
     }
 
@@ -313,7 +321,7 @@ async function resolveImportedCircularEntities(
     ([p, ents]) => `import { ${ents.join(', ')} } from '${p}'`,
   ) as ImportStatement[];
 
-  return [...formattedImports, ...wildcardImports];
+  return [...formattedImports, ...circularStatements];
 }
 
 /**

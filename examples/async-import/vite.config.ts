@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const pathToLib = resolve(__dirname, './src/lib');
 
-export default defineConfig(async () => ({
+export default defineConfig(() => ({
   plugins: [
     EntryShakingPlugin({
       targets: [pathToLib],

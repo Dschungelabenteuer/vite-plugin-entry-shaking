@@ -177,6 +177,37 @@ importers:
         specifier: ^2.1.6
         version: 2.1.6(typescript@5.6.2)
 
+  examples/issue-53:
+    dependencies:
+      vue:
+        specifier: ^3.5.7
+        version: 3.5.7(typescript@5.6.2)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.5.5
+        version: 22.5.5
+      '@vitejs/plugin-vue':
+        specifier: ^5.1.4
+        version: 5.1.4(vite@5.4.7)(vue@3.5.7)
+      '@yungezeit/eslint-vue':
+        specifier: ^0.0.12
+        version: 0.0.12(eslint@9.11.0)(typescript@5.6.2)
+      sass:
+        specifier: ^1.79.3
+        version: 1.79.3
+      typescript:
+        specifier: ^5.6.2
+        version: 5.6.2
+      vite:
+        specifier: ^5.4.7
+        version: 5.4.7(@types/node@22.5.5)(sass@1.79.3)
+      vite-plugin-entry-shaking:
+        specifier: workspace:*
+        version: link:../../packages/core
+      vue-tsc:
+        specifier: ^2.1.6
+        version: 2.1.6(typescript@5.6.2)
+
   examples/jsx:
     dependencies:
       vue:

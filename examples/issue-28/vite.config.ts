@@ -11,7 +11,7 @@ const pathToFirst = resolve(__dirname, 'src/first/');
 const pathToSecond = resolve(__dirname, 'src/second/');
 const pathToThird = resolve(__dirname, 'src/third/');
 
-export default defineConfig(async () => ({
+export default defineConfig(() => ({
   plugins: [
     EntryShakingPlugin({
       targets: ['@first/', pathToSecond, pathToThird],
