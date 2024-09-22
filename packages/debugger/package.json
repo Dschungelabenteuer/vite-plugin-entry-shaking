@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-entry-shaking-debugger",
   "type": "module",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "Debugger for vite-plugin-entry-shaking",
   "author": "Charles Gruenais",
   "license": "MIT",
@@ -14,7 +14,13 @@
   "bugs": {
     "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
   },
-  "keywords": ["vite", "vite-plugin", "entry", "tree shaking", "debugger"],
+  "keywords": [
+    "vite",
+    "vite-plugin",
+    "entry",
+    "tree shaking",
+    "debugger"
+  ],
   "exports": {
     ".": {
       "require": {
