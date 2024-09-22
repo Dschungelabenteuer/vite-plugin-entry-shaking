@@ -20,9 +20,12 @@ export interface BrowserData<Filters = any> {
 }
 
 /** Type utility that returns keys of columns that may be sorted. */
-export type SortableColumn<T extends BrowserData> = keyof {
-  [K in keyof T['columns'] as T['columns'][K]['sortable'] extends true ? K : never]: true;
-};
+export type SortableColumn<T extends BrowserData> =
+  | string
+  | number
+  | keyof {
+      [K in keyof T['columns'] as T['columns'][K]['sortable'] extends true ? K : never]: true;
+    };
 
 /** Type utility that returns keys of columns that may be searched through. */
 export type SearchableColumn<T extends BrowserData> = keyof {

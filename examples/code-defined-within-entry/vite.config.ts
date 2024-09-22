@@ -10,7 +10,7 @@ const pathToMaxDepth = resolve(__dirname, './src/max-depth');
 const pathToWithImport = resolve(__dirname, './src/with-import');
 const pathToWithoutImport = resolve(__dirname, './src/without-import');
 
-export default defineConfig(async () => ({
+export default defineConfig(() => ({
   plugins: [
     EntryShakingPlugin({
       targets: [pathToMaxDepth, pathToWithImport, pathToWithoutImport],

@@ -1,7 +1,7 @@
 import { describe, it } from 'vitest';
 
 import type { CaseTarget } from '../../utils';
-import { resolveModule } from '../../utils';
+import { constructCircularImport, resolveModule } from '../../utils';
 import { createCaseTarget, setupCase, testCase } from '../../utils';
 
 const casePath = '@test-cases/wildcard-export';
@@ -62,7 +62,7 @@ export function testWildcardExportWithAlias(middleTarget?: CaseTarget) {
       const otherTarget = await createCaseTarget('@test-modules/named-exports');
       const { importPath, targetList } = setupCase(target, middleTarget);
       const input = `import { AliasedWildcard } from '${importPath}';\n`;
-      const output = `import * as AliasedWildcard from '${resolved}';\n`;
+      const output = constructCircularImport(resolved!, ['NamedExportOne', 'NamedExportTwo'], 'AliasedWildcard');
       await testCase([...targetList, otherTarget], input, output);
     });
 
@@ -86,7 +86,7 @@ export function testWildcardExportWithAlias(middleTarget?: CaseTarget) {
       const expectedPath = (await createCaseTarget(`${casePath}/wildcard-two`)).path;
       const { importPath, targetList } = setupCase(target, middleTarget);
       const input = `import { AliasedWildcard } from '${importPath}';\n`;
-      const output = `import * as AliasedWildcard from '${expectedPath}';\n`;
+      const output = constructCircularImport(expectedPath, ['ExportedFromWildcardTwo'], 'AliasedWildcard');
       await testCase(targetList, input, output, { maxWildcardDepth: 2 });
     });
   });

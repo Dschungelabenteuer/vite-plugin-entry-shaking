@@ -9,7 +9,7 @@ const __dirname = dirname(__filename);
 const pathToLib = resolve(__dirname, './src/lib');
 const pathToEntries = resolve(__dirname, './src/entries');
 
-export default defineConfig(async () => ({
+export default defineConfig(() => ({
   plugins: [
     EntryShakingPlugin({
       targets: [

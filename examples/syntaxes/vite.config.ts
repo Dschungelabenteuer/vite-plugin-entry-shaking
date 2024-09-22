@@ -11,7 +11,7 @@ const rootDir = resolve(__dirname, '../..');
 const pathToTests = resolve(__dirname, './src/data/');
 const pathToTestCases = resolve(pathToTests, 'cases');
 
-export default defineConfig(async () => ({
+export default defineConfig(() => ({
   plugins: [
     EntryShakingPlugin({
       targets: targets.map((target) => resolve(rootDir, target)),
