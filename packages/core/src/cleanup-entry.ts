@@ -69,7 +69,7 @@ export function removeResolvedExports(
     output.overwrite(start, end, replacement);
   });
 
-  return output.toString().replace(/(\w*\s*as\s*)([,}])/gm, '$2');
+  return output.toString().replace(/(\w*\s+as\s+)([,}])/gm, '$2');
 }
 
 export const methods = {
