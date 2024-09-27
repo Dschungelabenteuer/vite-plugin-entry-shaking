@@ -1,5 +1,11 @@
 # vite-plugin-entry-shaking
 
+## 0.5.1
+
+### Patch Changes
+
+- 8d06211: Fixed identifiers containing "as" being removed from template strings (thanks [TobySJ](https://github.com/Shunjun))
+
 ## 0.5.0
 
 ### Minor Changes
