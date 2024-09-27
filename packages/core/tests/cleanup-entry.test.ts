@@ -181,4 +181,18 @@ describe('removeResolvedExports', () => {
 
     expect(output).toStrictEqual(input);
   });
+
+  it('should not remove identifier with as in template strings', async () => {
+    const input = dedent(`
+      const someIdentifierWithas = 'SomeDefinedCode';
+      const code = \`\${someIdentifierWithas}\`;
+      `);
+    const exports = await getMockedExports(input);
+    const entryExports: EntryExports = new Map([
+      ['SomeDefinedCode', { path: '/some/path', importDefault: false }],
+    ]);
+
+    const output = EntryCleaner.removeResolvedExports(input, entryExports, exports);
+    expect(output).toStrictEqual(input);
+  });
 });
