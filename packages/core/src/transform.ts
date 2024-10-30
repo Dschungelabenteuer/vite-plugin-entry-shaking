@@ -4,7 +4,7 @@ import { init, parse } from 'es-module-lexer';
 
 import type { Context } from './context';
 import ImportAnalyzer from './analyze-import';
-import { getCode } from './utils';
+import { getCode, getExtensionFromPath } from './utils';
 
 /**
  * Transforms a candidate file only if needed.
@@ -135,9 +135,11 @@ export async function transformImports(
  * @param id Resolved id of the file.
  */
 export function requiresTransform(ctx: Context, id: string) {
-  const extension = id.split('.').pop()!;
+  const extension = getExtensionFromPath(id);
+  if (!extension || !ctx.options.extensions.includes(extension)) return false;
+
   const isIgnored = ctx.options.ignorePatterns.some((pattern) => id.match(pattern));
-  return !isIgnored && ctx.options.extensions.includes(extension);
+  return !isIgnored;
 }
 
 /**

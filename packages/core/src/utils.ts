@@ -56,14 +56,28 @@ export const getAllTargetPaths = async (targets: EntryTarget[]) => {
 
 /** Determines whether provided file requires an esbuild pre-transform. */
 const requiresEsbuildTransform = (path: string) => isJsxFile(path);
-/** Determines whether provided path is a JSX/TSX file. */
-export const isJsxFile = (path: string) => path.endsWith('.jsx') || path.endsWith('.tsx');
 
-export const getCodeFromPath = async (path: string) => {
-  const code = readFileSync(resolve(path), 'utf-8');
-  return getCode(code, path);
+/** Determines whether provided path is a JSX/TSX file. */
+export const isJsxFile = (path: string) => {
+  const extension = getExtensionFromPath(path);
+  return extension === 'jsx' || extension === 'tsx';
 };
 
+/** Returns extension of a given path, if any. */
+export const getExtensionFromPath = (path: string) => {
+  const getExtension = (p: string) => p.split('.').pop();
+  try {
+    return getExtension(new URL(path).pathname);
+  } catch {
+    return getExtension(path);
+  }
+};
+
+/** Returns esm code from path (and transpiles JSX if needed). */
+export const getCodeFromPath = async (path: string) =>
+  getCode(readFileSync(resolve(path), 'utf-8'), path);
+
+/** Returns esm code (and transpiles JSX if needed). */
 export const getCode = async (code: string, path: string) =>
   requiresEsbuildTransform(path) ? (await transformWithEsbuild(code, path)).code : code;
 
