@@ -42,7 +42,7 @@ const _transitions = useViewTransition({
 <style lang="scss">
 .browser-view {
   &__header-meta {
-    @include flex-row(normal, center);
+    @include global.flex-row(normal, center);
 
     svg {
       margin-inline-end: var(--spacing-md);

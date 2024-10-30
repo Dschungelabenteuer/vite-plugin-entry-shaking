@@ -38,8 +38,8 @@ useViewTransition({ names: { 'layout-header': headerRef } });
   padding-inline-start: var(--spacing-md);
   background: var(--overall-background-color);
 
-  @include flex(normal, center);
-  @include border-bottom;
+  @include global.flex(normal, center);
+  @include global.border-bottom;
 
   &__title {
     .button {
@@ -48,7 +48,7 @@ useViewTransition({ names: { 'layout-header': headerRef } });
       color: var(--text-emphasize-color);
     }
 
-    @media (max-width: $breakpoint-sm) {
+    @media (max-width: global.$breakpoint-sm) {
       display: none;
     }
   }

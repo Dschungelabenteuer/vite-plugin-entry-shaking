@@ -48,7 +48,8 @@ export const parseCssDuration = (duration: string) => {
   return parseFloat(duration.replace('s', '')) * 1000;
 };
 
-export const formatDuration = (duration: number) => {
+export const formatDuration = (dur?: number) => {
+  const duration = dur ?? 0;
   if (duration < 1) return `${(duration * 1000).toFixed(0)}µs`;
   if (duration > 1000) return `${(duration / 1000).toFixed(2)}s`;
   return `${duration.toFixed(1)}ms`;

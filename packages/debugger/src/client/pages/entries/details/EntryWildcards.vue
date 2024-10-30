@@ -93,11 +93,11 @@ const page = computed(() => ({ name: 'Wilcards' }));
 </template>
 
 <style lang="scss">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --entry-wildcards-grid-header-background-tint: transparent;
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --entry-wildcards-grid-header-background-tint: #1c151b;
 }
 

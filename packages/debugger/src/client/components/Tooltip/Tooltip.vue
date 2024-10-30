@@ -20,12 +20,12 @@ const tooltipClass = computed(() => [$class(), stateClass.value]);
 </template>
 
 <style lang="scss">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --tooltip-background-color: var(--accent-color);
   --tooltip-text-color: var(--accent-color-contrast);
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --tooltip-background-color: var(--accent-color);
   --tooltip-text-color: var(--accent-color-contrast);
 }
@@ -41,7 +41,7 @@ const tooltipClass = computed(() => [$class(), stateClass.value]);
   transition: all var(--easing-backwards) var(--transition-duration-short);
   transform: translateY(calc(var(--spacing-sm) * -1));
 
-  @include padding;
+  @include global.padding;
 
   &.open {
     opacity: 0.875;

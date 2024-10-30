@@ -65,7 +65,7 @@ onMounted(() => {
 
 <style lang="scss">
 .layout-wrapper {
-  @include contained;
+  @include global.contained;
 
   display: grid;
   grid-template-rows: var(--size-header) 1fr var(--size-footer);

@@ -32,7 +32,7 @@ const icon = computed(() => {
 
 <style lang="scss">
 .status {
-  @include flex;
+  @include global.flex;
 
   svg {
     margin-inline: var(--spacing-md);

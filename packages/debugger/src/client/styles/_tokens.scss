@@ -1,7 +1,9 @@
 /// Note: component-related tokens are defined in the component's style layer.
 
+@use "mixins";
+
 /// Light color scheme.
-@include color-scheme(light) {
+@include mixins.color-scheme(light) {
   // Overall (light).
   --overall-background-color: #fff;
   --overall-border-color: #ddd;
@@ -52,7 +54,7 @@
 }
 
 /// Dark color scheme.
-@include color-scheme(dark) {
+@include mixins.color-scheme(dark) {
   // Overall (dark).
   --overall-background-color: #0004;
   --overall-border-color: #ffffff0c;
@@ -100,7 +102,7 @@
 }
 
 /// Common variables.
-@include token {
+@include mixins.token {
   // Spacing.
   --spacing-2xs: 0.125rem;
   --spacing-xs: 0.175rem;
@@ -142,7 +144,7 @@
   --blur-xl: blur(12px);
 }
 
-@include color-scheme {
+@include mixins.color-scheme {
   // Common colors.
   --background-gradient: linear-gradient(
     133deg,
@@ -157,7 +159,7 @@
 }
 
 /// Transitions.
-@include token {
+@include mixins.token {
   --transition-duration-short: 170ms;
   --transition-duration-medium: 260ms;
 

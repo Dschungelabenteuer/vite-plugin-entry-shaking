@@ -66,12 +66,12 @@ defineOptions({ inheritAttrs: false });
 </template>
 
 <style lang="scss">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --input-border-color: var(--overall-border-color);
   --input-shortcut-opacity: 0.5;
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --input-border-color: var(--overall-border-color-stronger);
   --input-shortcut-opacity: 0.28;
 }

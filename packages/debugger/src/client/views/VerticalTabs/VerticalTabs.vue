@@ -71,11 +71,11 @@ const { menu, ids, tablistWidth, setActiveTab } = useVerticalTabs(props, tabButt
 </template>
 
 <style lang="scss">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --tablist-background-color: color-mix(in srgb, var(--background-color-alt) 10%, #fff);
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --tablist-background-color: var(--overall-background-color);
 }
 
@@ -95,7 +95,7 @@ const { menu, ids, tablistWidth, setActiveTab } = useVerticalTabs(props, tabButt
       height: 100%;
       background: var(--tablist-background-color);
 
-      @include border-right;
+      @include global.border-right;
     }
 
     .button {
@@ -128,7 +128,7 @@ const { menu, ids, tablistWidth, setActiveTab } = useVerticalTabs(props, tabButt
         bottom: 0;
         opacity: 1;
 
-        @include border-right;
+        @include global.border-right;
       }
 
       &.active {

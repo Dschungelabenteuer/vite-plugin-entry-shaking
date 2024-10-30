@@ -32,8 +32,8 @@ const colorSchemeIcon = computed(() => (colorScheme === 'dark' ? 'sun' : 'moon')
 .footer {
   z-index: 100;
 
-  @include flex(normal, center);
-  @include border-top;
+  @include global.flex(normal, center);
+  @include global.border-top;
 
   padding-inline: var(--spacing-md);
   background: var(--overall-background-color);

@@ -44,11 +44,11 @@ const selfTime = computed(() => formatDuration(props.item.self));
 </template>
 
 <style lang="scss">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --entry-fixed-action-background-tint: transparent;
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --entry-fixed-action-background-tint: var(--background-gradient);
 }
 

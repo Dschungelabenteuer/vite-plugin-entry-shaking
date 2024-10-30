@@ -31,12 +31,12 @@ const isTransitioning = ref(false);
 </template>
 
 <style lang="scss">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --popover-background-color: var(--overall-background-color);
   --popover-border-color: var(--overall-border-color);
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --popover-background-color: #1a1318cc;
   --popover-border-color: #caf2;
 }

@@ -1,5 +1,4 @@
-@import './reset';
-@import './global';
+@use './reset';
 
 body,
 #root,
@@ -10,12 +9,12 @@ body,
 }
 
 #wrapper {
-  @include contained;
-  @include flex-col(center, normal);
+  @include global.contained;
+  @include global.flex-col(center, normal);
 }
 
 .theme-wrapper {
-  @include contained;
+  @include global.contained;
 
   display: flex;
   color: var(--text-color);

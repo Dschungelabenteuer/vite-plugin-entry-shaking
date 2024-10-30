@@ -53,7 +53,7 @@ provide('$class', $class);
 
 <style lang="scss">
 .panel {
-  @include contained;
+  @include global.contained;
 
   display: grid;
   grid-template-rows: var(--size-header) 1fr var(--size-footer);
@@ -86,7 +86,7 @@ provide('$class', $class);
     border-inline-start: 1px solid var(--overall-border-color);
   }
 
-  @media (max-width: $breakpoint-md) {
+  @media (max-width: global.$breakpoint-md) {
     position: absolute;
     inset-inline-end: 0;
 

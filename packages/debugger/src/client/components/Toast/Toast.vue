@@ -34,12 +34,12 @@ const icon = computed(() => {
 </template>
 
 <style lang="scss">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --toast-background-color: var(--overall-background-color);
   --toast-border-color: var(--overall-border-color);
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --toast-background-color: #1a1318cc;
   --toast-border-color: #caf2;
 }

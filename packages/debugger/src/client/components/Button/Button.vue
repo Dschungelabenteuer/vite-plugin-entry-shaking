@@ -103,12 +103,12 @@ defineExpose({ reference });
 </template>
 
 <style lang="scss" data-desc="tokens">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --button-outline-color: var(--overall-border-color);
   --button-outline-color-hover: var(--overall-border-color-stronger);
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --button-outline-color: var(--overall-border-color-stronger);
   --button-outline-color-hover: #573943;
 }

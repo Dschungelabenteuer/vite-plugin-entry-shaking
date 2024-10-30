@@ -63,12 +63,12 @@ const items = computed(() => {
 </template>
 
 <style lang="scss" data-desc="tokens">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --kbd-opacity: 0.8;
   --kbd-opacity-dimmed: 0.5;
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --kbd-opacity: 0.7;
   --kbd-opacity-dimmed: 0.3;
 }
@@ -109,7 +109,7 @@ const items = computed(() => {
 <style lang="scss" data-desc="variants">
 .kbd {
   &.condensed {
-    @include padding(var(--spacing-2xs), var(--spacing-xs));
+    @include global.padding(var(--spacing-2xs), var(--spacing-xs));
   }
 
   &.dimmed {

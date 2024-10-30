@@ -29,7 +29,7 @@ const model = defineModel<boolean | string[]>();
 </template>
 
 <style lang="scss">
-@include color-scheme {
+@include global.color-scheme {
   --checkbox-checkmark-color: var(--accent-color);
   --checkbox-border-color: var(--field-border-color);
   --checkbox-border-color-focus: var(--field-border-color-focus);

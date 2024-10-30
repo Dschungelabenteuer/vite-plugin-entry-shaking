@@ -1,4 +1,4 @@
-@import 'mixins';
-@import 'tokens';
-@import 'typefaces';
-@import 'animations';
+@forward 'mixins';
+@forward 'tokens';
+@forward 'typefaces';
+@forward 'animations';

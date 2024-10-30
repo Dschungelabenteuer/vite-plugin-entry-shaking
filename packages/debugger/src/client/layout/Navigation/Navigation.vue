@@ -49,8 +49,8 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
 <style lang="scss">
 .navigation {
   ul {
-    @include flex;
-    @include reset-list;
+    @include global.flex;
+    @include global.reset-list;
   }
 
   li {
@@ -67,7 +67,7 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
     min-width: 1rem;
   }
 
-  @media (max-width: $breakpoint-md) {
+  @media (max-width: global.$breakpoint-md) {
     .metrics-btn[disabled] {
       display: initial;
     }

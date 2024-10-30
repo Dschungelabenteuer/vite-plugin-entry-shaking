@@ -77,7 +77,7 @@ const popoverId = computed(() => `${props.id}-shortcuts-popover`);
     font-size: var(--font-size-xs);
     pointer-events: none;
 
-    @include border-top;
+    @include global.border-top;
   }
 
   &__list {

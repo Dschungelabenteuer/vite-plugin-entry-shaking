@@ -100,12 +100,12 @@ defineExpose({
 </template>
 
 <style lang="scss">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --dialog-background-color: var(--overall-background-color);
   --dialog-backdrop-color: #fff4;
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --dialog-background-color: color-mix(in srgb, var(--background-color-alt) 50%, rgb(9 6 19));
   --dialog-backdrop-color: color-mix(in srgb, var(--background-color-alt) 20%, transparent);
 }
@@ -166,7 +166,7 @@ defineExpose({
     padding: var(--spacing-md) var(--spacing-lg);
     color: var(--text-emphasize-color);
 
-    @include border-bottom;
+    @include global.border-bottom;
 
     h2 {
       padding-block: 0;
@@ -181,7 +181,7 @@ defineExpose({
     justify-content: end;
     padding: var(--spacing-md) var(--spacing-lg);
 
-    @include border-top;
+    @include global.border-top;
   }
 
   &__close.button {

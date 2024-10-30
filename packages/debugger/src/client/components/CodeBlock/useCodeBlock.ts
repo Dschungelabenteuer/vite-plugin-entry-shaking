@@ -1,10 +1,27 @@
 import type { ShikiTransformer } from 'shiki';
-import { codeToHtml } from 'shiki';
+import { createHighlighterCore, createOnigurumaEngine } from 'shiki';
 import { ref, watchEffect } from 'vue';
 import { transformerNotationDiff } from '@shikijs/transformers';
 
 import type { CodeBlockProps } from './CodeBlock.types';
 import { useDiffs } from './useDiffs';
+
+async function getHighlighter() {
+  return await createHighlighterCore({
+    themes: [
+      import('shiki/themes/dracula-soft.mjs')
+    ],
+    langs: [
+      import('shiki/langs/javascript.mjs'),
+      import('shiki/langs/typescript.mjs'),
+      import('shiki/langs/jsx.mjs'),
+      import('shiki/langs/tsx.mjs'),
+    ],
+    // `shiki/wasm` contains the wasm binary inlined as base64 string.
+    engine: createOnigurumaEngine(import('shiki/wasm'))
+  })
+}
+
 
 export function useCodeBlock(props: CodeBlockProps) {
   const code = ref('');
@@ -26,18 +43,19 @@ export function useCodeBlock(props: CodeBlockProps) {
 
   watchEffect(() => {
     (async () => {
+      const highlighter = await getHighlighter();
       if (props.source && props.target) {
         const diffs = useDiffs();
         await diffs.prepare();
         diffs.compare('lol', props.source, props.target).then(async (val) => {
-          code.value = await codeToHtml(val, {
+          code.value = highlighter.codeToHtml(val, {
             lang: props.lang!,
             theme: props.theme!,
             transformers: await getTransformers(),
           });
         });
       } else {
-        code.value = await codeToHtml(props.source, {
+        code.value = highlighter.codeToHtml(props.source, {
           lang: props.lang!,
           theme: props.theme!,
           transformers: await getTransformers(),

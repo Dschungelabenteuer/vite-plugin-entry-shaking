@@ -30,7 +30,7 @@ const props = defineProps<Required<BrowserProps>>();
 <style lang="scss">
 .browser-view {
   &__header {
-    @include flex-row(normal, center);
+    @include global.flex-row(normal, center);
 
     z-index: 1000;
     height: var(--size-page-header);

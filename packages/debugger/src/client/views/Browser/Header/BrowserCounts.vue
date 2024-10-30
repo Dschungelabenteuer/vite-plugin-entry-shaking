@@ -29,7 +29,7 @@ const _transitions = useViewTransition({
 <style lang="scss">
 .browser-view {
   &__header-counts {
-    @include padding;
+    @include global.padding;
 
     margin: var(--spacing-md);
     font-size: var(--font-size-2xs);

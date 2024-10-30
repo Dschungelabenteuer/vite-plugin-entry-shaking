@@ -96,14 +96,14 @@ provide('onSort', onSort);
 </style>
 
 <style lang="scss">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --grid-header-background-color: #fffa;
   --grid-header-background-tint: transparent;
   --grid-header-border-color: var(--overall-border-color);
   --grid-header-background-blur: var(--blur-lg);
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --grid-header-background-color: var(--overall-background-color);
   --grid-header-background-tint: var(--background-gradient);
   --grid-header-border-color: var(--overall-border-color);

@@ -27,7 +27,7 @@ import Illustration from '@components/Illustration/Illustration.vue';
   --name-margin: calc(var(--spacing-md) + var(--vite-logo-size));
   --ilustration-max-width: 420px;
 
-  @include flex;
+  @include global.flex;
 
   width: 100%;
   max-width: 100vw;
@@ -51,7 +51,7 @@ import Illustration from '@components/Illustration/Illustration.vue';
   }
 
   &__tagline {
-    @include flex(normal, center);
+    @include global.flex(normal, center);
 
     font-weight: 700;
     color: var(--tagline-color);
@@ -65,7 +65,7 @@ import Illustration from '@components/Illustration/Illustration.vue';
     transform: translateX(var(--name-margin));
   }
 
-  @container (max-width: #{$breakpoint-md}) {
+  @container (max-width: #{global.$breakpoint-md}) {
     flex-direction: column;
     align-items: center;
     justify-content: center;

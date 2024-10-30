@@ -1,9 +1,10 @@
 import type { Ref } from 'vue';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watchPostEffect } from 'vue';
 import type { ShortEmits } from '#uitypes';
 import { useFocusTrap } from '@composables/useFocusTrap';
 import { useTeleport } from '@composables/useTeleport';
 import type { DialogEvents, DialogProps } from './Dialog.types';
+import { watch } from 'vue';
 
 export const DIALOG_CONTAINER_ID_VAR = 'dialogContainerId';
 export const DIALOG_MAIN_CONTAINER_ID = 'dialog-container-main';
@@ -62,20 +63,21 @@ export function useDialog(
   const backdropTransitionName = computed(() => `dialog-backdrop-${props.id}-transition`);
   const isOpen = ref(element.value?.open ?? false);
 
-  let observer: MutationObserver | undefined;
-  onMounted(() => {
-    observer = new MutationObserver(() => {
-      isOpen.value = element.value?.open ?? false;
-    });
+  const observer =  new MutationObserver(() => {
+    isOpen.value = element.value?.open ?? false;
+  });
 
-    observer.observe(element.value!, {
-      attributes: true,
-      attributeFilter: ['open'],
-    });
+  watch(element, () => {
+    if (element.value) {
+      observer.observe(element.value, {
+        attributes: true,
+        attributeFilter: ['open'],
+      });
+    }
   });
 
   onUnmounted(() => {
-    observer?.disconnect();
+    observer.disconnect();
   });
 
   return {

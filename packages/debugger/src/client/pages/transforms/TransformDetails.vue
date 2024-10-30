@@ -51,8 +51,8 @@ provide('depth', 1);
   overflow: hidden;
 
   &__path {
-    @include border-bottom;
-    @include padding(var(--spacing-sm), var(--spacing-xs));
+    @include global.border-bottom;
+    @include global.padding(var(--spacing-sm), var(--spacing-xs));
 
     display: flex;
     align-items: center;

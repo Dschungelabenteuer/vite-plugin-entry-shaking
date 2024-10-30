@@ -107,11 +107,11 @@ const page = computed(() => ({ name: 'Exports' }));
 </template>
 
 <style lang="scss">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --entry-exports-grid-header-background-tint: transparent;
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --entry-exports-grid-header-background-tint: #1c151b;
 }
 

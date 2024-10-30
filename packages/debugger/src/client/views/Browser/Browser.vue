@@ -42,11 +42,11 @@ provide('search', search);
 </template>
 
 <style lang="scss">
-@include color-scheme(light) {
+@include global.color-scheme(light) {
   --browser-background-color: #fbfdfe;
 }
 
-@include color-scheme(dark) {
+@include global.color-scheme(dark) {
   --browser-background-color: transparent;
 }
 
