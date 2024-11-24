@@ -1,0 +1,24 @@
+{
+  "name": "vite-plugin-entry-shaking-example-issue-61",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.5.12"
+  },
+  "devDependencies": {
+    "@types/node": "^22.8.4",
+    "@vitejs/plugin-vue": "^5.1.4",
+    "@yungezeit/eslint-vue": "^0.0.12",
+    "sass": "^1.80.5",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vite-plugin-entry-shaking": "workspace:*",
+    "vue-tsc": "^2.1.8"
+  }
+}
