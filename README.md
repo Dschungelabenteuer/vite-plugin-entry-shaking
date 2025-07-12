@@ -196,7 +196,7 @@ file which initiates requests for all of the three `a`, `b` and `c` modules it r
 is, we actually only needed the `c` module, this results in both `a` and `b` requests being
 unnecessary!
 
-As your projet and entry points grow, you end up paying the price for the ever-increasing amount of
+As your project and entry points grow, you end up paying the price for the ever-increasing amount of
 unnecessary requests and HMR updates, which consumes time and resources. Well, that escalated
 quickly. Let's try to work around this…
 
