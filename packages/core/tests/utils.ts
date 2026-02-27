@@ -262,8 +262,7 @@ export async function resolveUnitEntry(name: string) {
  * It creates it if it doesn't exist yet.
  */
 async function getResolver() {
-  if (!testResolver) testResolver = await getTestResolver();
-  return testResolver;
+  return testResolver ??= await getTestResolver();
 }
 
 /**
