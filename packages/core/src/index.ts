@@ -41,6 +41,13 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin {
   const options = mergeOptions(userOptions);
   /** Plugin's context. */
   let context: Context;
+  /** Plugin's init promise. */
+  let initPromise: Promise<void> | undefined;
+
+  const ensureInitialized = async () => {
+    initPromise ??= context.init();
+    await initPromise;
+  };
 
   return {
     name,
@@ -49,10 +56,13 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin {
 
     async configResolved(config) {
       context = new Context(options, config);
-      await context.init();
+      await ensureInitialized();
+
     },
 
     async configureServer(server) {
+      await ensureInitialized();
+
       if (context.options.debug) {
         const { attachDebugger } = await loadDebugger();
         attachDebugger(server, context);
