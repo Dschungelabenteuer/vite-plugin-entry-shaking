@@ -28,7 +28,7 @@ export const Row = defineComponent({
     const prepareRow = () => {
       const children = [...(rowRef.value?.children ?? [])];
       // Warn if number of children mismatch the number of columns.
-      if (children.length !== Number(props.columns.length)) {
+      if (children.length !== props.columns.length) {
         console.warn(
           `[useDataGrid] Columns and children count mismatch.\n` +
             `The following element is expected to have ${props.columns.length} children ` +
@@ -80,7 +80,7 @@ export const Row = defineComponent({
       }
 
       // Set row as rendered if we were waiting for it.
-      if (renderCallback.value && renderCallback.value.row === props.rowIndex + 1) {
+      if (renderCallback.value?.row === props.rowIndex + 1) {
         renderCallback.value.resolve(true);
         renderCallback.value = undefined;
       }

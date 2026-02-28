@@ -9,7 +9,7 @@ export type ThemeProps = {
 const theme = reactive<ThemeProps>({ colorScheme: 'light' });
 
 export const themeDecorator = (storyFn: () => ReturnType<StoryFn>, context: StoryContext) => {
-  theme.colorScheme = context.globals.colorScheme || 'light';
+  theme.colorScheme = context.globals.colorScheme ?? 'light';
   const story = storyFn();
 
   return () =>

@@ -47,7 +47,7 @@ export function useButton(
 function useButtonAttributes(props: ButtonProps, className: string, popover: UseFloatingReturn) {
   const attrs = useAttrs();
   const slots = useSlots();
-  const id = computed(() => String(attrs['id'] ?? randomId('btn')));
+  const id = computed(() => (attrs['id'] as string | undefined) ?? randomId('btn'));
   const ariaLabel = computed(() => attrs['aria-label'] as string | undefined);
   const tabindex = computed(() => attrs['tabindex'] as number | undefined);
   const popoverId = computed(() => `${id.value}-popover`);

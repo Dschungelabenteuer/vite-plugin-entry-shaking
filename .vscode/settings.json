@@ -8,6 +8,10 @@
   },
   // ESLint.
   "eslint.validate": ["javascript", "javascriptreact", "yaml", "json", "jsonc", "json5"],
+  "eslint.workingDirectories": [
+    "./packages/core",
+    "./packages/debugger",
+  ],
   "html.format.wrapAttributes": "force-expand-multiline",
   // Stylelint.
   "css.validate": false,
