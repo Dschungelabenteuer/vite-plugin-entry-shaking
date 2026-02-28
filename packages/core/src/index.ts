@@ -50,6 +50,7 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin[] {
       apply: 'serve',
       enforce: 'pre',
       configResolved(config) {
+        // Capture the original createResolver before vite-plugin-inspect hijacks it.
         originalCreateResolver = config.createResolver;
       },
     },
