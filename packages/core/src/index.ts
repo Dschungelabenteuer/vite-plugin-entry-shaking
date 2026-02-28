@@ -1,4 +1,4 @@
-import type { Plugin } from 'vite';
+import type { Plugin, ResolvedConfig } from 'vite';
 import type {
   Diagnostic,
   PluginMetrics,
@@ -36,51 +36,55 @@ export { DiagnosticKinds } from './diagnostics';
 
 export const name = 'vite-plugin-entry-shaking';
 
-export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin {
+export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin[] {
   /** Final options of the plugin. */
   const options = mergeOptions(userOptions);
   /** Plugin's context. */
   let context: Context;
-  /** Plugin's init promise. */
-  let initPromise: Promise<void> | undefined;
+  /** Original createResolver captured early */
+  let originalCreateResolver: ResolvedConfig['createResolver'];
 
-  const ensureInitialized = async () => {
-    initPromise ??= context.init();
-    await initPromise;
-  };
-
-  return {
-    name,
-    apply: 'serve',
-    enforce: 'post',
-
-    async configResolved(config) {
-      context = new Context(options, config);
-      await ensureInitialized();
-
+  return [
+    {
+      name: `${name}:pre`,
+      apply: 'serve',
+      enforce: 'pre',
+      configResolved(config) {
+        originalCreateResolver = config.createResolver;
+      },
     },
+    {
+      name,
+      apply: 'serve',
+      enforce: 'post',
 
-    async configureServer(server) {
-      await ensureInitialized();
+      async configResolved(config) {
+        // @ts-expect-error Who hijacks last hijacks best
+        config.createResolver = originalCreateResolver;
+        context = new Context(options, config);
+        await context.init();
+      },
 
-      if (context.options.debug) {
-        const { attachDebugger } = await loadDebugger();
-        attachDebugger(server, context);
-      }
+      async configureServer(server) {
+        if (context.options.debug) {
+          const { attachDebugger } = await loadDebugger();
+          attachDebugger(server, context);
+        }
+      },
+
+      load(id) {
+        return context.loadFile(id);
+      },
+
+      async transform(code, id) {
+        return await context.transformFile(code, id);
+      },
+
+      async handleHotUpdate({ file }) {
+        await context.checkUpdate(file);
+      },
     },
-
-    load(id) {
-      return context.loadFile(id);
-    },
-
-    async transform(code, id) {
-      return await context.transformFile(code, id);
-    },
-
-    async handleHotUpdate({ file }) {
-      await context.checkUpdate(file);
-    },
-  };
+  ];
 }
 
 export default createEntryShakingPlugin;
