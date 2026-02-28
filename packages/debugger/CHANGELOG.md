@@ -1,5 +1,12 @@
 # vite-plugin-entry-shaking-debugger
 
+## 2.0.2
+
+### Patch Changes
+
+- Updated dependencies [22febdf]
+  - vite-plugin-entry-shaking@0.5.2
+
 ## 2.0.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # vite-plugin-entry-shaking
 
+## 0.5.2
+
+### Patch Changes
+
+- 22febdf: Fixed conflict with vite-plugin-inspect
+
 ## 0.5.1
 
 ### Patch Changes
