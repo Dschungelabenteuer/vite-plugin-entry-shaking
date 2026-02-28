@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-entry-shaking",
   "type": "module",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Mimic tree-shaking behaviour when importing code from an entry file in development mode.",
   "author": "Charles Gruenais",
   "license": "MIT",
