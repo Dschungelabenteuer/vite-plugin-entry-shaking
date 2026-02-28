@@ -80,7 +80,7 @@ export const Row = defineComponent({
       }
 
       // Set row as rendered if we were waiting for it.
-      if (renderCallback.value && renderCallback.value.row === props.rowIndex + 1) {
+      if (renderCallback.value?.row === props.rowIndex + 1) {
         renderCallback.value.resolve(true);
         renderCallback.value = undefined;
       }
