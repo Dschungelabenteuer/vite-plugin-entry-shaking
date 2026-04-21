@@ -1,7 +1,9 @@
-import type { ResolveFn, ResolvedConfig } from 'vite';
+import type { FSWatcher, ModuleGraph, ModuleNode, ResolveFn, ResolvedConfig } from 'vite';
+import { normalizePath } from 'vite';
 import type { EventBus } from './event-bus';
 import type {
   ExtendedTargets,
+  EntryPath,
   PluginEntries,
   PluginMetrics,
   FinalPluginOptions,
@@ -11,7 +13,7 @@ import type {
 import { Logger } from './logger';
 
 import EntryAnalyzer from './analyze-entry';
-import { parseId } from './urls';
+import { addSourceQuerySuffix, parseId } from './urls';
 import { transformIfNeeded } from './transform';
 import Utils, { loadEventBus } from './utils';
 import { extensions } from './options';
@@ -28,6 +30,9 @@ export class Context {
 
   /** Map of registered targets. */
   public targets: ExtendedTargets = new Map();
+
+  /** Map of transformed importers indexed by the entry files they imported. */
+  public entryImporters = new Map<EntryPath, Set<string>>();
 
   /** Plugin's logger. */
   public logger: Logger;
@@ -70,6 +75,7 @@ export class Context {
   public async init() {
     await this.registerTargets();
     this.entries = await EntryAnalyzer.analyzeEntries(this);
+    this.includeEntriesInWatcherOptions();
 
     if (this.options.debug) {
       const { EventBus } = await loadEventBus();
@@ -118,17 +124,154 @@ export class Context {
    * @param id Path to the file.
    */
   public async checkUpdate(id: string) {
-    const entryFile = this.entries.get(id);
+    const entryId = normalizePath(parseId(id).url);
+    const entryFile = this.entries.get(entryId);
 
     if (entryFile) {
-      this.logger.info(`HMR requires new analysis of ${id}`);
-      await EntryAnalyzer.doAnalyzeEntry(this, id, entryFile.depth);
+      this.logger.info(`HMR requires new analysis of ${entryId}`);
+      await EntryAnalyzer.doAnalyzeEntry(this, entryId, entryFile.depth);
+      return true;
     }
+
+    return false;
+  }
+
+  /**
+   * Returns Vite module ids that can be served for an entry file.
+   * @param id Path to the changed entry file.
+   */
+  public getHotUpdateModuleIds(id: string) {
+    const entryId = normalizePath(parseId(id).url);
+
+    if (!this.entries.has(entryId)) return [];
+
+    return [entryId, addSourceQuerySuffix(entryId)];
+  }
+
+  /**
+   * Collects the entry modules that should be invalidated after an HMR update.
+   * @param id Path to the changed entry file.
+   * @param modules Modules Vite already associated to the changed file.
+   * @param moduleGraph Vite's module graph.
+   */
+  public getHotUpdateModules(
+    id: string,
+    modules: ModuleNode[],
+    moduleGraph: Pick<ModuleGraph, 'getModuleById' | 'getModulesByFile'>,
+  ) {
+    const affectedModules = new Set<ModuleNode>();
+    const moduleIds = this.getHotUpdateModuleIds(id);
+    const entryId = moduleIds[0];
+    const servedModuleIds = new Set(moduleIds);
+
+    if (!entryId) return [];
+
+    const addModule = (module?: ModuleNode) => {
+      if (module && this.isServedEntryModule(module, entryId, servedModuleIds)) {
+        affectedModules.add(module);
+      }
+    };
+    const addImporterModule = (module?: ModuleNode) => {
+      if (module) affectedModules.add(module);
+    };
+
+    modules.forEach(addModule);
+    moduleGraph.getModulesByFile(entryId)?.forEach(addModule);
+    moduleIds.forEach((moduleId) => {
+      addModule(moduleGraph.getModuleById(moduleId));
+    });
+    this.getEntryImporterIds(entryId).forEach((moduleId) => {
+      addImporterModule(moduleGraph.getModuleById(moduleId));
+    });
+
+    return [...affectedModules];
+  }
+
+  /**
+   * Registers which entries were used to transform an importer.
+   * @param importerId Resolved id of the transformed file.
+   * @param entryIds Resolved ids of the imported entries.
+   */
+  public registerEntryImporter(importerId: string, entryIds: EntryPath[]) {
+    const normalizedImporterId = normalizePath(importerId);
+    this.unregisterEntryImporter(normalizedImporterId);
+
+    entryIds.forEach((entryId) => {
+      const normalizedEntryId = normalizePath(parseId(entryId).url);
+      if (!this.entries.has(normalizedEntryId)) return;
+
+      const importers = this.entryImporters.get(normalizedEntryId) ?? new Set<string>();
+      importers.add(normalizedImporterId);
+      this.entryImporters.set(normalizedEntryId, importers);
+    });
+  }
+
+  /**
+   * Removes stale transformed-importer references.
+   * @param importerId Resolved id of a transformed file.
+   */
+  public unregisterEntryImporter(importerId: string) {
+    const normalizedImporterId = normalizePath(importerId);
+
+    this.entryImporters.forEach((importers, entryId) => {
+      importers.delete(normalizedImporterId);
+      if (!importers.size) this.entryImporters.delete(entryId);
+    });
+  }
+
+  /** Ensures Vite's dev watcher does not ignore registered entry files. */
+  public includeEntriesInWatcherOptions() {
+    const serverConfig = (this.config as { server?: ResolvedConfig['server'] }).server;
+    const watchOptions = serverConfig?.watch;
+    if (!watchOptions) return;
+
+    const ignored = watchOptions.ignored;
+    const ignoredList = Array.isArray(ignored) ? ignored : ignored ? [ignored] : [];
+    watchOptions.ignored = [...this.getEntryWatchIgnoreExceptions(), ...ignoredList];
+  }
+
+  /**
+   * Adds registered entry files to Vite's dev watcher.
+   * @param watcher Vite's dev server watcher.
+   */
+  public watchEntryFiles(watcher: Pick<FSWatcher, 'add'>) {
+    const entryIds = [...this.entries.keys()];
+    if (!entryIds.length) return;
+
+    this.logger.info(`Watching ${entryIds.length} entry file(s) for HMR`);
+    watcher.add(entryIds);
   }
 
   /** Registers targets from the plugin options. */
   private async registerTargets() {
     const paths = await Utils.getAllTargetPaths(this.options.targets);
     this.targets = new Map(paths.map((path) => [path, 0]));
+  }
+
+  /** Determines whether a Vite module is one of the entry modules served by this plugin. */
+  private isServedEntryModule(
+    module: ModuleNode,
+    entryId: string,
+    servedModuleIds: Set<string>,
+  ) {
+    if (!module.id) {
+      return module.file ? normalizePath(module.file) === entryId : false;
+    }
+
+    const moduleId = normalizePath(module.id);
+    if (servedModuleIds.has(moduleId)) return true;
+
+    const parsed = parseId(moduleId);
+    return parsed.url === entryId && parsed.serveSource;
+  }
+
+  /** Returns negative ignored patterns for entry files watched explicitly by this plugin. */
+  private getEntryWatchIgnoreExceptions() {
+    return [...this.entries.keys()].map((entryId) => `!${entryId}`);
+  }
+
+  /** Returns transformed importer ids that depended on the given entry analysis. */
+  private getEntryImporterIds(entryId: EntryPath) {
+    return [...(this.entryImporters.get(entryId) ?? [])];
   }
 }

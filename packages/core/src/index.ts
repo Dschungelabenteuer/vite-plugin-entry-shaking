@@ -1,4 +1,4 @@
-import type { Plugin, ResolvedConfig } from 'vite';
+import type { ModuleNode, Plugin, ResolvedConfig } from 'vite';
 import type {
   Diagnostic,
   PluginMetrics,
@@ -67,6 +67,8 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin[] {
       },
 
       async configureServer(server) {
+        context.watchEntryFiles(server.watcher);
+
         if (context.options.debug) {
           const { attachDebugger } = await loadDebugger();
           attachDebugger(server, context);
@@ -81,8 +83,21 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin[] {
         return await context.transformFile(code, id);
       },
 
-      async handleHotUpdate({ file }) {
-        await context.checkUpdate(file);
+      async handleHotUpdate({ file, modules, server, timestamp }) {
+        const isEntryUpdate = await context.checkUpdate(file);
+
+        if (!isEntryUpdate) return;
+
+        const affectedModules = context.getHotUpdateModules(file, modules, server.moduleGraph);
+        const invalidatedModules = new Set<ModuleNode>();
+
+        for (const module of affectedModules) {
+          server.moduleGraph.invalidateModule(module, invalidatedModules, timestamp, true);
+        }
+
+        // Import rewrites can remove the graph edge from consumers back to the entry.
+        server.ws.send({ type: 'full-reload' });
+        return [];
       },
     },
   ];

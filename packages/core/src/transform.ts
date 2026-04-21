@@ -60,6 +60,7 @@ export async function transformImportsIfNeeded(
   const entriesMatched = importedEntries.length;
   const { transformImports: transform } = methods;
   if (!entriesMatched) {
+    ctx.unregisterEntryImporter(id);
     const ignoredMessage = `Did not transform "${id}" because it does not import any registered target`;
     ctx.logger.debug(ignoredMessage, undefined);
     return;
@@ -74,6 +75,7 @@ export async function transformImportsIfNeeded(
     `Transforming file "${id}"`,
     async () => await transform(ctx, id, code, imports, exports),
   );
+  ctx.registerEntryImporter(id, importedEntries);
 
   ctx.eventBus?.emit('registerTransform', {
     id,
