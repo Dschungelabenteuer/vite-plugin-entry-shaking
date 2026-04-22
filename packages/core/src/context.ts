@@ -249,11 +249,7 @@ export class Context {
   }
 
   /** Determines whether a Vite module is one of the entry modules served by this plugin. */
-  private isServedEntryModule(
-    module: ModuleNode,
-    entryId: string,
-    servedModuleIds: Set<string>,
-  ) {
+  private isServedEntryModule(module: ModuleNode, entryId: string, servedModuleIds: Set<string>) {
     if (!module.id) {
       return module.file ? normalizePath(module.file) === entryId : false;
     }
