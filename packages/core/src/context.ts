@@ -25,6 +25,9 @@ export class Context {
   /** Vite resolver. */
   public resolver: ResolveFn;
 
+  /** Whether targets and entries have already been initialized. */
+  private initialized = false;
+
   /** Map of analyzed entries. */
   public entries: PluginEntries = new Map();
 
@@ -73,6 +76,12 @@ export class Context {
 
   /**  Initializes the plugin context. */
   public async init() {
+    if (this.initialized) return;
+
+    this.targets = new Map();
+    this.entries = new Map();
+    this.entryImporters.clear();
+
     await this.registerTargets();
     this.entries = await EntryAnalyzer.analyzeEntries(this);
     this.includeEntriesInWatcherOptions();
@@ -82,6 +91,41 @@ export class Context {
       this.eventBus = new EventBus();
       this.logger.getOntoEventBus(this.eventBus);
     }
+
+    this.initialized = true;
+  }
+
+  /**
+   * Replaces the resolver used by the plugin.
+   * This invalidates any analysis previously built with another resolver.
+   * @param resolver Final Vite/Rollup resolver.
+   */
+  public setResolver(resolver: ResolveFn) {
+    this.resolver = resolver;
+    this.initialized = false;
+    this.targets = new Map();
+    this.entries = new Map();
+    this.entryImporters.clear();
+  }
+
+  /**
+   * Resolves and normalizes a module id through the active Vite resolver.
+   * @param id Imported id/specifier.
+   * @param importer Importer id.
+   * @param aliasOnly Whether only aliases should be resolved.
+   * @param ssr Whether the resolution is for SSR.
+   */
+  public async resolve(id: string, importer?: string, aliasOnly?: boolean, ssr?: boolean) {
+    const resolved = await this.resolver(id, importer, aliasOnly, ssr);
+    return resolved ? this.normalizeId(resolved) : undefined;
+  }
+
+  /**
+   * Normalizes a module id before using it as a target/entry cache key.
+   * @param id Module id.
+   */
+  public normalizeId(id: string) {
+    return normalizePath(parseId(id).url);
   }
 
   /**
@@ -90,12 +134,13 @@ export class Context {
    */
   public loadFile(id: string) {
     const { url, serveSource } = parseId(id);
-    const entry = this.entries.get(url);
+    const entryId = this.normalizeId(url);
+    const entry = this.entries.get(entryId);
 
     if (entry) {
       const version = serveSource ? 'original' : 'mutated';
       const output = serveSource ? entry.source : entry.updatedSource;
-      this.logger.info(`Serving ${version} version entry file ${url}`);
+      this.logger.info(`Serving ${version} version entry file ${entryId}`);
       return output;
     }
   }
@@ -245,7 +290,15 @@ export class Context {
   /** Registers targets from the plugin options. */
   private async registerTargets() {
     const paths = await Utils.getAllTargetPaths(this.options.targets);
-    this.targets = new Map(paths.map((path) => [path, 0]));
+    const targets: ExtendedTargets = new Map();
+
+    await Utils.parallelize(paths, async (path) => {
+      const resolvedPath = (await this.resolve(path)) ?? this.normalizeId(path);
+      this.logger.debug(`Registered target "${path}" as "${resolvedPath}"`);
+      targets.set(resolvedPath, 0);
+    });
+
+    this.targets = targets;
   }
 
   /** Determines whether a Vite module is one of the entry modules served by this plugin. */

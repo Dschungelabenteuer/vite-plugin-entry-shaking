@@ -1,4 +1,4 @@
-import type { ModuleNode, Plugin, ResolvedConfig } from 'vite';
+import type { ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite';
 import type {
   Diagnostic,
   PluginMetrics,
@@ -59,14 +59,28 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin[] {
       apply: 'serve',
       enforce: 'post',
 
-      async configResolved(config) {
+      configResolved(config) {
         // @ts-expect-error Who hijacks last hijacks best
         config.createResolver = originalCreateResolver;
         context = new Context(options, config);
-        await context.init();
       },
 
       async configureServer(server) {
+        const fallbackResolver = context.resolver;
+        const { pluginContainer } = server as Partial<ViteDevServer>;
+
+        if (pluginContainer) {
+          context.setResolver(async (id, importer, aliasOnly, ssr) => {
+            if (aliasOnly) return await fallbackResolver(id, importer, aliasOnly, ssr);
+
+            const resolved = await pluginContainer.resolveId(id, importer, { ssr });
+            if (resolved) return typeof resolved === 'string' ? resolved : resolved.id;
+
+            return await fallbackResolver(id, importer, aliasOnly, ssr);
+          });
+        }
+
+        await context.init();
         context.watchEntryFiles(server.watcher);
 
         if (context.options.debug) {
@@ -75,15 +89,18 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin[] {
         }
       },
 
-      load(id) {
+      async load(id) {
+        await context.init();
         return context.loadFile(id);
       },
 
       async transform(code, id) {
+        await context.init();
         return await context.transformFile(code, id);
       },
 
       async handleHotUpdate({ file, modules, server, timestamp }) {
+        await context.init();
         const isEntryUpdate = await context.checkUpdate(file);
 
         if (!isEntryUpdate) return;
