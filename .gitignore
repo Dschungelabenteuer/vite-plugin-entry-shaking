@@ -7,9 +7,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+!packages/core/tests/__mocks__/remap/node_modules/
+!packages/core/tests/__mocks__/remap/node_modules/**
 dev-dist
 dist
 dist-ssr
+!packages/core/tests/__mocks__/remap/**/dist/
+!packages/core/tests/__mocks__/remap/**/dist/**
 *.local
 
 # Tests

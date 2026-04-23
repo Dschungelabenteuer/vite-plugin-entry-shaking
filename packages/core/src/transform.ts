@@ -112,7 +112,7 @@ export async function transformImports(
 
   // Analyze the imported entities of the file.
   for (const { n: path, ss: startPosition, se: endPosition } of imports) {
-    const resolvedImport = path && (await ctx.resolver(path, id));
+    const resolvedImport = path && (await ctx.resolveEntryImport(path, id));
     const entry = resolvedImport && ctx.entries.get(resolvedImport);
     // If the active import is one of the targets, let's analyze it.
     if (entry) {
@@ -157,7 +157,7 @@ export async function getEntryImports(
     return await imports.reduce(
       async (out, importParams) => {
         const { n: importPath } = importParams;
-        const resolvedPath = importPath && (await ctx.resolver(importPath, id));
+        const resolvedPath = importPath && (await ctx.resolveEntryImport(importPath, id));
         if (resolvedPath && ctx.entries.has(resolvedPath)) (await out).push(resolvedPath);
         return out;
       },

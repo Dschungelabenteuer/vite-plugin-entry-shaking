@@ -25,14 +25,23 @@ export class Context {
   /** Vite resolver. */
   public resolver: ResolveFn;
 
+  /** Whether targets and entries have already been initialized. */
+  private initialized = false;
+
   /** Map of analyzed entries. */
   public entries: PluginEntries = new Map();
 
   /** Map of registered targets. */
   public targets: ExtendedTargets = new Map();
 
+  /** Set of target ids exactly as configured before importer-specific resolution. */
+  public targetSpecifiers = new Set<EntryPath>();
+
   /** Map of transformed importers indexed by the entry files they imported. */
   public entryImporters = new Map<EntryPath, Set<string>>();
+
+  /** Vite's dev server watcher. */
+  private watcher?: Pick<FSWatcher, 'add'>;
 
   /** Plugin's logger. */
   public logger: Logger;
@@ -73,6 +82,13 @@ export class Context {
 
   /**  Initializes the plugin context. */
   public async init() {
+    if (this.initialized) return;
+
+    this.targets = new Map();
+    this.targetSpecifiers.clear();
+    this.entries = new Map();
+    this.entryImporters.clear();
+
     await this.registerTargets();
     this.entries = await EntryAnalyzer.analyzeEntries(this);
     this.includeEntriesInWatcherOptions();
@@ -82,6 +98,86 @@ export class Context {
       this.eventBus = new EventBus();
       this.logger.getOntoEventBus(this.eventBus);
     }
+
+    this.initialized = true;
+  }
+
+  /**
+   * Replaces the resolver used by the plugin.
+   * This invalidates any analysis previously built with another resolver.
+   * @param resolver Final Vite/Rollup resolver.
+   */
+  public setResolver(resolver: ResolveFn) {
+    this.resolver = resolver;
+    this.initialized = false;
+    this.targets = new Map();
+    this.targetSpecifiers.clear();
+    this.entries = new Map();
+    this.entryImporters.clear();
+  }
+
+  /**
+   * Resolves and normalizes a module id through the active Vite resolver.
+   * @param id Imported id/specifier.
+   * @param importer Importer id.
+   * @param aliasOnly Whether only aliases should be resolved.
+   * @param ssr Whether the resolution is for SSR.
+   */
+  public async resolve(id: string, importer?: string, aliasOnly?: boolean, ssr?: boolean) {
+    const resolved = await this.resolver(id, importer, aliasOnly, ssr);
+    return resolved ? this.normalizeId(resolved) : undefined;
+  }
+
+  /**
+   * Normalizes a module id before using it as a target/entry cache key.
+   * @param id Module id.
+   */
+  public normalizeId(id: string) {
+    return normalizePath(parseId(id).url);
+  }
+
+  /**
+   * Resolves an import with its real importer and ensures configured targets are
+   * analyzed under the final resolved identity.
+   * @param importPath Import specifier from the importer source.
+   * @param importer Importer id.
+   */
+  public async resolveEntryImport(importPath: string, importer: string) {
+    const resolvedPath = await this.resolve(importPath, importer);
+    if (!resolvedPath) return;
+
+    if (this.entries.has(resolvedPath)) return resolvedPath;
+    if (!(await this.isResolvedTargetImport(importPath, importer, resolvedPath))) return;
+
+    this.logger.info(`Adding importer-resolved target "${importPath}" as "${resolvedPath}"`);
+    this.targets.set(resolvedPath, 0);
+    await EntryAnalyzer.analyzeEntry(this, resolvedPath, 0);
+    this.watcher?.add(resolvedPath);
+
+    return this.entries.has(resolvedPath) ? resolvedPath : undefined;
+  }
+
+  private async isResolvedTargetImport(importPath: string, importer: string, resolvedPath: string) {
+    if (this.isTargetSpecifier(importPath)) return true;
+
+    for (const targetSpecifier of this.targetSpecifiers) {
+      const resolvedTarget = await this.resolve(targetSpecifier, importer);
+      if (resolvedTarget === resolvedPath) return true;
+    }
+
+    return false;
+  }
+
+  private isTargetSpecifier(importPath: string) {
+    const normalizedImport = this.normalizeId(importPath);
+
+    for (const targetSpecifier of this.targetSpecifiers) {
+      if (targetSpecifier === importPath || this.normalizeId(targetSpecifier) === normalizedImport) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -90,12 +186,13 @@ export class Context {
    */
   public loadFile(id: string) {
     const { url, serveSource } = parseId(id);
-    const entry = this.entries.get(url);
+    const entryId = this.normalizeId(url);
+    const entry = this.entries.get(entryId);
 
     if (entry) {
       const version = serveSource ? 'original' : 'mutated';
       const output = serveSource ? entry.source : entry.updatedSource;
-      this.logger.info(`Serving ${version} version entry file ${url}`);
+      this.logger.info(`Serving ${version} version entry file ${entryId}`);
       return output;
     }
   }
@@ -235,6 +332,7 @@ export class Context {
    * @param watcher Vite's dev server watcher.
    */
   public watchEntryFiles(watcher: Pick<FSWatcher, 'add'>) {
+    this.watcher = watcher;
     const entryIds = [...this.entries.keys()];
     if (!entryIds.length) return;
 
@@ -245,7 +343,16 @@ export class Context {
   /** Registers targets from the plugin options. */
   private async registerTargets() {
     const paths = await Utils.getAllTargetPaths(this.options.targets);
-    this.targets = new Map(paths.map((path) => [path, 0]));
+    const targets: ExtendedTargets = new Map();
+
+    await Utils.parallelize(paths, async (path) => {
+      this.targetSpecifiers.add(path);
+      const resolvedPath = (await this.resolve(path)) ?? this.normalizeId(path);
+      this.logger.debug(`Registered target "${path}" as "${resolvedPath}"`);
+      targets.set(resolvedPath, 0);
+    });
+
+    this.targets = targets;
   }
 
   /** Determines whether a Vite module is one of the entry modules served by this plugin. */
