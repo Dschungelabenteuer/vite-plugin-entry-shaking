@@ -1,3 +1,3 @@
-import { ModeWatcher, ObjectValue, String } from '@cms/core/admin';
+import { ModeWatcher, ObjectValue, String } from 'mode-watcher';
 
 export const ConsumerValue = `${ModeWatcher}:${String}:${ObjectValue}`;

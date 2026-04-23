@@ -7,19 +7,29 @@ import { createEntryShakingPlugin } from '../src';
 
 const fixtureRoot = normalizePath(resolve(__dirname, '__mocks__/remap'));
 const consumerPath = normalizePath(resolve(fixtureRoot, 'consumer.ts'));
-const testConsumerPath = normalizePath(resolve(fixtureRoot, 'consumer-test.ts'));
+const modeWatcherConsumerPath = normalizePath(resolve(fixtureRoot, 'consumer-mode-watcher.ts'));
+const coreEntryPath = normalizePath(
+  resolve(fixtureRoot, 'node_modules/@cms/core/admin/dist/lib/index.ts'),
+);
+const coreModeWatcherPath = normalizePath(
+  resolve(fixtureRoot, 'node_modules/@cms/core/admin/dist/lib/mode-watcher.ts'),
+);
 const testEntryPath = normalizePath(
   resolve(fixtureRoot, 'node_modules/@cms/test/admin/dist/lib/index.ts'),
+);
+const testModeWatcherPath = normalizePath(
+  resolve(fixtureRoot, 'node_modules/@cms/test/admin/dist/lib/mode-watcher.ts'),
 );
 
 type RemapMode = 'package-entry' | 'concrete-file';
 
-function remapCmsCoreAdmin(mode: RemapMode): Plugin {
+function remapCmsCoreAdmin(mode: RemapMode, remapModeWatcher = false): Plugin {
   return {
     name: `test-remap-cms-core-admin-${mode}`,
     enforce: 'pre',
     async resolveId(id, importer) {
-      if (id !== '@cms/core/admin') return;
+      if (!importer) return null;
+      if (id !== '@cms/core/admin' && (!remapModeWatcher || id !== 'mode-watcher')) return;
 
       if (mode === 'concrete-file') return testEntryPath;
 
@@ -29,7 +39,11 @@ function remapCmsCoreAdmin(mode: RemapMode): Plugin {
   };
 }
 
-async function createFixtureServer(target: string, remapMode?: RemapMode) {
+async function createFixtureServer(
+  target: string,
+  remapMode?: RemapMode,
+  remapModeWatcher = false,
+) {
   return await createServer({
     appType: 'custom',
     configFile: false,
@@ -44,8 +58,8 @@ async function createFixtureServer(target: string, remapMode?: RemapMode) {
       middlewareMode: true,
     },
     plugins: [
-      ...(remapMode ? [remapCmsCoreAdmin(remapMode)] : []),
-      ...createEntryShakingPlugin({ targets: [target] }),
+      ...(remapMode ? [remapCmsCoreAdmin(remapMode, remapModeWatcher)] : []),
+      ...createEntryShakingPlugin({ maxWildcardDepth: 5, targets: [target] }),
     ],
   });
 }
@@ -54,16 +68,25 @@ function fsUrl(path: string) {
   return `/@fs/${path}`;
 }
 
-function expectCodeUsesTestEntry(code: string) {
-  expect(code).toContain('/node_modules/@cms/test/admin/dist/lib/object.ts');
-  expect(code).toContain('/node_modules/@cms/test/admin/dist/lib/index.ts');
-  expect(code).not.toContain('/node_modules/@cms/core/admin/dist/lib/object.ts');
-  expect(code).not.toContain('/node_modules/@cms/core/admin/dist/lib/index.ts');
+function expectCodeUsesPackage(code: string, packageName: 'core' | 'test') {
+  const otherPackageName = packageName === 'core' ? 'test' : 'core';
+  expect(code).toContain(`/node_modules/@cms/${packageName}/admin/dist/lib/ModeWatcher.svelte`);
+  expect(code).toContain(`/node_modules/@cms/${packageName}/admin/dist/lib/object.ts`);
+  expect(code).toContain(`/node_modules/@cms/${packageName}/admin/dist/lib/mode-watcher.ts`);
+  expect(code).not.toContain(`/node_modules/@cms/${otherPackageName}/admin/dist/lib/ModeWatcher.svelte`);
+  expect(code).not.toContain(`/node_modules/@cms/${otherPackageName}/admin/dist/lib/object.ts`);
+  expect(code).not.toContain(`/node_modules/@cms/${otherPackageName}/admin/dist/lib/index.ts`);
+  expect(code).not.toContain(`/node_modules/@cms/${otherPackageName}/admin/dist/lib/mode-watcher.ts`);
   expect(code).not.toContain('@cms_test_admin');
+  expect(code).toContain('default as ModeWatcher');
 }
 
-function expectEntryProvidesString(entry: string) {
-  expect(entry).toMatch(/export const String = ["']test-string["'];/);
+function expectEntryReexportsModeWatcher(entry: string, packageName: 'core' | 'test') {
+  expect(entry).toContain(`/node_modules/@cms/${packageName}/admin/dist/lib/mode-watcher.ts`);
+}
+
+function expectModeWatcherProvidesString(modeWatcher: string, packageName: 'core' | 'test') {
+  expect(modeWatcher).toMatch(new RegExp(`export const String = ["']${packageName}-string["'];`));
 }
 
 async function transformFile(server: ViteDevServer, path: string) {
@@ -81,13 +104,15 @@ describe('resolveId remapped package entries', () => {
   });
 
   it('preserves normal direct entry-shaking behavior without a remap', async () => {
-    server = await createFixtureServer('@cms/test/admin');
+    server = await createFixtureServer('@cms/core/admin');
 
-    const code = await transformFile(server, testConsumerPath);
-    const entry = await transformFile(server, testEntryPath);
+    const code = await transformFile(server, consumerPath);
+    const entry = await transformFile(server, coreEntryPath);
+    const modeWatcher = await transformFile(server, coreModeWatcherPath);
 
-    expectCodeUsesTestEntry(code);
-    expectEntryProvidesString(entry);
+    expectCodeUsesPackage(code, 'core');
+    expectEntryReexportsModeWatcher(entry, 'core');
+    expectModeWatcherProvidesString(modeWatcher, 'core');
   });
 
   it('uses the final resolved package entry before building and using its export map', async () => {
@@ -95,9 +120,11 @@ describe('resolveId remapped package entries', () => {
 
     const code = await transformFile(server, consumerPath);
     const entry = await transformFile(server, testEntryPath);
+    const modeWatcher = await transformFile(server, testModeWatcherPath);
 
-    expectCodeUsesTestEntry(code);
-    expectEntryProvidesString(entry);
+    expectCodeUsesPackage(code, 'test');
+    expectEntryReexportsModeWatcher(entry, 'test');
+    expectModeWatcherProvidesString(modeWatcher, 'test');
     expect(entry).not.toContain("export { ObjectValue } from './object';");
   });
 
@@ -106,8 +133,24 @@ describe('resolveId remapped package entries', () => {
 
     const code = await transformFile(server, consumerPath);
     const entry = await transformFile(server, testEntryPath);
+    const modeWatcher = await transformFile(server, testModeWatcherPath);
 
-    expectCodeUsesTestEntry(code);
-    expectEntryProvidesString(entry);
+    expectCodeUsesPackage(code, 'test');
+    expectEntryReexportsModeWatcher(entry, 'test');
+    expectModeWatcherProvidesString(modeWatcher, 'test');
+  });
+
+  it('rewrites a non-target source import when another plugin resolves it to a target package entry', async () => {
+    server = await createFixtureServer('@cms/core/admin', 'package-entry', true);
+
+    const code = await transformFile(server, modeWatcherConsumerPath);
+    const entry = await transformFile(server, testEntryPath);
+    const modeWatcher = await transformFile(server, testModeWatcherPath);
+
+    expectCodeUsesPackage(code, 'test');
+    expectEntryReexportsModeWatcher(entry, 'test');
+    expectModeWatcherProvidesString(modeWatcher, 'test');
+    expect(code).not.toContain('from "mode-watcher"');
+    expect(code).not.toContain("from 'mode-watcher'");
   });
 });

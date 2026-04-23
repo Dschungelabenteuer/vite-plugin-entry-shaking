@@ -34,8 +34,14 @@ export class Context {
   /** Map of registered targets. */
   public targets: ExtendedTargets = new Map();
 
+  /** Set of target ids exactly as configured before importer-specific resolution. */
+  public targetSpecifiers = new Set<EntryPath>();
+
   /** Map of transformed importers indexed by the entry files they imported. */
   public entryImporters = new Map<EntryPath, Set<string>>();
+
+  /** Vite's dev server watcher. */
+  private watcher?: Pick<FSWatcher, 'add'>;
 
   /** Plugin's logger. */
   public logger: Logger;
@@ -79,6 +85,7 @@ export class Context {
     if (this.initialized) return;
 
     this.targets = new Map();
+    this.targetSpecifiers.clear();
     this.entries = new Map();
     this.entryImporters.clear();
 
@@ -104,6 +111,7 @@ export class Context {
     this.resolver = resolver;
     this.initialized = false;
     this.targets = new Map();
+    this.targetSpecifiers.clear();
     this.entries = new Map();
     this.entryImporters.clear();
   }
@@ -126,6 +134,50 @@ export class Context {
    */
   public normalizeId(id: string) {
     return normalizePath(parseId(id).url);
+  }
+
+  /**
+   * Resolves an import with its real importer and ensures configured targets are
+   * analyzed under the final resolved identity.
+   * @param importPath Import specifier from the importer source.
+   * @param importer Importer id.
+   */
+  public async resolveEntryImport(importPath: string, importer: string) {
+    const resolvedPath = await this.resolve(importPath, importer);
+    if (!resolvedPath) return;
+
+    if (this.entries.has(resolvedPath)) return resolvedPath;
+    if (!(await this.isResolvedTargetImport(importPath, importer, resolvedPath))) return;
+
+    this.logger.info(`Adding importer-resolved target "${importPath}" as "${resolvedPath}"`);
+    this.targets.set(resolvedPath, 0);
+    await EntryAnalyzer.analyzeEntry(this, resolvedPath, 0);
+    this.watcher?.add(resolvedPath);
+
+    return this.entries.has(resolvedPath) ? resolvedPath : undefined;
+  }
+
+  private async isResolvedTargetImport(importPath: string, importer: string, resolvedPath: string) {
+    if (this.isTargetSpecifier(importPath)) return true;
+
+    for (const targetSpecifier of this.targetSpecifiers) {
+      const resolvedTarget = await this.resolve(targetSpecifier, importer);
+      if (resolvedTarget === resolvedPath) return true;
+    }
+
+    return false;
+  }
+
+  private isTargetSpecifier(importPath: string) {
+    const normalizedImport = this.normalizeId(importPath);
+
+    for (const targetSpecifier of this.targetSpecifiers) {
+      if (targetSpecifier === importPath || this.normalizeId(targetSpecifier) === normalizedImport) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -280,6 +332,7 @@ export class Context {
    * @param watcher Vite's dev server watcher.
    */
   public watchEntryFiles(watcher: Pick<FSWatcher, 'add'>) {
+    this.watcher = watcher;
     const entryIds = [...this.entries.keys()];
     if (!entryIds.length) return;
 
@@ -293,6 +346,7 @@ export class Context {
     const targets: ExtendedTargets = new Map();
 
     await Utils.parallelize(paths, async (path) => {
+      this.targetSpecifiers.add(path);
       const resolvedPath = (await this.resolve(path)) ?? this.normalizeId(path);
       this.logger.debug(`Registered target "${path}" as "${resolvedPath}"`);
       targets.set(resolvedPath, 0);

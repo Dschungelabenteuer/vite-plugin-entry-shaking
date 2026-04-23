@@ -313,6 +313,22 @@ async function resolveImportedCircularEntities(
       });
 
       entityMap.set(resolvedPath, [...(entityMap.get(resolvedPath) ?? []), resolvedImports]);
+      continue;
+    }
+
+    const currentEntryExport = originalEntry.exports.get(name);
+    if (currentEntryExport) {
+      const resolvedPath = currentEntryExport.selfDefined
+        ? path
+        : await ctx.resolve(currentEntryExport.path, path);
+      if (!resolvedPath) continue;
+
+      const resolvedImports = methods.formatImportReplacement({
+        ...currentEntryExport,
+        name,
+        alias,
+      });
+      entityMap.set(resolvedPath, [...(entityMap.get(resolvedPath) ?? []), resolvedImports]);
     }
   }
 
