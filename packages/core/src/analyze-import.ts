@@ -81,7 +81,7 @@ async function getImportsMap(
     const found = await methods.resolveImport(ctx, entry, entryPath, map, name, alias);
     if (found) return;
 
-    map.set(entryPath, [...(map.get(entryPath) ?? []), { name, importDefault: false }]);
+    map.set(entryPath, [...(map.get(entryPath) ?? []), { name, importDefault: false, alias }]);
   });
 
   return map;
