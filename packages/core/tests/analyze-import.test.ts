@@ -297,6 +297,19 @@ describe('getImportsMap', async () => {
     expect(_(output)).toStrictEqual({
       importDefault: false,
       name: 'test',
+      alias: undefined,
+    });
+  });
+
+  it('should correctly feed the import map when [importing with alias] a named entity [directly defined in entry]', async () => {
+    const imports: string[] = ['test as T'];
+    const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a')))!;
+    const output = await ImportAnalyzer.getImportsMap(ctx, entry, entryPath, imports);
+    expect(output.size).toStrictEqual(1);
+    expect(_(output)).toStrictEqual({
+      importDefault: false,
+      name: 'test',
+      alias: 'T',
     });
   });
 });
