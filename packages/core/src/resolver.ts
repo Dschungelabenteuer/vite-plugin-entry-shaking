@@ -89,7 +89,6 @@ export class Resolver {
     );
     this.context.targets.set(resolvedPath, 0);
     await EntryAnalyzer.analyzeEntry(this.context, resolvedPath, 0);
-    this.context.hmr.watchEntryFile(resolvedPath);
 
     return this.context.entries.has(resolvedPath) ? resolvedPath : undefined;
   }

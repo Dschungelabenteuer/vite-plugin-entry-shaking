@@ -23,12 +23,16 @@ const testModeWatcherPath = normalizePath(
 
 type RemapMode = 'package-entry' | 'concrete-file';
 
-function remapCmsCoreAdmin(mode: RemapMode, remapModeWatcher = false): Plugin {
+function remapCmsCoreAdmin(
+  mode: RemapMode,
+  remapModeWatcher = false,
+  remapTopLevel = false,
+): Plugin {
   return {
     name: `test-remap-cms-core-admin-${mode}`,
     enforce: 'pre',
     async resolveId(id, importer) {
-      if (!importer) return null;
+      if (!importer && !remapTopLevel) return null;
       if (id !== '@cms/core/admin' && (!remapModeWatcher || id !== 'mode-watcher')) return;
 
       if (mode === 'concrete-file') return testEntryPath;
@@ -43,6 +47,7 @@ async function createFixtureServer(
   target: string,
   remapMode?: RemapMode,
   remapModeWatcher = false,
+  remapTopLevel = false,
 ) {
   return await createServer({
     appType: 'custom',
@@ -58,7 +63,7 @@ async function createFixtureServer(
       middlewareMode: true,
     },
     plugins: [
-      ...(remapMode ? [remapCmsCoreAdmin(remapMode, remapModeWatcher)] : []),
+      ...(remapMode ? [remapCmsCoreAdmin(remapMode, remapModeWatcher, remapTopLevel)] : []),
       ...createEntryShakingPlugin({ maxWildcardDepth: 5, targets: [target] }),
     ],
   });
@@ -138,6 +143,22 @@ describe('resolveId remapped package entries', () => {
     expectCodeUsesPackage(code, 'test');
     expectEntryReexportsModeWatcher(entry, 'test');
     expectModeWatcherProvidesString(modeWatcher, 'test');
+  });
+
+  it('registers top-level targets through the final plugin container resolver', async () => {
+    server = await createFixtureServer('@cms/core/admin', 'concrete-file', false, true);
+
+    expect(server.watcher.options.ignored).toContain(`!${testEntryPath}`);
+    expect(server.watcher.options.ignored).not.toContain(`!${coreEntryPath}`);
+  });
+
+  it('watches importer-resolved entries and their late wildcard entries', async () => {
+    server = await createFixtureServer('@cms/core/admin', 'package-entry');
+
+    await transformFile(server, consumerPath);
+
+    expect(server.watcher.options.ignored).toContain(`!${testEntryPath}`);
+    expect(server.watcher.options.ignored).toContain(`!${testModeWatcherPath}`);
   });
 
   it('rewrites a non-target source import when another plugin resolves it to a target package entry', async () => {

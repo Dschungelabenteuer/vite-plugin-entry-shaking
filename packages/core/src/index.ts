@@ -1,4 +1,4 @@
-import type { ModuleNode, Plugin, ResolvedConfig, ViteDevServer } from 'vite';
+import type { ModuleNode, Plugin, ResolvedConfig } from 'vite';
 import type {
   Diagnostic,
   PluginMetrics,
@@ -59,15 +59,16 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin[] {
       apply: 'serve',
       enforce: 'post',
 
-      async configResolved(config) {
+      configResolved(config) {
         // @ts-expect-error Who hijacks last hijacks best
         config.createResolver = originalCreateResolver;
         context = new Context(options, config);
-        await context.init();
+        context.hmr.includeEntriesInWatcherOptions();
       },
 
       async configureServer(server) {
-        context.resolver.usePluginContainer(server as Partial<ViteDevServer>);
+        context.resolver.usePluginContainer(server);
+        await context.init();
         context.hmr.watchEntryFiles(server.watcher);
 
         if (context.options.debug) {
@@ -76,15 +77,18 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin[] {
         }
       },
 
-      load(id) {
+      async load(id) {
+        await context.init();
         return context.loadFile(id);
       },
 
       async transform(code, id) {
+        await context.init();
         return await context.transformFile(code, id);
       },
 
       async handleHotUpdate({ file, modules, server, timestamp }) {
+        await context.init();
         const isEntryUpdate = await context.hmr.checkUpdate(file);
 
         if (!isEntryUpdate) return;

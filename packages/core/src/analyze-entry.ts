@@ -50,12 +50,15 @@ async function analyzeEntries(ctx: Context): Promise<PluginEntries> {
 async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number): Promise<Duration> {
   if (ctx.entries.has(entryPath)) return [0, 0];
 
-  return await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e: unknown) => {
+  const duration = await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e: unknown) => {
     const message = `Could not analyze entry file "${entryPath}"`;
     console.error(e);
     ctx.logger.error(message);
     throw new Error(message);
   });
+
+  ctx.hmr.watchEntryFile(entryPath);
+  return duration;
 }
 
 /**

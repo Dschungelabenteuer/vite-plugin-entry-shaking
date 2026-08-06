@@ -31,6 +31,9 @@ export class Context {
   /** Map of analyzed entries. */
   public entries: PluginEntries = new Map();
 
+  /** Whether targets and entries have already been initialized. */
+  private initialized = false;
+
   /** Map of registered targets. */
   public targets: ExtendedTargets = new Map();
 
@@ -74,15 +77,18 @@ export class Context {
 
   /** Initializes the plugin context. */
   public async init() {
+    if (this.initialized) return;
+
     await this.resolver.registerTargets();
     this.entries = await EntryAnalyzer.analyzeEntries(this);
-    this.hmr.includeEntriesInWatcherOptions();
 
     if (this.options.debug) {
       const { EventBus } = await loadEventBus();
       this.eventBus = new EventBus();
       this.logger.getOntoEventBus(this.eventBus);
     }
+
+    this.initialized = true;
   }
 
   /**

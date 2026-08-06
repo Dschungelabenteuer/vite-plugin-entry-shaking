@@ -10,8 +10,11 @@ export class HMR {
   /** Map of transformed importers indexed by the entry files they imported. */
   public entryImporters = new Map<EntryPath, Set<string>>();
 
+  /** Entry files registered for explicit watching. */
+  private watchedEntries = new Set<EntryPath>();
+
   /** Vite's dev server watcher. */
-  private watcher?: Pick<FSWatcher, 'add'>;
+  private watcher?: Pick<FSWatcher, 'add' | 'options'>;
 
   constructor(private context: Context) {}
 
@@ -118,22 +121,28 @@ export class HMR {
 
   /** Ensures Vite's dev watcher does not ignore registered entry files. */
   public includeEntriesInWatcherOptions() {
-    const serverConfig = (this.context.config as { server?: ResolvedConfig['server'] }).server;
-    const watchOptions = serverConfig?.watch;
+    const watchOptions = this.getWatchOptions();
     if (!watchOptions) return;
 
     const ignored = watchOptions.ignored;
     const ignoredList = Array.isArray(ignored) ? ignored : ignored ? [ignored] : [];
-    watchOptions.ignored = [...this.getEntryWatchIgnoreExceptions(), ...ignoredList];
+    const exceptions = this.getEntryWatchIgnoreExceptions();
+    const exceptionSet = new Set(exceptions);
+    watchOptions.ignored = [
+      ...exceptions,
+      ...ignoredList.filter((pattern) => typeof pattern !== 'string' || !exceptionSet.has(pattern)),
+    ];
   }
 
   /**
    * Adds registered entry files to Vite's dev watcher.
    * @param watcher Vite's dev server watcher.
    */
-  public watchEntryFiles(watcher: Pick<FSWatcher, 'add'>) {
+  public watchEntryFiles(watcher: Pick<FSWatcher, 'add' | 'options'>) {
     this.watcher = watcher;
-    const entryIds = [...this.context.entries.keys()];
+    const entryIds = [...new Set([...this.context.entries.keys(), ...this.watchedEntries])].map(
+      (entryId) => this.registerEntryForWatching(entryId),
+    );
     if (!entryIds.length) return;
 
     this.context.logger.info(`Watching ${entryIds.length} entry file(s) for HMR`);
@@ -145,7 +154,8 @@ export class HMR {
    * @param entryId Resolved entry id.
    */
   public watchEntryFile(entryId: EntryPath) {
-    this.watcher?.add(entryId);
+    const normalizedEntryId = this.registerEntryForWatching(entryId);
+    this.watcher?.add(normalizedEntryId);
   }
 
   /** Determines whether a Vite module is one of the entry modules served by this plugin. */
@@ -163,7 +173,44 @@ export class HMR {
 
   /** Returns negative ignored patterns for entry files watched explicitly by this plugin. */
   private getEntryWatchIgnoreExceptions() {
-    return [...this.context.entries.keys()].map((entryId) => `!${entryId}`);
+    return [...new Set([...this.context.entries.keys(), ...this.watchedEntries])].map(
+      (entryId) => `!${entryId}`,
+    );
+  }
+
+  /** Registers an entry with the live watcher keep policy. */
+  private registerEntryForWatching(entryId: EntryPath) {
+    const normalizedEntryId = normalizePath(parseId(entryId).url);
+    this.watchedEntries.add(normalizedEntryId);
+    this.addEntryWatchIgnoreException(normalizedEntryId);
+    return normalizedEntryId;
+  }
+
+  /** Adds an entry exception to the configured and active watcher options. */
+  private addEntryWatchIgnoreException(entryId: EntryPath) {
+    const exception = `!${entryId}`;
+    const watchOptions = this.getWatchOptions();
+
+    if (watchOptions) {
+      const ignored = watchOptions.ignored;
+      const ignoredList = Array.isArray(ignored) ? ignored : ignored ? [ignored] : [];
+      if (!ignoredList.includes(exception)) {
+        watchOptions.ignored = [exception, ...ignoredList];
+      }
+    }
+
+    const activeIgnored = this.watcher?.options.ignored;
+    if (Array.isArray(activeIgnored) && !activeIgnored.includes(exception)) {
+      activeIgnored.unshift(exception);
+    }
+  }
+
+  /** Returns Vite's configured watcher options when file watching is enabled. */
+  private getWatchOptions() {
+    const serverConfig = (this.context.config as { server?: ResolvedConfig['server'] }).server;
+    if (!serverConfig || serverConfig.watch === null) return;
+
+    return (serverConfig.watch ??= {});
   }
 
   /** Returns transformed importer ids that depended on the given entry analysis. */

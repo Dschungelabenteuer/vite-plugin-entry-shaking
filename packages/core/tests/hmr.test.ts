@@ -134,8 +134,39 @@ describe('HMR', () => {
     const add = vi.fn();
     ctx.entries = new Map([[entryId, createMockEntryData()]]);
 
-    ctx.hmr.watchEntryFiles({ add });
+    const watcher = { add, options: { ignored: [] } };
+    ctx.hmr.watchEntryFiles(watcher);
 
     expect(add).toHaveBeenCalledWith([entryId]);
+    expect(watcher.options.ignored).toStrictEqual([`!${entryId}`]);
+  });
+
+  it('should keep late entries out of ignored paths before adding them to Vite watcher', async () => {
+    const ctx = await createTestContext({ targets: [] });
+    const add = vi.fn();
+    const lateEntryId = '/path/to/node_modules/late-entry.ts';
+    const watcher = {
+      add,
+      options: { ignored: ['**/node_modules/**'] },
+    };
+
+    ctx.hmr.watchEntryFiles(watcher);
+    ctx.hmr.watchEntryFile(lateEntryId);
+
+    expect(watcher.options.ignored).toStrictEqual([`!${lateEntryId}`, '**/node_modules/**']);
+    expect(add).toHaveBeenLastCalledWith(lateEntryId);
+  });
+
+  it('should watch entries registered before the Vite watcher is available', async () => {
+    const ctx = await createTestContext({ targets: [] });
+    const add = vi.fn();
+    const earlyEntryId = '/path/to/node_modules/early-entry.ts';
+    const watcher = { add, options: { ignored: ['**/node_modules/**'] } };
+
+    ctx.hmr.watchEntryFile(earlyEntryId);
+    ctx.hmr.watchEntryFiles(watcher);
+
+    expect(add).toHaveBeenCalledWith([earlyEntryId]);
+    expect(watcher.options.ignored).toContain(`!${earlyEntryId}`);
   });
 });

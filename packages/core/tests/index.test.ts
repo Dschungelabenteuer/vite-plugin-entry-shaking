@@ -30,6 +30,7 @@ const createServer = (modules: ModuleNode[]) => {
     moduleGraph,
     watcher: {
       add,
+      options: { ignored: [] },
     },
     ws: {
       send,
