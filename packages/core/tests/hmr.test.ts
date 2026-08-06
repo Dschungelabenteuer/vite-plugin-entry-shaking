@@ -12,7 +12,7 @@ const createModule = (id: string, file = id.split('?')[0]) =>
     url: id,
   }) as ModuleNode;
 
-describe('Context HMR utilities', () => {
+describe('HMR', () => {
   const entryId = '/path/to/entry.ts';
 
   beforeEach(() => {
@@ -24,10 +24,10 @@ describe('Context HMR utilities', () => {
     ctx.entries = new Map([[entryId, createMockEntryData()]]);
     vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockResolvedValue([0, 0]);
 
-    await expect(ctx.checkUpdate(addSourceQuerySuffix(entryId))).resolves.toStrictEqual(true);
+    await expect(ctx.hmr.checkUpdate(addSourceQuerySuffix(entryId))).resolves.toStrictEqual(true);
     expect(EntryAnalyzer.doAnalyzeEntry).toHaveBeenCalledWith(ctx, entryId, 0);
 
-    await expect(ctx.checkUpdate('/path/to/other.ts')).resolves.toStrictEqual(false);
+    await expect(ctx.hmr.checkUpdate('/path/to/other.ts')).resolves.toStrictEqual(false);
     expect(EntryAnalyzer.doAnalyzeEntry).toHaveBeenCalledTimes(1);
   });
 
@@ -35,11 +35,11 @@ describe('Context HMR utilities', () => {
     const ctx = await createTestContext({ targets: [] });
     ctx.entries = new Map([[entryId, createMockEntryData()]]);
 
-    expect(ctx.getHotUpdateModuleIds(entryId)).toStrictEqual([
+    expect(ctx.hmr.getHotUpdateModuleIds(entryId)).toStrictEqual([
       entryId,
       addSourceQuerySuffix(entryId),
     ]);
-    expect(ctx.getHotUpdateModuleIds('/path/to/other.ts')).toStrictEqual([]);
+    expect(ctx.hmr.getHotUpdateModuleIds('/path/to/other.ts')).toStrictEqual([]);
   });
 
   it('should collect entry modules and plugin source variants from Vite module graph', async () => {
@@ -61,7 +61,11 @@ describe('Context HMR utilities', () => {
 
     ctx.entries = new Map([[entryId, createMockEntryData()]]);
 
-    const modules = ctx.getHotUpdateModules(entryId, [normalModule, unrelatedModule], moduleGraph);
+    const modules = ctx.hmr.getHotUpdateModules(
+      entryId,
+      [normalModule, unrelatedModule],
+      moduleGraph,
+    );
 
     expect(new Set(modules)).toStrictEqual(new Set([normalModule, sourceModule]));
     expect(moduleGraph.getModulesByFile).toHaveBeenCalledWith(entryId);
@@ -84,9 +88,9 @@ describe('Context HMR utilities', () => {
     } as Pick<ModuleGraph, 'getModuleById' | 'getModulesByFile'>;
 
     ctx.entries = new Map([[entryId, createMockEntryData()]]);
-    ctx.registerEntryImporter(importerId, [entryId]);
+    ctx.hmr.registerEntryImporter(importerId, [entryId]);
 
-    const modules = ctx.getHotUpdateModules(entryId, [normalModule], moduleGraph);
+    const modules = ctx.hmr.getHotUpdateModules(entryId, [normalModule], moduleGraph);
 
     expect(new Set(modules)).toStrictEqual(new Set([normalModule, importerModule]));
     expect(moduleGraph.getModuleById).toHaveBeenCalledWith(importerId);
@@ -101,24 +105,26 @@ describe('Context HMR utilities', () => {
       [otherEntryId, createMockEntryData()],
     ]);
 
-    ctx.registerEntryImporter(importerId, [entryId]);
-    ctx.registerEntryImporter(importerId, [otherEntryId]);
+    ctx.hmr.registerEntryImporter(importerId, [entryId]);
+    ctx.hmr.registerEntryImporter(importerId, [otherEntryId]);
 
-    expect(ctx.entryImporters.get(entryId)).toBeUndefined();
-    expect(ctx.entryImporters.get(otherEntryId)).toStrictEqual(new Set([importerId]));
+    expect(ctx.hmr.entryImporters.get(entryId)).toBeUndefined();
+    expect(ctx.hmr.entryImporters.get(otherEntryId)).toStrictEqual(new Set([importerId]));
   });
 
   it('should add entry exceptions to Vite watcher ignored options', async () => {
     const ctx = await createTestContext({ targets: [] });
     const existingIgnore = /existing/;
     ctx.entries = new Map([[entryId, createMockEntryData()]]);
-    ctx.config.server = {
-      watch: {
-        ignored: existingIgnore,
+    Object.assign(ctx.config, {
+      server: {
+        watch: {
+          ignored: existingIgnore,
+        },
       },
-    } as any;
+    });
 
-    ctx.includeEntriesInWatcherOptions();
+    ctx.hmr.includeEntriesInWatcherOptions();
 
     expect(ctx.config.server.watch?.ignored).toStrictEqual([`!${entryId}`, existingIgnore]);
   });
@@ -128,7 +134,7 @@ describe('Context HMR utilities', () => {
     const add = vi.fn();
     ctx.entries = new Map([[entryId, createMockEntryData()]]);
 
-    ctx.watchEntryFiles({ add });
+    ctx.hmr.watchEntryFiles({ add });
 
     expect(add).toHaveBeenCalledWith([entryId]);
   });

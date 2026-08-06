@@ -59,29 +59,16 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin[] {
       apply: 'serve',
       enforce: 'post',
 
-      configResolved(config) {
+      async configResolved(config) {
         // @ts-expect-error Who hijacks last hijacks best
         config.createResolver = originalCreateResolver;
         context = new Context(options, config);
+        await context.init();
       },
 
       async configureServer(server) {
-        const fallbackResolver = context.resolver;
-        const { pluginContainer } = server as Partial<ViteDevServer>;
-
-        if (pluginContainer) {
-          context.setResolver(async (id, importer, aliasOnly, ssr) => {
-            if (aliasOnly) return await fallbackResolver(id, importer, aliasOnly, ssr);
-
-            const resolved = await pluginContainer.resolveId(id, importer, { ssr });
-            if (resolved) return typeof resolved === 'string' ? resolved : resolved.id;
-
-            return await fallbackResolver(id, importer, aliasOnly, ssr);
-          });
-        }
-
-        await context.init();
-        context.watchEntryFiles(server.watcher);
+        context.resolver.usePluginContainer(server as Partial<ViteDevServer>);
+        context.hmr.watchEntryFiles(server.watcher);
 
         if (context.options.debug) {
           const { attachDebugger } = await loadDebugger();
@@ -89,30 +76,28 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin[] {
         }
       },
 
-      async load(id) {
-        await context.init();
+      load(id) {
         return context.loadFile(id);
       },
 
       async transform(code, id) {
-        await context.init();
         return await context.transformFile(code, id);
       },
 
       async handleHotUpdate({ file, modules, server, timestamp }) {
-        await context.init();
-        const isEntryUpdate = await context.checkUpdate(file);
+        const isEntryUpdate = await context.hmr.checkUpdate(file);
 
         if (!isEntryUpdate) return;
 
-        const affectedModules = context.getHotUpdateModules(file, modules, server.moduleGraph);
+        const affectedModules = context.hmr.getHotUpdateModules(file, modules, server.moduleGraph);
         const invalidatedModules = new Set<ModuleNode>();
 
         for (const module of affectedModules) {
           server.moduleGraph.invalidateModule(module, invalidatedModules, timestamp, true);
         }
 
-        // Import rewrites can remove the graph edge from consumers back to the entry.
+        // Rewritten imports bypass the entry module, so Vite cannot propagate its update
+        // to every consumer through the module graph. Reload to execute the new imports.
         server.ws.send({ type: 'full-reload' });
         return [];
       },

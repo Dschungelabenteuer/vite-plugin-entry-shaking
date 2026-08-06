@@ -60,7 +60,7 @@ export async function transformImportsIfNeeded(
   const entriesMatched = importedEntries.length;
   const { transformImports: transform } = methods;
   if (!entriesMatched) {
-    ctx.unregisterEntryImporter(id);
+    ctx.hmr.unregisterEntryImporter(id);
     const ignoredMessage = `Did not transform "${id}" because it does not import any registered target`;
     ctx.logger.debug(ignoredMessage, undefined);
     return;
@@ -75,7 +75,7 @@ export async function transformImportsIfNeeded(
     `Transforming file "${id}"`,
     async () => await transform(ctx, id, code, imports, exports),
   );
-  ctx.registerEntryImporter(id, importedEntries);
+  ctx.hmr.registerEntryImporter(id, importedEntries);
 
   ctx.eventBus?.emit('registerTransform', {
     id,
@@ -112,7 +112,7 @@ export async function transformImports(
 
   // Analyze the imported entities of the file.
   for (const { n: path, ss: startPosition, se: endPosition } of imports) {
-    const resolvedImport = path && (await ctx.resolveEntryImport(path, id));
+    const resolvedImport = path && (await ctx.resolver.resolveEntryImport(path, id));
     const entry = resolvedImport && ctx.entries.get(resolvedImport);
     // If the active import is one of the targets, let's analyze it.
     if (entry) {
@@ -157,7 +157,7 @@ export async function getEntryImports(
     return await imports.reduce(
       async (out, importParams) => {
         const { n: importPath } = importParams;
-        const resolvedPath = importPath && (await ctx.resolveEntryImport(importPath, id));
+        const resolvedPath = importPath && (await ctx.resolver.resolveEntryImport(importPath, id));
         if (resolvedPath && ctx.entries.has(resolvedPath)) (await out).push(resolvedPath);
         return out;
       },

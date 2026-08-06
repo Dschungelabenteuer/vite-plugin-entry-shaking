@@ -322,8 +322,8 @@ async function registerWildcardImportIfNeeded(
   depth: number,
 ): Promise<Duration> {
   return await ctx.timer.time(`Wilcard import analysis`, async (nonselfTime) => {
-    const normalizedPath = ctx.normalizeId(path);
-    const resolvedPath = (await ctx.resolve(path, importedFrom)) ?? normalizedPath;
+    const normalizedPath = ctx.resolver.normalizeId(path);
+    const resolvedPath = (await ctx.resolver.resolve(path, importedFrom)) ?? normalizedPath;
     const importsEntry = ctx.targets.get(resolvedPath) === 0 || ctx.targets.get(normalizedPath) === 0;
     const maxDepthReached = depth >= ctx.options.maxWildcardDepth;
 
@@ -369,7 +369,7 @@ async function registerWildcardImport(
   depth: number,
 ): Promise<Duration> {
   return await ctx.timer.time('Register wildcard import', async (nonselfTime) => {
-    const resolvedPath = await ctx.resolve(path, importedFrom);
+    const resolvedPath = await ctx.resolver.resolve(path, importedFrom);
     if (!resolvedPath || ctx.targets.has(resolvedPath)) return nonselfTime;
     ctx.logger.info(`Adding implicit target "${path}" because of a wildcard at "${importedFrom}"`);
     ctx.targets.set(resolvedPath, depth);

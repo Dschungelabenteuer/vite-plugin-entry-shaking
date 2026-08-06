@@ -386,7 +386,7 @@ describe('findNamedImport', () => {
     const ctx = await createTestContext({ targets: [] });
     const entry = { exports: new Map([[name, { path: 'path/to/export' }]]) } as EntryData;
     const map = new Map() as TargetImports;
-    vi.spyOn(ctx, 'resolver').mockImplementationOnce(() => Promise.resolve(resolvedPath));
+    vi.spyOn(ctx.resolver, 'resolve').mockImplementationOnce(() => Promise.resolve(resolvedPath));
 
     const output = await ImportAnalyzer.findNamedImport(ctx, entry, entryPath, map, name, alias);
 
@@ -402,7 +402,7 @@ describe('findNamedImport', () => {
     const ctx = await createTestContext({ targets: [] });
     const entry = { exports: new Map([[name, { path: 'path/to/export' }]]) } as EntryData;
     const map = new Map([[resolvedPath, [{ name: 'first' }]]]) as TargetImports;
-    vi.spyOn(ctx, 'resolver').mockImplementationOnce(() => Promise.resolve(resolvedPath));
+    vi.spyOn(ctx.resolver, 'resolve').mockImplementationOnce(() => Promise.resolve(resolvedPath));
 
     const output = await ImportAnalyzer.findNamedImport(ctx, entry, entryPath, map, name, alias);
 
@@ -450,7 +450,7 @@ describe('findNamedWildcard', () => {
     const entry = { wildcardExports: { named: new Map([[name, {} as any]]) } } as EntryData;
     const map = new Map() as TargetImports;
 
-    vi.spyOn(ctx, 'resolver').mockImplementationOnce(() => Promise.resolve(resolvedPath));
+    vi.spyOn(ctx.resolver, 'resolve').mockImplementationOnce(() => Promise.resolve(resolvedPath));
     const output = await ImportAnalyzer.findNamedWildcard(ctx, entry, entryPath, map, name);
 
     expect(output).toStrictEqual(undefined);
@@ -465,7 +465,7 @@ describe('findNamedWildcard', () => {
     ctx.entries = new Map([[resolvedPath, {} as EntryData]]);
     const entry = { wildcardExports: { named: new Map([[name, {} as any]]) } } as EntryData;
     const map = new Map() as TargetImports;
-    vi.spyOn(ctx, 'resolver').mockImplementationOnce(() => Promise.resolve(resolvedPath));
+    vi.spyOn(ctx.resolver, 'resolve').mockImplementationOnce(() => Promise.resolve(resolvedPath));
 
     const output = await ImportAnalyzer.findNamedWildcard(ctx, entry, entryPath, map, name);
 
@@ -481,7 +481,7 @@ describe('findNamedWildcard', () => {
     ctx.entries = new Map([[resolvedPath, {} as EntryData]]);
     const entry = { wildcardExports: { named: new Map([[name, {} as any]]) } } as EntryData;
     const map = new Map([[resolvedPath, [{ name: 'first' }]]]) as TargetImports;
-    vi.spyOn(ctx, 'resolver').mockImplementationOnce(() => Promise.resolve(resolvedPath));
+    vi.spyOn(ctx.resolver, 'resolve').mockImplementationOnce(() => Promise.resolve(resolvedPath));
 
     const output = await ImportAnalyzer.findNamedWildcard(ctx, entry, entryPath, map, name);
 
@@ -521,7 +521,7 @@ describe('findDirectWildcardExports', () => {
     ctx.entries = new Map([[resolvedPath, { exports: new Map([[name, {}]]) } as EntryData]]);
     const entry = { wildcardExports: { direct: ['path/to/import'] as string[] } } as EntryData;
     const map = new Map() as TargetImports;
-    vi.spyOn(ctx, 'resolver').mockImplementationOnce(() => Promise.resolve(resolvedPath));
+    vi.spyOn(ctx.resolver, 'resolve').mockImplementationOnce(() => Promise.resolve(resolvedPath));
 
     const fn = ImportAnalyzer.findDirectWildcardExports;
     const output = await fn(ctx, entry, entryPath, map, name, alias);
@@ -540,7 +540,7 @@ describe('findDirectWildcardExports', () => {
     ctx.entries = new Map([[resolvedPath, { exports: new Map([[name, {}]]) } as EntryData]]);
     const entry = { wildcardExports: { direct: ['path/to/import'] as string[] } } as EntryData;
     const map = new Map() as TargetImports;
-    vi.spyOn(ctx, 'resolver').mockImplementationOnce(() => Promise.resolve(resolvedPath));
+    vi.spyOn(ctx.resolver, 'resolve').mockImplementationOnce(() => Promise.resolve(resolvedPath));
 
     const fn = ImportAnalyzer.findDirectWildcardExports;
     const output = await fn(ctx, entry, entryPath, map, name, alias);
@@ -562,7 +562,7 @@ describe('findDirectWildcardExports', () => {
       ]);
       const entry = { wildcardExports: { direct: ['path/to/import'] as string[] } } as EntryData;
       const map = new Map() as TargetImports;
-      vi.spyOn(ctx, 'resolver').mockImplementationOnce(() => Promise.resolve(resolvedPath));
+      vi.spyOn(ctx.resolver, 'resolve').mockImplementationOnce(() => Promise.resolve(resolvedPath));
       vi.spyOn(ImportAnalyzer, 'resolveImport').mockImplementationOnce(() => Promise.resolve(true));
 
       const fn = ImportAnalyzer.findDirectWildcardExports;
@@ -583,7 +583,7 @@ describe('findDirectWildcardExports', () => {
       ]);
       const entry = { wildcardExports: { direct: ['path/to/import'] as string[] } } as EntryData;
       const map = new Map() as TargetImports;
-      vi.spyOn(ctx, 'resolver').mockImplementationOnce(() => Promise.resolve(resolvedPath));
+      vi.spyOn(ctx.resolver, 'resolve').mockImplementationOnce(() => Promise.resolve(resolvedPath));
       vi.spyOn(ImportAnalyzer, 'resolveImport').mockImplementationOnce(() =>
         Promise.resolve(false),
       );
@@ -649,9 +649,46 @@ describe('resolveImportedEntities', () => {
   });
 });
 
-/** Let's rely on syntax-related integration tests for now, it seems exhausting testing this. */
-describe.todo('resolveImportedCircularEntities', () => {
-  // …
+describe('resolveImportedCircularEntities', () => {
+  it('should preserve the requested binding name when resolving an aliased re-export', async () => {
+    const entryPath = '/entry.ts';
+    const sourcePath = '/source.ts';
+    const ctx = await createTestContext({ targets: [] });
+    ctx.entries = new Map([
+      [
+        entryPath,
+        {
+          exports: new Map([
+            [
+              'entryName',
+              {
+                path: sourcePath,
+                importDefault: false,
+                originalName: 'sourceName',
+              },
+            ],
+          ]),
+        } as EntryData,
+      ],
+    ]);
+    vi.spyOn(ctx.resolver, 'resolve').mockResolvedValue(sourcePath);
+
+    const output = await ImportAnalyzer.resolveImportedCircularEntities(
+      ctx,
+      [
+        {
+          name: 'publicName',
+          originalName: 'entryName',
+          importDefault: false,
+        },
+      ],
+      entryPath,
+    );
+
+    expect(output).toStrictEqual([
+      `import { sourceName as publicName } from '${sourcePath}'`,
+    ]);
+  });
 });
 
 describe('formatImportReplacement', () => {
