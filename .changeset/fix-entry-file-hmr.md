@@ -1,5 +1,5 @@
 ---
-'vite-plugin-entry-shaking': patch
+'vite-plugin-entry-shaking': minor
 ---
 
 Fixed HMR for registered entry files by watching analyzed entries, re-analyzing changed entries, and invalidating transformed importers that depended on stale entry analysis.
