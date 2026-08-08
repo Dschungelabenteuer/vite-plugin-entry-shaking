@@ -1,11 +1,11 @@
-import type { ResolveFn, ResolvedConfig } from 'vite';
+import type { ResolvedConfig } from 'vite';
 import type { EventBus } from './event-bus';
 import type {
+  DebuggerEvents,
   ExtendedTargets,
+  FinalPluginOptions,
   PluginEntries,
   PluginMetrics,
-  FinalPluginOptions,
-  DebuggerEvents,
 } from './types';
 
 import { Logger } from './logger';
@@ -13,18 +13,26 @@ import { Logger } from './logger';
 import EntryAnalyzer from './analyze-entry';
 import { parseId } from './urls';
 import { transformIfNeeded } from './transform';
-import Utils, { loadEventBus } from './utils';
+import { loadEventBus } from './utils';
 import { extensions } from './options';
 import { Diagnostics } from './diagnostics';
+import { HMR } from './hmr';
+import { Resolver } from './resolver';
 import { Timer } from './timer';
 
 /** Plugin's context. */
 export class Context {
-  /** Vite resolver. */
-  public resolver: ResolveFn;
+  /** Plugin's resolver utilities. */
+  public resolver: Resolver;
+
+  /** Plugin's HMR utilities. */
+  public hmr: HMR;
 
   /** Map of analyzed entries. */
   public entries: PluginEntries = new Map();
+
+  /** Whether targets and entries have already been initialized. */
+  private initialized = false;
 
   /** Map of registered targets. */
   public targets: ExtendedTargets = new Map();
@@ -59,16 +67,19 @@ export class Context {
     public options: Required<FinalPluginOptions>,
     public config: ResolvedConfig,
   ) {
-    this.resolver = config.createResolver();
     this.logger = new Logger(config.logger, false);
     this.logger.info('Plugin configuration resolved');
     this.diagnostics = new Diagnostics(this.options);
     this.timer = new Timer(this.logger);
+    this.resolver = new Resolver(this, config.createResolver());
+    this.hmr = new HMR(this);
   }
 
-  /**  Initializes the plugin context. */
+  /** Initializes the plugin context. */
   public async init() {
-    await this.registerTargets();
+    if (this.initialized) return;
+
+    await this.resolver.registerTargets();
     this.entries = await EntryAnalyzer.analyzeEntries(this);
 
     if (this.options.debug) {
@@ -76,6 +87,8 @@ export class Context {
       this.eventBus = new EventBus();
       this.logger.getOntoEventBus(this.eventBus);
     }
+
+    this.initialized = true;
   }
 
   /**
@@ -84,12 +97,13 @@ export class Context {
    */
   public loadFile(id: string) {
     const { url, serveSource } = parseId(id);
-    const entry = this.entries.get(url);
+    const entryId = this.resolver.normalizeId(url);
+    const entry = this.entries.get(entryId);
 
     if (entry) {
       const version = serveSource ? 'original' : 'mutated';
       const output = serveSource ? entry.source : entry.updatedSource;
-      this.logger.info(`Serving ${version} version entry file ${url}`);
+      this.logger.info(`Serving ${version} version entry file ${entryId}`);
       return output;
     }
   }
@@ -110,25 +124,5 @@ export class Context {
     }
 
     return await transformIfNeeded(this, id, code);
-  }
-
-  /**
-   * Checks if hot update matches any of the entries.
-   * If it does, re-triggers the analysis of that entry.
-   * @param id Path to the file.
-   */
-  public async checkUpdate(id: string) {
-    const entryFile = this.entries.get(id);
-
-    if (entryFile) {
-      this.logger.info(`HMR requires new analysis of ${id}`);
-      await EntryAnalyzer.doAnalyzeEntry(this, id, entryFile.depth);
-    }
-  }
-
-  /** Registers targets from the plugin options. */
-  private async registerTargets() {
-    const paths = await Utils.getAllTargetPaths(this.options.targets);
-    this.targets = new Map(paths.map((path) => [path, 0]));
   }
 }

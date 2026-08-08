@@ -195,7 +195,7 @@ export async function createTestContext(options: PluginOptions) {
 
   const finalOptions = mergeOptions(options);
   const context = new Context(finalOptions, config);
-  await context['registerTargets']();
+  await context.resolver.registerTargets();
   return context;
 }
 
@@ -262,7 +262,7 @@ export async function resolveUnitEntry(name: string) {
  * It creates it if it doesn't exist yet.
  */
 async function getResolver() {
-  return testResolver ??= await getTestResolver();
+  return (testResolver ??= await getTestResolver());
 }
 
 /**

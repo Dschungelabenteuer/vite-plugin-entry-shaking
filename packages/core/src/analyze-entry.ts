@@ -28,8 +28,7 @@ async function analyzeEntries(ctx: Context): Promise<PluginEntries> {
   const { time, out } = await ctx.timer.measure('Analysis of target entry files', async () => {
     const targets = [...ctx.targets.entries()];
     await Utils.parallelize(targets, async ([path, depth]) => {
-      const absolutePath = (await ctx.resolver(path)) ?? path;
-      await methods.analyzeEntry(ctx, absolutePath, depth);
+      await methods.analyzeEntry(ctx, path, depth);
     });
     return ctx.entries;
   });
@@ -51,12 +50,15 @@ async function analyzeEntries(ctx: Context): Promise<PluginEntries> {
 async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number): Promise<Duration> {
   if (ctx.entries.has(entryPath)) return [0, 0];
 
-  return await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e: unknown) => {
+  const duration = await methods.doAnalyzeEntry(ctx, entryPath, depth).catch((e: unknown) => {
     const message = `Could not analyze entry file "${entryPath}"`;
     console.error(e);
     ctx.logger.error(message);
     throw new Error(message);
   });
+
+  ctx.hmr.watchEntryFile(entryPath);
+  return duration;
 }
 
 /**
@@ -323,7 +325,9 @@ async function registerWildcardImportIfNeeded(
   depth: number,
 ): Promise<Duration> {
   return await ctx.timer.time(`Wilcard import analysis`, async (nonselfTime) => {
-    const importsEntry = ctx.targets.get(path) === 0;
+    const normalizedPath = ctx.resolver.normalizeId(path);
+    const resolvedPath = (await ctx.resolver.resolve(path, importedFrom)) ?? normalizedPath;
+    const importsEntry = ctx.targets.get(resolvedPath) === 0 || ctx.targets.get(normalizedPath) === 0;
     const maxDepthReached = depth >= ctx.options.maxWildcardDepth;
 
     if (maxDepthReached) {
@@ -368,7 +372,7 @@ async function registerWildcardImport(
   depth: number,
 ): Promise<Duration> {
   return await ctx.timer.time('Register wildcard import', async (nonselfTime) => {
-    const resolvedPath = await ctx.resolver(path, importedFrom);
+    const resolvedPath = await ctx.resolver.resolve(path, importedFrom);
     if (!resolvedPath || ctx.targets.has(resolvedPath)) return nonselfTime;
     ctx.logger.info(`Adding implicit target "${path}" because of a wildcard at "${importedFrom}"`);
     ctx.targets.set(resolvedPath, depth);

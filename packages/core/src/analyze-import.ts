@@ -134,7 +134,7 @@ export async function findNamedImport(
 ) {
   const namedImport = entry.exports.get(name);
   if (namedImport) {
-    const resolvedPath = await ctx.resolver(namedImport.path, entryPath);
+    const resolvedPath = await ctx.resolver.resolve(namedImport.path, entryPath);
     if (resolvedPath) {
       const { importDefault, originalName } = namedImport;
       map.set(resolvedPath, [
@@ -165,7 +165,7 @@ export async function findNamedWildcard(
 ) {
   const wildcardImport = entry.wildcardExports?.named.get(name);
   if (wildcardImport) {
-    const resolvedPath = await ctx.resolver(wildcardImport, entryPath);
+    const resolvedPath = await ctx.resolver.resolve(wildcardImport, entryPath);
     const resolvedEntry = resolvedPath ? ctx.entries.get(resolvedPath) : undefined;
     if (resolvedPath && resolvedEntry) {
       map.set(resolvedPath, [
@@ -198,7 +198,7 @@ export async function findDirectWildcardExports(
 ) {
   const wildcardExports = entry.wildcardExports?.direct ?? [];
   for (const wildcardExportPath of wildcardExports) {
-    const resolvedPath = await ctx.resolver(wildcardExportPath, entryPath);
+    const resolvedPath = await ctx.resolver.resolve(wildcardExportPath, entryPath);
     const resolvedEntry = resolvedPath ? ctx.entries.get(resolvedPath) : undefined;
     const resolvedExport = resolvedEntry ? resolvedEntry.exports.get(name) : undefined;
     if (resolvedPath) {
@@ -303,15 +303,31 @@ async function resolveImportedCircularEntities(
 
     if (originalName && originalEntry.exports.has(originalName)) {
       const originalImport = originalEntry.exports.get(originalName)!;
-      const resolvedPath = await ctx.resolver(originalImport.path, path);
+      const resolvedPath = await ctx.resolver.resolve(originalImport.path, path);
       if (!resolvedPath) continue;
 
       const resolvedImports = methods.formatImportReplacement({
         ...originalImport,
         name: originalName,
-        alias,
+        alias: alias ?? name,
       });
 
+      entityMap.set(resolvedPath, [...(entityMap.get(resolvedPath) ?? []), resolvedImports]);
+      continue;
+    }
+
+    const currentEntryExport = originalEntry.exports.get(name);
+    if (currentEntryExport) {
+      const resolvedPath = currentEntryExport.selfDefined
+        ? path
+        : await ctx.resolver.resolve(currentEntryExport.path, path);
+      if (!resolvedPath) continue;
+
+      const resolvedImports = methods.formatImportReplacement({
+        ...currentEntryExport,
+        name,
+        alias: alias ?? name,
+      });
       entityMap.set(resolvedPath, [...(entityMap.get(resolvedPath) ?? []), resolvedImports]);
     }
   }
