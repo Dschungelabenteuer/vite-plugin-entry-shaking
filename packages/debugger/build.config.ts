@@ -1,14 +1,12 @@
-import { defineBuildConfig } from 'unbuild';
-
+import { defineBuildConfig } from 'obuild/config';
 export default defineBuildConfig({
-  clean: false,
-  entries: ['src/index'],
-  declaration: true,
-  externals: ['vite', 'vite-plugin-entry-shaking'],
-  rollup: {
-    emitCJS: true,
-    inlineDependencies: true,
-    dts: { respectExternal: true },
-    output: { exports: 'named' },
-  },
+  entries: [
+    {
+      type: 'bundle',
+      input: ['./src/index'],
+      dts: true,
+      minify: true,
+      rolldown: { external: ['vite', 'vite-plugin-entry-shaking'] },
+    },
+  ],
 });
