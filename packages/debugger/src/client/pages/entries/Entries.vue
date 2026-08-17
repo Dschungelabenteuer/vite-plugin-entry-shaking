@@ -24,7 +24,7 @@ const source = computed(() =>
     ...entry,
     absolutePath: path,
     relativePath: relativePath(store.root, path),
-  })),
+  }))
 );
 
 const defaultFilters: ('implicit' | 'explicit')[] = ['implicit', 'explicit'];
@@ -35,12 +35,7 @@ const { id, title, sort, columns, items, filters, matched, methods } = useBrowse
   filterFn: (item, levels) => levels.includes(item.isImplicit ? 'implicit' : 'explicit'),
   defaultFilters,
   columns: {
-    icon: {
-      label: '',
-      width: '2.5rem',
-      class: 'no-padding',
-      minWidth: '100px',
-    },
+    icon: { label: '', width: '2.5rem', class: 'no-padding', minWidth: '100px' },
     time: {
       label: 'Time (total)',
       class: 'centered',
@@ -59,17 +54,8 @@ const { id, title, sort, columns, items, filters, matched, methods } = useBrowse
       ascLabel: 'Self time: show slowest first',
       descLabel: 'Self time: show fastest first',
     },
-    isImplicit: {
-      label: '',
-      width: '2rem',
-      class: 'centered',
-      minWidth: '100px',
-    },
-    path: {
-      label: 'File',
-      width: '1fr',
-      searchable: true,
-    },
+    isImplicit: { label: '', width: '2rem', class: 'centered', minWidth: '100px' },
+    path: { label: 'File', width: '1fr', searchable: true },
   },
 });
 

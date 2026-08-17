@@ -6,14 +6,8 @@ import { useClassNames } from '@composables/useClassNames';
 const $class = useClassNames('exports-filters');
 const model = defineModel<('defaultImport' | 'selfDefined')[]>();
 const options: CheckboxProps[] = [
-  {
-    label: "Imported via source module's default export",
-    value: 'defaultImport',
-  },
-  {
-    label: 'Code defined within the entry',
-    value: 'selfDefined',
-  },
+  { label: "Imported via source module's default export", value: 'defaultImport' },
+  { label: 'Code defined within the entry', value: 'selfDefined' },
 ];
 </script>
 

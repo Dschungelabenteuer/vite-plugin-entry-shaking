@@ -1,8 +1,6 @@
 import type { Placement } from '@floating-ui/vue';
 
-export type TooltipProps = {
-  isOpen: boolean;
-};
+export type TooltipProps = { isOpen: boolean };
 
 export type TooltipSlots = {
   /** Tooltip content. */

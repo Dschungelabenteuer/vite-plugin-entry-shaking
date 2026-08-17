@@ -41,7 +41,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     beforeEach(() => {
       vi.restoreAllMocks();
       vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementation(async () =>
-        Promise.resolve(mockedDuration),
+        Promise.resolve(mockedDuration)
       );
     });
 
@@ -63,7 +63,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
       const ctx = await createTestContext({ targets: [path] });
       ctx.entries = new Map([]) as any;
       vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementationOnce(() =>
-        Promise.reject(new Error()),
+        Promise.reject(new Error())
       );
       await expect(async () => {
         await EntryAnalyzer.analyzeEntry(ctx, path, 0);
@@ -104,8 +104,8 @@ describe.each([true, false])('with or without new line characters', (newLineChar
 
         export { Article };
         export { User, Group };
-      `),
-        ),
+      `)
+        )
       );
       expect(output.entries.size).toStrictEqual(1);
       expect(output.entries.get(output.targetPath)?.exports.get('User')).toMatchObject({
@@ -128,7 +128,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         import { User as MyUser } from '@models/User';
 
         export { MyUser };
-      `),
+      `)
       );
       expect(output.entries.size).toStrictEqual(1);
       expect(output.entries.get(output.targetPath)?.exports.has('User')).toStrictEqual(false);
@@ -140,8 +140,8 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           createStatementVariant(`
         export { User, UserId } from '@models/User';
         export { Group } from '../models/Group';
-      `),
-        ),
+      `)
+        )
       );
       expect(output.entries.size).toStrictEqual(1);
       expect(output.entries.get(output.targetPath)?.exports.get('UserId')).toMatchObject({
@@ -171,8 +171,8 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         export function TestFunction() {
           return User;
         };
-      `),
-        ),
+      `)
+        )
       );
       const resolvedEntry = output.entries.get(output.targetPath);
 
@@ -275,21 +275,17 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         path,
         startPosition,
         endPosition,
-        0,
+        0
       );
 
-      return {
-        analyzedImports,
-        startPosition,
-        endPosition,
-      };
+      return { analyzedImports, startPosition, endPosition };
     };
 
     describe('aggregated export statements', () => {
       it('should feed the `analyzedImports` map if this is an aggregated export', async () => {
         const originalName = 'UserId';
         const output = await run(
-          createStatementVariant(`export { ${originalName} } from '${path}'`),
+          createStatementVariant(`export { ${originalName} } from '${path}'`)
         );
 
         expect(output.analyzedImports.size).toStrictEqual(1);
@@ -303,21 +299,18 @@ describe.each([true, false])('with or without new line characters', (newLineChar
       it('should feed the `analyzedImports` map if this is an aggregated default export with alias', async () => {
         const alias = 'User';
         const output = await run(
-          createStatementVariant(`export { default as ${alias} } from '${path}'`),
+          createStatementVariant(`export { default as ${alias} } from '${path}'`)
         );
 
         expect(output.analyzedImports.size).toStrictEqual(1);
-        expect(output.analyzedImports.get(alias)).toStrictEqual({
-          path,
-          importDefault: true,
-        });
+        expect(output.analyzedImports.get(alias)).toStrictEqual({ path, importDefault: true });
       });
 
       it('should feed the `analyzedImports` map if this is an aggregated export with alias', async () => {
         const originalName = 'UserId';
         const alias = 'User';
         const output = await run(
-          createStatementVariant(`export { ${originalName} as ${alias} } from '${path}'`),
+          createStatementVariant(`export { ${originalName} as ${alias} } from '${path}'`)
         );
 
         expect(output.analyzedImports.size).toStrictEqual(1);
@@ -333,7 +326,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
       it('should feed the `analyzedImports` map if it imports named exports', async () => {
         const originalName = `GroupId`;
         const output = await run(
-          createStatementVariant(`import { ${originalName} } from "${path}"`),
+          createStatementVariant(`import { ${originalName} } from "${path}"`)
         );
 
         expect(output.analyzedImports.size).toStrictEqual(1);
@@ -360,7 +353,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         const alias = `MyUser`;
         const importString = `${originalName} as ${alias}`;
         const output = await run(
-          createStatementVariant(`import { ${importString} } from "${path}"`),
+          createStatementVariant(`import { ${importString} } from "${path}"`)
         );
 
         expect(output.analyzedImports.size).toStrictEqual(1);
@@ -374,14 +367,11 @@ describe.each([true, false])('with or without new line characters', (newLineChar
       it('should feed the `analyzedImports` map if it imports a default export with an alias', async () => {
         const alias = `MyUser`;
         const output = await run(
-          createStatementVariant(`import { default as ${alias} } from "${path}"`),
+          createStatementVariant(`import { default as ${alias} } from "${path}"`)
         );
 
         expect(output.analyzedImports.size).toStrictEqual(1);
-        expect(output.analyzedImports.get(alias)).toStrictEqual({
-          path,
-          importDefault: true,
-        });
+        expect(output.analyzedImports.get(alias)).toStrictEqual({ path, importDefault: true });
       });
     });
 
@@ -399,7 +389,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           expect.any(Set),
           path,
           entryPath,
-          0,
+          0
         );
       });
     });
@@ -418,7 +408,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           expect.any(Set),
           path,
           entryPath,
-          0,
+          0
         );
       });
     });
@@ -445,7 +435,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         entryMap,
         wildcardImports,
         analyzedImports,
-        importedName,
+        importedName
       );
 
       expect(entryMap.size).toStrictEqual(1);
@@ -467,7 +457,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         entryMap,
         wildcardImports,
         analyzedImports,
-        importedAlias,
+        importedAlias
       );
 
       expect(entryMap.size).toStrictEqual(1);
@@ -488,7 +478,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         entryMap,
         wildcardImports,
         analyzedImports,
-        importedName,
+        importedName
       );
 
       expect(entryMap.size).toStrictEqual(1);
@@ -516,14 +506,14 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           new Set(),
           otherTargetEntryPath,
           entryOnePath,
-          0,
+          0
         );
         expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
         expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
           ctx,
           otherTargetEntryPath,
           entryOnePath,
-          1,
+          1
         );
       });
 
@@ -535,14 +525,14 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           new Set(),
           otherTargetEntryPath,
           entryOnePath,
-          3,
+          3
         );
         expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
         expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
           ctx,
           otherTargetEntryPath,
           entryOnePath,
-          4,
+          4
         );
       });
 
@@ -559,7 +549,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           diagnostics,
           otherTargetEntryPath,
           entryOnePath,
-          3,
+          3
         );
         expect(diagnostics.size).toStrictEqual(0);
       });
@@ -577,7 +567,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           diagnostics,
           otherTargetEntryPath,
           entryOnePath,
-          3,
+          3
         );
         expect(diagnostics.size).toStrictEqual(1);
       });
@@ -594,7 +584,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           new Set(),
           wildcardExportedPath,
           entryOnePath,
-          0,
+          0
         );
         expect(EntryAnalyzer.registerWildcardImport).not.toHaveBeenCalled();
       });
@@ -606,7 +596,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           new Set(),
           wildcardExportedPath,
           entryOnePath,
-          3,
+          3
         );
         expect(EntryAnalyzer.registerWildcardImport).not.toHaveBeenCalled();
       });
@@ -618,14 +608,14 @@ describe.each([true, false])('with or without new line characters', (newLineChar
           new Set(),
           wildcardExportedPath,
           entryOnePath,
-          1,
+          1
         );
         expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledOnce();
         expect(EntryAnalyzer.registerWildcardImport).toHaveBeenCalledWith(
           ctx,
           wildcardExportedPath,
           entryOnePath,
-          2,
+          2
         );
       });
     });

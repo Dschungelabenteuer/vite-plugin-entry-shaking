@@ -9,11 +9,7 @@ const $class = inject<ClassNameFn>('$class')!;
 const _props = defineProps<Required<BrowserProps>>();
 
 const headerCountsRef = ref<HTMLElement | null>(null);
-const _transitions = useViewTransition({
-  names: {
-    'browser-header-counts': headerCountsRef,
-  },
-});
+const _transitions = useViewTransition({ names: { 'browser-header-counts': headerCountsRef } });
 </script>
 
 <template>

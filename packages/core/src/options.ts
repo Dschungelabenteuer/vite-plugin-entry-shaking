@@ -15,10 +15,7 @@ export const defaultOptions: FinalPluginOptions = {
   ignorePatterns,
   debug: false,
   maxWildcardDepth: 0,
-  diagnostics: {
-    definedWithinEntry: true,
-    maxDepthReached: true,
-  },
+  diagnostics: { definedWithinEntry: true, maxDepthReached: true },
 };
 
 /**

@@ -13,7 +13,7 @@ export class Resolver {
 
   constructor(
     private context: Context,
-    private resolveFn: ResolveFn,
+    private resolveFn: ResolveFn
   ) {}
 
   /**
@@ -85,7 +85,7 @@ export class Resolver {
     if (!(await this.isResolvedTargetImport(importPath, importer, resolvedPath))) return;
 
     this.context.logger.info(
-      `Adding importer-resolved target "${importPath}" as "${resolvedPath}"`,
+      `Adding importer-resolved target "${importPath}" as "${resolvedPath}"`
     );
     this.context.targets.set(resolvedPath, 0);
     await EntryAnalyzer.analyzeEntry(this.context, resolvedPath, 0);
@@ -93,11 +93,7 @@ export class Resolver {
     return this.context.entries.has(resolvedPath) ? resolvedPath : undefined;
   }
 
-  private async isResolvedTargetImport(
-    importPath: string,
-    importer: string,
-    resolvedPath: string,
-  ) {
+  private async isResolvedTargetImport(importPath: string, importer: string, resolvedPath: string) {
     if (this.isTargetSpecifier(importPath)) return true;
 
     for (const targetSpecifier of this.targetSpecifiers) {

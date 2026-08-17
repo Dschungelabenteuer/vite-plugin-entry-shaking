@@ -15,7 +15,7 @@ const _ = wsMessageName;
 export function createChannel(
   { hot, config }: ViteDevServer,
   ctx: Context,
-  consumer: ConsumerPackageInfo,
+  consumer: ConsumerPackageInfo
 ) {
   subscribeToEventBus(hot, ctx);
   const { root } = config;
@@ -29,15 +29,9 @@ export function createChannel(
         entries: ctx.entries,
         metrics: ctx.metrics,
         logs: ctx.logger.logs,
-        options: {
-          diagnostics: ctx.options.diagnostics,
-          debug: ctx.options.debug,
-        },
-        diagnostics: {
-          list: ctx.diagnostics.list,
-          listPerPath: ctx.diagnostics.listPerPath,
-        },
-      }),
+        options: { diagnostics: ctx.options.diagnostics, debug: ctx.options.debug },
+        diagnostics: { list: ctx.diagnostics.list, listPerPath: ctx.diagnostics.listPerPath },
+      })
     );
   });
 }

@@ -1,32 +1,36 @@
 {
   "name": "vite-plugin-entry-shaking",
-  "type": "module",
   "version": "0.5.2",
   "description": "Mimic tree-shaking behaviour when importing code from an entry file in development mode.",
-  "author": "Charles Gruenais",
-  "license": "MIT",
+  "keywords": [
+    "entry",
+    "tree shaking",
+    "vite",
+    "vite-plugin"
+  ],
   "homepage": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/#readme",
+  "bugs": {
+    "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
+  },
+  "license": "MIT",
+  "author": "Charles Gruenais",
   "repository": {
     "type": "git",
     "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking",
     "directory": "packages/core"
   },
-  "bugs": {
-    "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
-  },
-  "keywords": ["vite", "vite-plugin", "entry", "tree shaking"],
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs"
     }
-  },
-  "main": "src/index.ts",
-  "types": "src/index.ts",
-  "files": ["dist"],
-  "engines": {
-    "node": "^14.18.0 || >=16.0.0"
   },
   "publishConfig": {
     "main": "dist/index.cjs",
@@ -36,31 +40,18 @@
   "scripts": {
     "dev": "pnpm unbuild --stub",
     "build": "pnpm unbuild",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
-  },
-  "peerDependencies": {
-    "vite": ">=5.1.0"
   },
   "dependencies": {
     "es-module-lexer": "^1.5.4",
     "magic-string": "^0.30.11"
   },
-  "optionalDependencies": {
-    "esbuild": "^0.23.1",
-    "fast-glob": "^3.3.2",
-    "vite-plugin-entry-shaking-debugger": "workspace:*"
-  },
   "devDependencies": {
     "@types/node": "^22.5.5",
     "@vitest/coverage-istanbul": "^2.1.1",
-    "@yungezeit/eslint-typescript": "^0.0.12",
     "esbuild": "^0.23.1",
-    "eslint": "^9.11.0",
-    "eslint-config-prettier": "^9.1.0",
     "fast-glob": "^3.3.2",
     "globals": "^15.9.0",
     "ts-dedent": "^2.2.0",
@@ -69,5 +60,16 @@
     "vite": "^5.4.7",
     "vite-plugin-entry-shaking-debugger": "workspace:*",
     "vitest": "^2.1.1"
+  },
+  "peerDependencies": {
+    "vite": ">=5.1.0"
+  },
+  "optionalDependencies": {
+    "esbuild": "^0.23.1",
+    "fast-glob": "^3.3.2",
+    "vite-plugin-entry-shaking-debugger": "workspace:*"
+  },
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
   }
 }

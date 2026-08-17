@@ -16,7 +16,7 @@ import { getCode } from './utils';
 export async function transformIfNeeded(
   ctx: Context,
   id: string,
-  code: string,
+  code: string
 ): Promise<string | undefined> {
   ctx.logger.debug(`Processing file "${id}"`, undefined);
   const isCandidate = methods.requiresTransform(ctx, id);
@@ -30,7 +30,7 @@ export async function transformIfNeeded(
         return await methods.transformImportsIfNeeded(ctx, id, source);
       }
     },
-    true,
+    true
   );
 
   ctx.eventBus?.emit('increaseProcessTime', time);
@@ -48,7 +48,7 @@ export async function transformIfNeeded(
 export async function transformImportsIfNeeded(
   ctx: Context,
   id: string,
-  code: string,
+  code: string
 ): Promise<string | undefined> {
   const [imports, exports] = parse(code);
   const importedStr = `${imports.length} imports`;
@@ -73,7 +73,7 @@ export async function transformImportsIfNeeded(
 
   const { time, out } = await ctx.timer.measure(
     `Transforming file "${id}"`,
-    async () => await transform(ctx, id, code, imports, exports),
+    async () => await transform(ctx, id, code, imports, exports)
   );
   ctx.hmr.registerEntryImporter(id, importedEntries);
 
@@ -103,7 +103,7 @@ export async function transformImports(
   id: string,
   code: string,
   imports: readonly ImportSpecifier[],
-  exports: readonly ExportSpecifier[],
+  exports: readonly ExportSpecifier[]
 ): Promise<string | undefined> {
   // We only need to transform file if it imports at least one of targets.
   await init;
@@ -123,7 +123,7 @@ export async function transformImports(
         entry,
         resolvedImport,
         startPosition,
-        endPosition,
+        endPosition
       );
     }
   }
@@ -151,7 +151,7 @@ export function requiresTransform(ctx: Context, id: string) {
 export async function getEntryImports(
   ctx: Context,
   id: string,
-  imports: readonly ImportSpecifier[],
+  imports: readonly ImportSpecifier[]
 ): Promise<string[]> {
   try {
     return await imports.reduce(
@@ -161,7 +161,7 @@ export async function getEntryImports(
         if (resolvedPath && ctx.entries.has(resolvedPath)) (await out).push(resolvedPath);
         return out;
       },
-      Promise.resolve([] as string[]),
+      Promise.resolve([] as string[])
     );
   } catch {
     return [];
@@ -174,7 +174,6 @@ export async function getEntryImports(
  */
 export function createReexportStatement(exports: readonly ExportSpecifier[]) {
   const namedExports = exports
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     .filter((e) => e.n !== undefined && e.n !== 'default' && e.ln === undefined)
     .map(({ n }) => n);
   if (namedExports.length === 0) return '';

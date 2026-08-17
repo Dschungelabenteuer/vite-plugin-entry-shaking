@@ -20,26 +20,19 @@ const meta = {
   tags: ['autodocs'],
   decorators: [paddingDecorator],
   subcomponents: { ShortcutsHint, ShortcutsList },
-  args: {
-    message: 'Use keys to navigate',
-    shortcuts: SimpleShortcuts,
-  },
+  args: { message: 'Use keys to navigate', shortcuts: SimpleShortcuts },
 } satisfies Meta<typeof Shortcuts>;
 
 type Story = StoryObj<typeof meta>;
 
 export const ShortcutHint: Story = {
   decorators: [() => ({ template: `<div style="height: 12px"><story /></div>` })],
-  args: {
-    showTooltip: true,
-  },
+  args: { showTooltip: true },
 };
 
 export const ShortcutList: Story = {
   decorators: [() => ({ template: `<div style="height: 154px"><story /></div>` })],
-  args: {
-    showList: true,
-  },
+  args: { showList: true },
 };
 
 export default meta;

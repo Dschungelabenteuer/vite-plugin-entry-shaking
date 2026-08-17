@@ -14,28 +14,14 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Text: Story = {
-  args: { content: Text_content },
-};
+export const Text: Story = { args: { content: Text_content } };
 
-export const Number: Story = {
-  args: { content: Number_content },
-};
+export const Number: Story = { args: { content: Number_content } };
 
 /** In this example, `max` is set to `5`. */
-export const MaxLengthText: Story = {
-  args: {
-    max: 5,
-    content: Text_content,
-  },
-};
+export const MaxLengthText: Story = { args: { max: 5, content: Text_content } };
 
 /** The actual content is 150, but `max` is set to `99`. */
-export const CappedNumber: Story = {
-  args: {
-    max: 99,
-    content: Number_content,
-  },
-};
+export const CappedNumber: Story = { args: { max: 99, content: Number_content } };
 
 export default meta;

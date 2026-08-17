@@ -13,7 +13,7 @@ const diagnostics = computed(() =>
   [...(entryDetails.entry?.diagnostics.values() ?? [])].reduce((out, i) => {
     const diagnostic = store.diagnostics.list[i];
     return [...out, diagnostic];
-  }, [] as Diagnostic[]),
+  }, [] as Diagnostic[])
 );
 </script>
 

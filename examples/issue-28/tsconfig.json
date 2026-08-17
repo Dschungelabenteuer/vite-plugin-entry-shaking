@@ -3,10 +3,9 @@
     "target": "es2020",
     "module": "esnext",
     "strict": true,
-    "baseUrl": ".",
     "jsx": "preserve",
     "importHelpers": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -14,9 +13,7 @@
     "resolveJsonModule": true,
     "noEmit": true,
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "paths": { "@/*": ["./src/*"] }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.vue"],
   "references": [{ "path": "./tsconfig.node.json" }],

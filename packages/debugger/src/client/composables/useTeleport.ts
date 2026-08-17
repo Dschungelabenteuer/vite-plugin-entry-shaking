@@ -13,8 +13,5 @@ export function useTeleport(what: 'floating' | 'dialog' = 'floating') {
     if (disabled.value) return 'body';
     return what === 'floating' ? `#${floatingContainerId}` : `#${dialogContainerId}`;
   });
-  return {
-    disabled,
-    to,
-  };
+  return { disabled, to };
 }

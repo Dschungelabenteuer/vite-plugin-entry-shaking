@@ -12,10 +12,7 @@ import { getFocusableChildren } from '@composables/useFocusTrap';
  */
 export const usePopover: UseFloating = (reference, floatingEl, options) => {
   const body = document.querySelector('body');
-  const floating = useFloating(reference, floatingEl, {
-    placement: 'bottom-end',
-    ...options,
-  });
+  const floating = useFloating(reference, floatingEl, { placement: 'bottom-end', ...options });
   const handlers: UseFloatingHandlers = { click: floating.toggle };
 
   const handleClickOutside = (event: Event) => {

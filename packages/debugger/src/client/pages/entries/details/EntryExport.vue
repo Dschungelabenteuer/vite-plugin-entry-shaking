@@ -8,11 +8,11 @@ const $class = useClassNames('entry-export');
 const props = defineProps<TransformProps>();
 
 const importDefaultTooltip = computed(() =>
-  props.item.importDefault ? "Imported via source module's default export" : undefined,
+  props.item.importDefault ? "Imported via source module's default export" : undefined
 );
 
 const selfDefinedTooltip = computed(() =>
-  props.item.selfDefined ? 'Code defined within the entry' : undefined,
+  props.item.selfDefined ? 'Code defined within the entry' : undefined
 );
 </script>
 

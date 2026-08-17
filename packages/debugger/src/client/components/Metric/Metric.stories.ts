@@ -14,12 +14,8 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Count: Story = {
-  args: TotalUsers,
-};
+export const Count: Story = { args: TotalUsers };
 
-export const Duration: Story = {
-  args: UsageTime,
-};
+export const Duration: Story = { args: UsageTime };
 
 export default meta;

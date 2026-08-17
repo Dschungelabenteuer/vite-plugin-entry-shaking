@@ -15,45 +15,20 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = {
-  args: {},
-};
+export const Simple: Story = { args: {} };
 
-export const Disabled: Story = {
-  args: {
-    disabled: true,
-  },
-};
+export const Disabled: Story = { args: { disabled: true } };
 
-export const Readonly: Story = {
-  args: {
-    readonly: true,
-  },
-};
+export const Readonly: Story = { args: { readonly: true } };
 
-export const WithPlaceholder: Story = {
-  args: {
-    placeholder: 'My placeholder…',
-  },
-};
+export const WithPlaceholder: Story = { args: { placeholder: 'My placeholder…' } };
 
-export const WithIcon: Story = {
-  args: {
-    icon: 'search',
-  },
-};
+export const WithIcon: Story = { args: { icon: 'search' } };
 
 /** The shorcut prop is purely visual, implementation is up to you. */
-export const WithShortcut: Story = {
-  args: {
-    shortcut: 'Cmd+K',
-  },
-};
+export const WithShortcut: Story = { args: { shortcut: 'Cmd+K' } };
 
-export const WithValue: Story = {
-  render: getModelRenderFunction(Input, 'some value'),
-  args: {},
-};
+export const WithValue: Story = { render: getModelRenderFunction(Input, 'some value'), args: {} };
 
 export const WithLeadingContent: Story = {
   args: {},

@@ -34,7 +34,7 @@ function mockWildcardExports(): WildcardExports {
     named: new Map(
       new Array(numberOfNamedExports)
         .fill(0)
-        .map(() => [faker.lorem.word(), getRandomProjectPath()]),
+        .map(() => [faker.lorem.word(), getRandomProjectPath()])
     ),
     direct: new Array(numberOfDirectExports).fill(0).map(() => getRandomProjectPath()),
   };
@@ -55,7 +55,7 @@ function mockExports(): EntryExports {
           selfDefined,
         },
       ];
-    }),
+    })
   );
 }
 
@@ -89,5 +89,5 @@ export const entries: Context['entries'] = new Map(
         self: Math.min(timeOne, timeTwo),
       },
     ];
-  }),
+  })
 );

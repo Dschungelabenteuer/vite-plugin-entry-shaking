@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["import", "typescript"],
+  "options": { "typeAware": true },
+  "categories": { "correctness": "warn" },
+  "ignorePatterns": ["**/dist", "**/tests/__mocks__", "**/tests/cases"],
+  "rules": {
+    "typescript/no-floating-promises": "off",
+    "typescript/no-redundant-type-constituents": "off",
+    "typescript/consistent-type-imports": ["error", { "prefer": "type-imports" }],
+    "import/consistent-type-specifier-style": ["error", "prefer-top-level"]
+  }
+}

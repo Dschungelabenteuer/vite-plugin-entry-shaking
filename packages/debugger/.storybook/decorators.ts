@@ -8,9 +8,7 @@ export const containedDecorator = (maxHeight?: string) => () => {
     'background: var(--overall-background-color)',
   ].join(';');
 
-  return {
-    template: `<div style="${styles}"><story/></div>`,
-  };
+  return { template: `<div style="${styles}"><story/></div>` };
 };
 
 export const metricsDecorator = () => ({

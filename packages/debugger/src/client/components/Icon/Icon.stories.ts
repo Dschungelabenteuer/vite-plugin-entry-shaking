@@ -18,12 +18,8 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = {
-  args: { name: 'home' },
-};
+export const Simple: Story = { args: { name: 'home' } };
 
-export const WithTooltip: Story = {
-  args: { name: 'home', tooltip: 'Some tooltip' },
-};
+export const WithTooltip: Story = { args: { name: 'home', tooltip: 'Some tooltip' } };
 
 export default meta;

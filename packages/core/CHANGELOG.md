@@ -54,7 +54,6 @@
     [moushicheng](https://github.com/moushicheng))
 
   ### Chore
-
   - Created some kind of logo, please don't hate I'm not a designer
   - Revamped examples with a simple webapp that one can use to test and debug this plugin against
     use-cases
@@ -63,7 +62,6 @@
   - Updated dependencies
 
   ### Fixes
-
   - Fixed an issue when re-exporting aliased entity (fixes #28, thanks
     [fdc-viktor-luft](https://github.com/fdc-viktor-luft) for reporting & investigating)
   - Fixed an issue with multiline imports/exports (fixes #35, thanks
@@ -116,14 +114,12 @@
 - ea9fd1a:
 
   #### New features
-
   - Added HMR support for the entry points. In previous releases, when editing one of the consumed
     entry points, you would need to restart the dev server to re-run the plugin analysis and
     cleanups of entry points. Editing any entry point will now automatically re-trigger its analysis
     and cleanup, and following served files should be served accordingly.
 
   #### Governance
-
   - Bumped Vite's reference version to 4.0.1
   - Copied README to core package so that it is correctly displayed on npm.
   - Refactored the code to improve maintainability and tests.
@@ -133,7 +129,6 @@
     logic_ to Vite.
 
   #### Bug fixes
-
   - Fixed a bug which caused served app to crash when using aliases to import named entities from
     entry point (e.g. `import { A_MODULE_B as B } from 'path/to/entry'`). The bug being fixed, you
     should also be able to import the same entities twice using aliases (e.g.

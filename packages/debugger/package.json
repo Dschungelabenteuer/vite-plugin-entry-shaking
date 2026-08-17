@@ -1,20 +1,29 @@
 {
   "name": "vite-plugin-entry-shaking-debugger",
-  "type": "module",
   "version": "2.0.2",
   "description": "Debugger for vite-plugin-entry-shaking",
-  "author": "Charles Gruenais",
-  "license": "MIT",
+  "keywords": [
+    "debugger",
+    "entry",
+    "tree shaking",
+    "vite",
+    "vite-plugin"
+  ],
   "homepage": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/#readme",
+  "bugs": {
+    "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
+  },
+  "license": "MIT",
+  "author": "Charles Gruenais",
   "repository": {
     "type": "git",
     "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking",
     "directory": "packages/debugger"
   },
-  "bugs": {
-    "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
-  },
-  "keywords": ["vite", "vite-plugin", "entry", "tree shaking", "debugger"],
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "require": {
@@ -27,22 +36,13 @@
       }
     }
   },
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
   "scripts": {
     "dev": "vite src/client",
     "build": "vite build src/client && unbuild",
     "stub": "unbuild --stub",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "storybook:dev": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "cypress:open": "cypress open"
-  },
-  "peerDependencies": {
-    "vite": ">=5.1.0",
-    "vite-plugin-entry-shaking": "workspace:*"
   },
   "dependencies": {
     "@vueuse/core": "^11.1.0",
@@ -69,10 +69,7 @@
     "@types/diff-match-patch": "^1.0.36",
     "@types/node": "^22.5.5",
     "@vitejs/plugin-vue": "^5.1.4",
-    "@yungezeit/eslint-vue": "^0.0.12",
     "cypress": "^13.14.2",
-    "eslint": "^9.11.0",
-    "eslint-config-prettier": "^9.1.0",
     "globals": "^15.9.0",
     "picocolors": "^1.1.0",
     "postcss-html": "^1.7.0",
@@ -90,5 +87,9 @@
     "vite-plugin-entry-shaking": "workspace:*",
     "vue": "^3.5.7",
     "vue-router": "^4.4.5"
+  },
+  "peerDependencies": {
+    "vite": ">=5.1.0",
+    "vite-plugin-entry-shaking": "workspace:*"
   }
 }

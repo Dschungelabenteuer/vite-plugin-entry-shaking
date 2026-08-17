@@ -8,10 +8,7 @@ import { useFloating } from '@composables/useFloating';
  * @param options Floating-ui options.
  */
 export const useTooltip: UseFloating = (reference, floatingEl, options) => {
-  const floating = useFloating(reference, floatingEl, {
-    placement: 'top',
-    ...options,
-  });
+  const floating = useFloating(reference, floatingEl, { placement: 'top', ...options });
   const handlers: UseFloatingHandlers = {
     mouseenter: floating.open,
     mouseleave: floating.close,

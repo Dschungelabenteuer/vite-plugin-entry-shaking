@@ -4,7 +4,7 @@ import ValuePreviewer from './ValuePreviewer.vue';
 export function getModelRenderFunction(
   Component: any,
   defaultValue?: any,
-  customTemplate?: string,
+  customTemplate?: string
 ) {
   return (args: any) => ({
     components: { Component, ValuePreviewer },

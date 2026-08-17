@@ -9,16 +9,6 @@ const __dirname = dirname(__filename);
 const pathToLib = resolve(__dirname, './src/lib');
 
 export default defineConfig(() => ({
-  plugins: [
-    EntryShakingPlugin({
-      targets: [pathToLib],
-      debug: true,
-    }),
-    vue(),
-  ],
-  resolve: {
-    alias: {
-      '@lib': pathToLib,
-    },
-  },
+  plugins: [EntryShakingPlugin({ targets: [pathToLib], debug: true }), vue()],
+  resolve: { alias: { '@lib': pathToLib } },
 }));

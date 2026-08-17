@@ -16,7 +16,7 @@ const source = computed(() =>
     ...exp,
     name,
     id: name,
-  })),
+  }))
 );
 
 const defaultFilters: ('defaultImport' | 'selfDefined')[] = ['defaultImport', 'selfDefined'];
@@ -31,12 +31,7 @@ const { id, title, sort, columns, items, filters, matched, methods } = useBrowse
   },
   defaultFilters,
   columns: {
-    flags: {
-      label: '',
-      width: '2rem',
-      class: 'centered',
-      minWidth: '100px',
-    },
+    flags: { label: '', width: '2rem', class: 'centered', minWidth: '100px' },
     alias: {
       label: 'Alias',
       class: 'centered',
@@ -58,10 +53,7 @@ const { id, title, sort, columns, items, filters, matched, methods } = useBrowse
       minWidth: '100px',
       searchable: true,
     },
-    id: {
-      label: 'File',
-      width: '1fr',
-    },
+    id: { label: 'File', width: '1fr' },
   },
 });
 

@@ -26,9 +26,5 @@ export default defineConfig({
       '@styles': fileURLToPath(new URL('./styles', import.meta.url)),
     },
   },
-  css: {
-    preprocessorOptions: {
-      scss: { additionalData: `@import "@styles/global.scss";` },
-    },
-  },
+  css: { preprocessorOptions: { scss: { additionalData: `@import "@styles/global.scss";` } } },
 });

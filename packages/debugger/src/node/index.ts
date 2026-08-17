@@ -37,7 +37,7 @@ export async function attachDebugger(server: ViteDevServer, ctx: Context) {
  * @param consumer Information about the consuming package.
  */
 function printUrls(server: ViteDevServer, debuggerRoute: string, consumer: ConsumerPackageInfo) {
-  // eslint-disable-next-line @typescript-eslint/unbound-method
+  // oxlint-disable-next-line @typescript-eslint/unbound-method
   const printViteUrls = server.printUrls;
 
   server.printUrls = () => {
@@ -58,13 +58,13 @@ function printUrls(server: ViteDevServer, debuggerRoute: string, consumer: Consu
 
       server.config.logger.info(
         colors.dim(colors.green('  ➜')) +
-          colors.dim(`  ${colors.bold('Local:')} ${colors.cyan(debugUrl)}`),
+          colors.dim(`  ${colors.bold('Local:')} ${colors.cyan(debugUrl)}`)
       );
 
       if (consumer.name && consumer.version) {
         const debuggee = `${consumer.name}@${consumer.version}`;
         server.config.logger.info(
-          colors.dim(colors.green('  ➜')) + colors.dim(`  Debugging ${colors.bold(debuggee)}`),
+          colors.dim(colors.green('  ➜')) + colors.dim(`  Debugging ${colors.bold(debuggee)}`)
         );
       }
     });

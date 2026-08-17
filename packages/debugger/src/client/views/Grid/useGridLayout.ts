@@ -13,7 +13,7 @@ export function useGridLayout<Cols extends Record<string, Column>, Items extends
   gridRef: Ref<HTMLElement | null>,
   gridScrollerRef: Ref<HTMLElement | null>,
   data: UseGridDataReturn,
-  $class: ClassNameFn,
+  $class: ClassNameFn
 ) {
   const scrollWidth = computed(() => gridScrollerRef.value?.scrollWidth ?? 0);
   const scrollLeft = computed(() => gridScrollerRef.value?.scrollLeft ?? 0);

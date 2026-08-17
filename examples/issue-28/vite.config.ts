@@ -13,16 +13,8 @@ const pathToThird = resolve(__dirname, 'src/third/');
 
 export default defineConfig(() => ({
   plugins: [
-    EntryShakingPlugin({
-      targets: ['@first/', pathToSecond, pathToThird],
-      debug: true,
-    }),
+    EntryShakingPlugin({ targets: ['@first/', pathToSecond, pathToThird], debug: true }),
     vue(),
   ],
-  resolve: {
-    alias: {
-      '@utils': pathToSecond,
-      '@first': pathToFirst,
-    },
-  },
+  resolve: { alias: { '@utils': pathToSecond, '@first': pathToFirst } },
 }));

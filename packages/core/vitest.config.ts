@@ -4,9 +4,6 @@ export default defineConfig({
   test: {
     // silent: true,
     includeSource: ['tests/**/*.test.ts'],
-    coverage: {
-      provider: 'istanbul',
-      exclude: ['src/index.ts', 'src/logger.ts'],
-    },
+    coverage: { provider: 'istanbul', exclude: ['src/index.ts', 'src/logger.ts'] },
   },
 });

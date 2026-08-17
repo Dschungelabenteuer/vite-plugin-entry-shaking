@@ -34,7 +34,7 @@ export const Row = defineComponent({
             `The following element is expected to have ${props.columns.length} children ` +
             `but has actually ${rowRef.value?.children.length}. This may cause both ` +
             `styling and accessibility issues:\n`,
-          rowRef.value,
+          rowRef.value
         );
       }
 
@@ -66,9 +66,7 @@ export const Row = defineComponent({
           const child = untypedChild as HTMLElement;
           unrove(child);
           nextTick(() => {
-            child.focus({
-              preventScroll: true,
-            });
+            child.focus({ preventScroll: true });
           });
         }
       } else if (
@@ -97,7 +95,7 @@ export const Row = defineComponent({
       () => {
         updateRow();
       },
-      { flush: 'post' },
+      { flush: 'post' }
     );
 
     onMounted(() => {

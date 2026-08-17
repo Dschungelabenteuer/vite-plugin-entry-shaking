@@ -16,12 +16,5 @@ pnpm add -D vite-plugin-entry-shaking-debugger
 Turn it on by setting `debug` to `true` in `vite.config.js`:
 
 ```ts
-export default defineConfig({
-  plugins: [
-    EntryShakingPlugin({
-      targets: ['…'],
-      debug: true,
-    }),
-  ],
-});
+export default defineConfig({ plugins: [EntryShakingPlugin({ targets: ['…'], debug: true })] });
 ```

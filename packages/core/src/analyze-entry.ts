@@ -74,7 +74,7 @@ async function analyzeEntry(ctx: Context, entryPath: EntryPath, depth: number): 
 async function doAnalyzeEntry(
   ctx: Context,
   entryPath: EntryPath,
-  depth: number,
+  depth: number
 ): Promise<Duration> {
   const exportsMap: EntryExports = new Map([]);
   const wildcardExports: WildcardExports = { named: new Map([]), direct: [] };
@@ -108,7 +108,7 @@ async function doAnalyzeEntry(
           path!,
           startPosition,
           endPosition,
-          depth,
+          depth
         );
 
         nonselfTime += t - s;
@@ -122,7 +122,7 @@ async function doAnalyzeEntry(
           wildcardExports,
           analyzedImports,
           namedExport,
-          localName,
+          localName
         );
 
         if (!definesExportedCode && definesExports) {
@@ -138,7 +138,7 @@ async function doAnalyzeEntry(
         source,
         exportsMap,
         exps,
-        definesExportedCode,
+        definesExportedCode
       );
 
       importsCount += analyzedImports.size - 1;
@@ -148,7 +148,7 @@ async function doAnalyzeEntry(
       ctx.logger.debug(`Cleaned-up entry "${entryPath}" (-${charactersDiff} chars)`);
 
       return nonselfTime;
-    },
+    }
   );
 
   // Finally export entry's analysis output.
@@ -185,7 +185,7 @@ function cleanupEntry(
   source: string,
   exportsMap: EntryExports,
   exps: ExportSpecifier[],
-  definesExportedCode: boolean,
+  definesExportedCode: boolean
 ) {
   const diagnosticName: keyof DiagnosticsConfig = 'definedWithinEntry';
   const updatedSource = EntryCleaner.cleanupEntry(source, exportsMap, exps);
@@ -230,7 +230,7 @@ async function analyzeEntryImport(
   path: string,
   startPosition: number,
   endPosition: number,
-  depth: number,
+  depth: number
 ): Promise<Duration> {
   return await ctx.timer.time(`Analysis of entry import"`, async (nonselfTime) => {
     const statement = rawEntry.slice(startPosition, endPosition);
@@ -254,11 +254,7 @@ async function analyzeEntryImport(
 
     imports.namedImports.forEach((namedImport) => {
       const { name, alias } = Parsers.parseImportParams(namedImport);
-      analyzedImports.set(alias ?? name, {
-        path,
-        importDefault: false,
-        originalName: name,
-      });
+      analyzedImports.set(alias ?? name, { path, importDefault: false, originalName: name });
     });
 
     return nonselfTime;
@@ -283,7 +279,7 @@ function analyzeEntryExport(
   wilcardExports: WildcardExports,
   analyzedImports: EntryImports,
   namedExport: string,
-  localName?: string,
+  localName?: string
 ): undefined | true {
   if (namedExport && !wilcardExports.named.has(namedExport)) {
     if (analyzedImports.has(namedExport)) {
@@ -322,12 +318,13 @@ async function registerWildcardImportIfNeeded(
   diagnostics: Set<number>,
   path: string,
   importedFrom: string,
-  depth: number,
+  depth: number
 ): Promise<Duration> {
   return await ctx.timer.time(`Wilcard import analysis`, async (nonselfTime) => {
     const normalizedPath = ctx.resolver.normalizeId(path);
     const resolvedPath = (await ctx.resolver.resolve(path, importedFrom)) ?? normalizedPath;
-    const importsEntry = ctx.targets.get(resolvedPath) === 0 || ctx.targets.get(normalizedPath) === 0;
+    const importsEntry =
+      ctx.targets.get(resolvedPath) === 0 || ctx.targets.get(normalizedPath) === 0;
     const maxDepthReached = depth >= ctx.options.maxWildcardDepth;
 
     if (maxDepthReached) {
@@ -341,7 +338,7 @@ async function registerWildcardImportIfNeeded(
           const diagnosticIndex = ctx.diagnostics.add(
             diagnosticName,
             diagnostic.message,
-            diagnosticCtx,
+            diagnosticCtx
           );
           diagnostics.add(diagnosticIndex);
           ctx.logger.debug(diagnostic.base);
@@ -369,7 +366,7 @@ async function registerWildcardImport(
   ctx: Context,
   path: string,
   importedFrom: string,
-  depth: number,
+  depth: number
 ): Promise<Duration> {
   return await ctx.timer.time('Register wildcard import', async (nonselfTime) => {
     const resolvedPath = await ctx.resolver.resolve(path, importedFrom);

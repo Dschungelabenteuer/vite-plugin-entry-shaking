@@ -18,7 +18,7 @@ export const DIALOG_CONTAINER_CLASS = 'dialog-container';
 export function useDialog(
   props: DialogProps,
   emit: ShortEmits<DialogEvents>,
-  element: Ref<HTMLDialogElement | null>,
+  element: Ref<HTMLDialogElement | null>
 ) {
   const trap = useFocusTrap(element);
   const timeout = ref<ReturnType<typeof setTimeout>>();
@@ -68,10 +68,7 @@ export function useDialog(
       isOpen.value = element.value?.open ?? false;
     });
 
-    observer.observe(element.value!, {
-      attributes: true,
-      attributeFilter: ['open'],
-    });
+    observer.observe(element.value!, { attributes: true, attributeFilter: ['open'] });
   });
 
   onUnmounted(() => {

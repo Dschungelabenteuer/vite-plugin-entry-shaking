@@ -59,7 +59,7 @@ describe('analyzeImportStatement', () => {
       entry, // Irrelevant for this test's puprposes
       entryPath,
       0,
-      input.length - 1,
+      input.length - 1
     );
 
     const res = src.toString().toLocaleLowerCase();
@@ -85,14 +85,7 @@ describe('analyzeImportStatement', () => {
     const input = `${importStart}} from "${path}";`;
     const entry = {
       exports: new Map([
-        [
-          'A_MODULE_H',
-          {
-            path: './modules/H',
-            importDefault: false,
-            originalName: 'A_MODULE_H',
-          },
-        ],
+        ['A_MODULE_H', { path: './modules/H', importDefault: false, originalName: 'A_MODULE_H' }],
         ['A_MODULE_I', { path: './modules/IJ', importDefault: true, originalName: undefined }],
         ['A_MODULE_J', { path: './modules/IJ', importDefault: false, originalName: 'J' }],
         ['A_MODULE_A', { path: './modules/A', importDefault: true, originalName: undefined }],
@@ -100,28 +93,10 @@ describe('analyzeImportStatement', () => {
         ['A_MODULE_C', { path: './modules/C', importDefault: true, originalName: undefined }],
         [
           'A_MODULE_D',
-          {
-            path: '@mocks/entry-a/modules/D',
-            importDefault: true,
-            originalName: undefined,
-          },
+          { path: '@mocks/entry-a/modules/D', importDefault: true, originalName: undefined },
         ],
-        [
-          'A_MODULE_E',
-          {
-            path: './modules/EF',
-            importDefault: false,
-            originalName: 'A_MODULE_E',
-          },
-        ],
-        [
-          'A_MODULE_F',
-          {
-            path: './modules/EF',
-            importDefault: false,
-            originalName: 'A_MODULE_F',
-          },
-        ],
+        ['A_MODULE_E', { path: './modules/EF', importDefault: false, originalName: 'A_MODULE_E' }],
+        ['A_MODULE_F', { path: './modules/EF', importDefault: false, originalName: 'A_MODULE_F' }],
         ['A_MODULE_G', { path: './modules/G', importDefault: false, originalName: 'G' }],
       ]),
     } as EntryData;
@@ -135,20 +110,20 @@ describe('analyzeImportStatement', () => {
       entry,
       entryPath,
       0,
-      input.length - 1,
+      input.length - 1
     );
 
     expect(src.toString()).toStrictEqual(
       dedent(`
       import { test } from '${entryPath}';
       import { default as A_MODULE_A, default as A_COPY } from '${await resolver(
-        `${path}/modules/A.ts`,
+        `${path}/modules/A.ts`
       )}';
       import { default as B } from '${await resolver(`${path}/modules/B.ts`)}';
       import { G as A_MODULE_G } from '${await resolver(`${path}/modules/G.ts`)}';
       import { J as JJ } from '${await resolver(`${path}/modules/IJ.ts`)}';
       import { default as A_MODULE_D } from '${await resolver(`${path}/modules/D.ts`)}';
-    `),
+    `)
     );
   });
 });
@@ -294,11 +269,7 @@ describe('getImportsMap', async () => {
     const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a')))!;
     const output = await ImportAnalyzer.getImportsMap(ctx, entry, entryPath, imports);
     expect(output.size).toStrictEqual(1);
-    expect(_(output)).toStrictEqual({
-      importDefault: false,
-      name: 'test',
-      alias: undefined,
-    });
+    expect(_(output)).toStrictEqual({ importDefault: false, name: 'test', alias: undefined });
   });
 
   it('should correctly feed the import map when [importing with alias] a named entity [directly defined in entry]', async () => {
@@ -306,11 +277,7 @@ describe('getImportsMap', async () => {
     const entryPath = (await resolver(resolve(__dirname, MOCKS_FOLDER_UNIT, 'entry-a')))!;
     const output = await ImportAnalyzer.getImportsMap(ctx, entry, entryPath, imports);
     expect(output.size).toStrictEqual(1);
-    expect(_(output)).toStrictEqual({
-      importDefault: false,
-      name: 'test',
-      alias: 'T',
-    });
+    expect(_(output)).toStrictEqual({ importDefault: false, name: 'test', alias: 'T' });
   });
 });
 
@@ -598,7 +565,7 @@ describe('findDirectWildcardExports', () => {
       const map = new Map() as TargetImports;
       vi.spyOn(ctx.resolver, 'resolve').mockImplementationOnce(() => Promise.resolve(resolvedPath));
       vi.spyOn(ImportAnalyzer, 'resolveImport').mockImplementationOnce(() =>
-        Promise.resolve(false),
+        Promise.resolve(false)
       );
 
       const fn = ImportAnalyzer.findDirectWildcardExports;
@@ -647,7 +614,7 @@ describe('resolveImportedEntities', () => {
     expect(ImportAnalyzer.resolveImportedCircularEntities).toHaveBeenCalledWith(
       ctx,
       imported,
-      path,
+      path
     );
   });
 
@@ -672,14 +639,7 @@ describe('resolveImportedCircularEntities', () => {
         entryPath,
         {
           exports: new Map([
-            [
-              'entryName',
-              {
-                path: sourcePath,
-                importDefault: false,
-                originalName: 'sourceName',
-              },
-            ],
+            ['entryName', { path: sourcePath, importDefault: false, originalName: 'sourceName' }],
           ]),
         } as EntryData,
       ],
@@ -688,19 +648,11 @@ describe('resolveImportedCircularEntities', () => {
 
     const output = await ImportAnalyzer.resolveImportedCircularEntities(
       ctx,
-      [
-        {
-          name: 'publicName',
-          originalName: 'entryName',
-          importDefault: false,
-        },
-      ],
-      entryPath,
+      [{ name: 'publicName', originalName: 'entryName', importDefault: false }],
+      entryPath
     );
 
-    expect(output).toStrictEqual([
-      `import { sourceName as publicName } from '${sourcePath}'`,
-    ]);
+    expect(output).toStrictEqual([`import { sourceName as publicName } from '${sourcePath}'`]);
   });
 });
 
@@ -715,7 +667,7 @@ describe('formatImportReplacement', () => {
         alias: undefined,
         originalName: undefined,
         importDefault,
-      }),
+      })
     ).toStrictEqual(`default as A`);
 
     expect(
@@ -724,7 +676,7 @@ describe('formatImportReplacement', () => {
         alias: 'A_RENAMED',
         originalName: undefined,
         importDefault,
-      }),
+      })
     ).toStrictEqual(`default as A_RENAMED`);
 
     expect(
@@ -733,7 +685,7 @@ describe('formatImportReplacement', () => {
         alias: undefined,
         originalName: 'A_ORIGIN',
         importDefault,
-      }),
+      })
     ).toStrictEqual(`default as A_ORIGIN`);
   });
 
@@ -748,7 +700,7 @@ describe('formatImportReplacement', () => {
         alias: undefined,
         originalName,
         importDefault,
-      }),
+      })
     ).toStrictEqual(`A_ORIGIN as A`);
 
     expect(
@@ -757,7 +709,7 @@ describe('formatImportReplacement', () => {
         alias: 'A_RENAMED',
         originalName,
         importDefault,
-      }),
+      })
     ).toStrictEqual(`A_ORIGIN as A_RENAMED`);
   });
 
@@ -771,7 +723,7 @@ describe('formatImportReplacement', () => {
         alias: undefined,
         originalName: undefined,
         importDefault,
-      }),
+      })
     ).toStrictEqual(`A`);
 
     expect(
@@ -780,7 +732,7 @@ describe('formatImportReplacement', () => {
         alias: 'A_RENAMED',
         originalName: undefined,
         importDefault,
-      }),
+      })
     ).toStrictEqual(`A as A_RENAMED`);
   });
 });

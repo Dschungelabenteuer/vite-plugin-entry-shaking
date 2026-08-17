@@ -9,10 +9,5 @@ export function usePanel(name: string): Panel {
     isOpen.value = !isOpen.value;
   };
 
-  return {
-    closeBtnId,
-    openBtnId,
-    isOpen,
-    toggle,
-  };
+  return { closeBtnId, openBtnId, isOpen, toggle };
 }

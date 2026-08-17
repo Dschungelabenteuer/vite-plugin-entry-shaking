@@ -21,23 +21,12 @@ setup((app) => {
 });
 
 const preview: Preview = {
-  globalTypes: {
-    colorScheme,
-  },
+  globalTypes: { colorScheme },
   decorators: [themeDecorator],
   parameters: {
     layout: 'fullscreen',
-    controls: {
-      matchers: {
-        color: /(background|color)$/i,
-        date: /Date$/i,
-      },
-    },
-    options: {
-      storySort: {
-        order: ['Assets'],
-      },
-    },
+    controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
+    options: { storySort: { order: ['Assets'] } },
   },
 };
 

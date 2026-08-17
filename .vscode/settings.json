@@ -1,19 +1,19 @@
 {
-  "editor.defaultFormatter": "biomejs.biome",
-  // DX.
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
     "source.fixAll.stylelint": "explicit",
-    "quickfix.biome": "explicit"
+    "source.fixAll.oxc": "always"
   },
-  // ESLint.
-  "eslint.validate": ["javascript", "javascriptreact", "yaml", "json", "jsonc", "json5"],
-  "eslint.workingDirectories": ["./packages/core", "./packages/debugger"],
-  "html.format.wrapAttributes": "force-expand-multiline",
-  // Stylelint.
-  "css.validate": false,
-  "less.validate": false,
-  "scss.validate": false,
-  "stylelint.enable": true,
-  "stylelint.validate": ["css", "scss", "postcss", "vue"]
+
+  "stylelint.validate": ["css", "scss"],
+
+  "editor.quickSuggestions": { "strings": "on" },
+  "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
+
+  // So you're still using them for legacy codebases, right? Not this time!
+  "eslint.enable": false,
+  "prettier.enable": false
 }

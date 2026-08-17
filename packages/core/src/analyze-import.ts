@@ -30,7 +30,7 @@ export async function analyzeImportStatement(
   entry: EntryData,
   entryPath: EntryPath,
   startPosition: number,
-  endPosition: number,
+  endPosition: number
 ) {
   const isWildCardImport = catchWildcardImport(src, code, startPosition, endPosition, entryPath);
   if (isWildCardImport) return;
@@ -72,7 +72,7 @@ async function getImportsMap(
   ctx: Context,
   entry: EntryData,
   entryPath: EntryPath,
-  imports: string[],
+  imports: string[]
 ): Promise<TargetImports> {
   const map: TargetImports = new Map([]);
 
@@ -102,7 +102,7 @@ async function resolveImport(
   path: EntryPath,
   map: TargetImports,
   name: string,
-  alias?: string,
+  alias?: string
 ) {
   const namedImport = await methods.findNamedImport(ctx, entry, path, map, name, alias);
   if (namedImport) return true;
@@ -130,7 +130,7 @@ export async function findNamedImport(
   entryPath: EntryPath,
   map: TargetImports,
   name: string,
-  alias?: string,
+  alias?: string
 ) {
   const namedImport = entry.exports.get(name);
   if (namedImport) {
@@ -161,7 +161,7 @@ export async function findNamedWildcard(
   entry: EntryData,
   entryPath: EntryPath,
   map: TargetImports,
-  name: string,
+  name: string
 ) {
   const wildcardImport = entry.wildcardExports?.named.get(name);
   if (wildcardImport) {
@@ -194,7 +194,7 @@ export async function findDirectWildcardExports(
   entryPath: EntryPath,
   map: TargetImports,
   name: string,
-  alias?: string,
+  alias?: string
 ) {
   const wildcardExports = entry.wildcardExports?.direct ?? [];
   for (const wildcardExportPath of wildcardExports) {
@@ -217,7 +217,7 @@ export async function findDirectWildcardExports(
           resolvedPath,
           map,
           name,
-          alias,
+          alias
         );
         if (found) return true;
       }
@@ -234,7 +234,7 @@ export async function findDirectWildcardExports(
 async function getImportReplacements(
   ctx: Context,
   imports: TargetImports,
-  entryPath: EntryPath,
+  entryPath: EntryPath
 ): Promise<ImportStatement[]> {
   const replacement: ImportStatement[] = [];
   // Iterate over all imported entities to rewrite a dedicated import statement.
@@ -258,7 +258,7 @@ async function resolveImportedEntities(
   ctx: Context,
   imported: ImportInput[],
   entryPath: EntryPath,
-  path: string,
+  path: string
 ): Promise<string[]> {
   // If the imported item is part of another entry point, let's resolve it from analysis.
   if (path !== entryPath && ctx.entries.has(path)) {
@@ -278,7 +278,7 @@ async function resolveImportedEntities(
 async function resolveImportedCircularEntities(
   ctx: Context,
   imported: ImportInput[],
-  path: string,
+  path: string
 ) {
   const entityMap = new Map<string, string[]>();
   const originalEntry = ctx.entries.get(path)!;
@@ -334,7 +334,7 @@ async function resolveImportedCircularEntities(
 
   const imports = [...entityMap.entries()];
   const formattedImports = imports.map(
-    ([p, ents]) => `import { ${ents.join(', ')} } from '${p}'`,
+    ([p, ents]) => `import { ${ents.join(', ')} } from '${p}'`
   ) as ImportStatement[];
 
   return [...formattedImports, ...circularStatements];
@@ -363,7 +363,7 @@ function catchWildcardImport(
   code: string,
   startPosition: number,
   endPosition: number,
-  entryPath: EntryPath,
+  entryPath: EntryPath
 ) {
   const isWildCardImport =
     code.slice(startPosition, WILDCARD_IMPORT_PREFIX.length) === WILDCARD_IMPORT_PREFIX;
@@ -373,7 +373,7 @@ function catchWildcardImport(
     src.overwrite(
       startPosition,
       endPosition + 1,
-      `${what.trim()} from "${addSourceQuerySuffix(entryPath)}";`,
+      `${what.trim()} from "${addSourceQuerySuffix(entryPath)}";`
     );
   }
 
@@ -393,7 +393,7 @@ function catchDynamicImport(
   code: string,
   startPosition: number,
   endPosition: number,
-  entryPath: EntryPath,
+  entryPath: EntryPath
 ) {
   const source = code.slice(startPosition, endPosition);
   const flatSource = source.replace(/\s/gm, '');

@@ -43,11 +43,7 @@ const { id, title, sort, columns, items, filters, matched, methods } = useBrowse
       minWidth: '100px',
       searchable: true,
     },
-    path: {
-      label: 'Path',
-      width: '1fr',
-      searchable: true,
-    },
+    path: { label: 'Path', width: '1fr', searchable: true },
   },
 });
 

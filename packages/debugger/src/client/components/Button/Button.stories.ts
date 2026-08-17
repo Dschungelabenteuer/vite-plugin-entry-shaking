@@ -15,51 +15,22 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = {
-  args: {
-    class: 'bordered',
-    label: 'My button',
-  },
-};
+export const Simple: Story = { args: { class: 'bordered', label: 'My button' } };
 
-export const WithIcon: Story = {
-  args: {
-    class: 'bordered',
-    label: 'My button',
-    icon: 'home',
-  },
-};
+export const WithIcon: Story = { args: { class: 'bordered', label: 'My button', icon: 'home' } };
 
 export const WithIconOnly: Story = {
-  args: {
-    class: 'bordered',
-    label: 'My button',
-    icon: 'home',
-    iconOnly: true,
-  },
+  args: { class: 'bordered', label: 'My button', icon: 'home', iconOnly: true },
 };
 
-export const Disabled: Story = {
-  args: {
-    class: 'bordered',
-    label: 'My button',
-    disabled: true,
-  },
-};
+export const Disabled: Story = { args: { class: 'bordered', label: 'My button', disabled: true } };
 
 export const DisabledWithReason: Story = {
-  args: {
-    class: 'bordered',
-    label: 'My button',
-    disabled: 'You have no right!',
-  },
+  args: { class: 'bordered', label: 'My button', disabled: 'You have no right!' },
 };
 
 export const WithPopover: Story = {
-  args: {
-    class: 'bordered',
-    label: 'My button',
-  },
+  args: { class: 'bordered', label: 'My button' },
   render: () => ({
     components: { Button },
     template: `
@@ -74,10 +45,7 @@ export const WithPopover: Story = {
 
 /** You may add trailing content to the button by using the `after` slot. */
 export const WithTrailingContent: Story = {
-  args: {
-    class: 'bordered',
-    label: 'My button',
-  },
+  args: { class: 'bordered', label: 'My button' },
   render: () => ({
     components: { Button, Icon, Kbd, Badge },
     template: `

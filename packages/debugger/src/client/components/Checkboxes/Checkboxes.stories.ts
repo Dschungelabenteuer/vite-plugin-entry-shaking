@@ -15,27 +15,16 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = {
-  args: {
-    options: Options,
-  },
-};
+export const Simple: Story = { args: { options: Options } };
 
-export const Disabled: Story = {
-  args: {
-    disabled: true,
-    options: Options,
-  },
-};
+export const Disabled: Story = { args: { disabled: true, options: Options } };
 
 export const DisabledOptions: Story = {
   render: getModelRenderFunction(Checkboxes, [
     OptionsWithDisabled[0].value,
     OptionsWithDisabled[3].value,
   ]),
-  args: {
-    options: OptionsWithDisabled,
-  },
+  args: { options: OptionsWithDisabled },
 };
 
 export default meta;

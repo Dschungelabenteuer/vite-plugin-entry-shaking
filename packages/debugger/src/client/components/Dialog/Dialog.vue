@@ -42,11 +42,7 @@ onMounted(() => {
   enableTeleports.value = true;
 });
 
-useViewTransition({
-  names: {
-    [dialogTransitionName.value]: element,
-  },
-});
+useViewTransition({ names: { [dialogTransitionName.value]: element } });
 defineExpose({
   element,
   refreshFocusTrap: trap.refresh,

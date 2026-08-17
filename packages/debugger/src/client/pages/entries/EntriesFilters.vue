@@ -6,14 +6,8 @@ import { useClassNames } from '@composables/useClassNames';
 const $class = useClassNames('entries-filters');
 const model = defineModel<('implicit' | 'explicit')[]>();
 const options: CheckboxProps[] = [
-  {
-    label: 'Implicit entries',
-    value: 'implicit',
-  },
-  {
-    label: 'Explicit entries',
-    value: 'explicit',
-  },
+  { label: 'Implicit entries', value: 'implicit' },
+  { label: 'Explicit entries', value: 'explicit' },
 ];
 </script>
 

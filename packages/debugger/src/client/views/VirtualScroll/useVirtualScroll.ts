@@ -11,7 +11,7 @@ export function useVirtualScroll(
   containerRef: Ref<HTMLElement | null>,
   contentRef: Ref<HTMLElement | null>,
   props: VirtualScrollProps,
-  emit: ShortEmits<VirtualScrollEvents>,
+  emit: ShortEmits<VirtualScrollEvents>
 ) {
   const scroll = ref(0);
 
@@ -24,8 +24,8 @@ export function useVirtualScroll(
       0,
       Math.floor(scroll.value / props.itemSize) -
         (props.padding ?? 0) -
-        (props.prerenderedBeforeStart ?? 0),
-    ),
+        (props.prerenderedBeforeStart ?? 0)
+    )
   );
   const offset = computed(() => startIndex.value * props.itemSize);
   const nbVisible = computed(() => {
@@ -33,22 +33,22 @@ export function useVirtualScroll(
     return (
       Math.min(
         totalCount.value - startIndex.value,
-        Math.ceil(containerSize / props.itemSize) + 2 * (props.padding ?? 0),
+        Math.ceil(containerSize / props.itemSize) + 2 * (props.padding ?? 0)
       ) + (props.prerenderAfterEnd ?? 0)
     );
   });
 
   const visibleItems = computed(() =>
-    props.items.slice(startIndex.value, startIndex.value + nbVisible.value),
+    props.items.slice(startIndex.value, startIndex.value + nbVisible.value)
   );
 
   const itemStyle = computed(
-    () => ({ position: 'relative', height: `${props.itemSize}px` }) as const,
+    () => ({ position: 'relative', height: `${props.itemSize}px` }) as const
   );
   const containerStyle = computed(() => ({ overflow: 'auto' }) as const);
   const contentStyle = computed(() => getElementStyle(contentSize.value, 'hidden'));
   const wrapperStyle = computed(
-    () => ({ transform: `${axisTranslateProp.value}(${offset.value}px)` }) as const,
+    () => ({ transform: `${axisTranslateProp.value}(${offset.value}px)` }) as const
   );
 
   const getElementStyle = (size: number, overflow: 'auto' | 'hidden') => ({

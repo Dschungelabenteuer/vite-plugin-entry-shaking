@@ -7,7 +7,7 @@ type MenuAxis = 'x' | 'y';
 export function useMenu(
   axis: MenuAxis | Ref<MenuAxis>,
   items: Ref<(HTMLButtonElement | null)[]>,
-  defaultActiveIndex = 0,
+  defaultActiveIndex = 0
 ) {
   const index = ref(defaultActiveIndex);
   const itemsCount = computed(() => items.value.length);

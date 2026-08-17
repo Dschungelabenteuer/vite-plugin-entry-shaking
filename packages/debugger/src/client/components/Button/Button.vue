@@ -13,11 +13,7 @@ const emit = defineEmits<ButtonEvents>();
 const _slots = defineSlots<ButtonSlots>();
 const props = withDefaults(defineProps<ButtonProps>(), {
   disabled: false,
-  tooltipOptions: () => ({
-    placement: 'top',
-    autoupdatePosition: true,
-    disable: false,
-  }),
+  tooltipOptions: () => ({ placement: 'top', autoupdatePosition: true, disable: false }),
 });
 
 const reference = ref<HTMLButtonElement | null>(null);

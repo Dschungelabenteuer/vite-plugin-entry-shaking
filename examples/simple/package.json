@@ -1,14 +1,13 @@
 {
   "name": "vite-plugin-entry-shaking-example-simple",
-  "type": "module",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@yungezeit/eslint-typescript": "^0.0.12",
     "sass": "^1.79.3",
     "typescript": "^5.6.2",
     "vite": "^5.4.7",

@@ -22,7 +22,7 @@ const source = computed(() =>
     ...transform,
     absolutePath: path,
     relativePath: relativePath(store.root, path),
-  })),
+  }))
 );
 
 const defaultFilters: string[] = [];
@@ -33,12 +33,7 @@ const { id, title, sort, columns, items, matched, methods } = useBrowserData({
   filterFn: () => true,
   defaultFilters,
   columns: {
-    icon: {
-      label: '',
-      width: '2.5rem',
-      minWidth: '100px',
-      class: 'no-padding',
-    },
+    icon: { label: '', width: '2.5rem', minWidth: '100px', class: 'no-padding' },
     timestamp: {
       label: 'Time',
       class: 'centered',
@@ -57,11 +52,7 @@ const { id, title, sort, columns, items, matched, methods } = useBrowserData({
       ascLabel: 'Show slowest first',
       descLabel: 'Show fastest first',
     },
-    id: {
-      label: 'File',
-      width: '1fr',
-      searchable: true,
-    },
+    id: { label: 'File', width: '1fr', searchable: true },
   },
 });
 

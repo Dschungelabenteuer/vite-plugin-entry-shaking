@@ -44,10 +44,7 @@ export default defineConfig({
         // Using direct paths.
         resolve(__dirname, 'src/entry-a'),
         // Or using glob patterns.
-        {
-          glob: 'src/utils/*.ts',
-          globOptions: { ignore: ['excluded.ts'] },
-        }
+        { glob: 'src/utils/*.ts', globOptions: { ignore: ['excluded.ts'] } },
       ],
     }),
   ],
@@ -252,7 +249,7 @@ to make the code it explicitly defines work.
 ## Limitations
 
 See `es-module-lexer`'s
-  [own limitations](https://github.com/guybedford/es-module-lexer#limitations).
+[own limitations](https://github.com/guybedford/es-module-lexer#limitations).
 
 ### Behaviour
 

@@ -58,7 +58,8 @@ const items = computed(() => {
     <span
       v-if="i < items.length - 1"
       :class="$class('sep')"
-    >+</span>
+      >+</span
+    >
   </template>
 </template>
 

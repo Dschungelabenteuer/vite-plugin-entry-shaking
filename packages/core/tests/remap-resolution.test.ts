@@ -9,16 +9,16 @@ const fixtureRoot = normalizePath(resolve(__dirname, '__mocks__/remap'));
 const consumerPath = normalizePath(resolve(fixtureRoot, 'consumer.ts'));
 const modeWatcherConsumerPath = normalizePath(resolve(fixtureRoot, 'consumer-mode-watcher.ts'));
 const coreEntryPath = normalizePath(
-  resolve(fixtureRoot, 'node_modules/@cms/core/admin/dist/lib/index.ts'),
+  resolve(fixtureRoot, 'node_modules/@cms/core/admin/dist/lib/index.ts')
 );
 const coreModeWatcherPath = normalizePath(
-  resolve(fixtureRoot, 'node_modules/@cms/core/admin/dist/lib/mode-watcher.ts'),
+  resolve(fixtureRoot, 'node_modules/@cms/core/admin/dist/lib/mode-watcher.ts')
 );
 const testEntryPath = normalizePath(
-  resolve(fixtureRoot, 'node_modules/@cms/test/admin/dist/lib/index.ts'),
+  resolve(fixtureRoot, 'node_modules/@cms/test/admin/dist/lib/index.ts')
 );
 const testModeWatcherPath = normalizePath(
-  resolve(fixtureRoot, 'node_modules/@cms/test/admin/dist/lib/mode-watcher.ts'),
+  resolve(fixtureRoot, 'node_modules/@cms/test/admin/dist/lib/mode-watcher.ts')
 );
 
 type RemapMode = 'package-entry' | 'concrete-file';
@@ -26,7 +26,7 @@ type RemapMode = 'package-entry' | 'concrete-file';
 function remapCmsCoreAdmin(
   mode: RemapMode,
   remapModeWatcher = false,
-  remapTopLevel = false,
+  remapTopLevel = false
 ): Plugin {
   return {
     name: `test-remap-cms-core-admin-${mode}`,
@@ -47,21 +47,15 @@ async function createFixtureServer(
   target: string,
   remapMode?: RemapMode,
   remapModeWatcher = false,
-  remapTopLevel = false,
+  remapTopLevel = false
 ) {
   return await createServer({
     appType: 'custom',
     configFile: false,
     logLevel: 'silent',
     root: fixtureRoot,
-    optimizeDeps: {
-      include: [],
-      noDiscovery: true,
-    },
-    server: {
-      hmr: false,
-      middlewareMode: true,
-    },
+    optimizeDeps: { include: [], noDiscovery: true },
+    server: { hmr: false, middlewareMode: true },
     plugins: [
       ...(remapMode ? [remapCmsCoreAdmin(remapMode, remapModeWatcher, remapTopLevel)] : []),
       ...createEntryShakingPlugin({ maxWildcardDepth: 5, targets: [target] }),
@@ -78,10 +72,14 @@ function expectCodeUsesPackage(code: string, packageName: 'core' | 'test') {
   expect(code).toContain(`/node_modules/@cms/${packageName}/admin/dist/lib/ModeWatcher.svelte`);
   expect(code).toContain(`/node_modules/@cms/${packageName}/admin/dist/lib/object.ts`);
   expect(code).toContain(`/node_modules/@cms/${packageName}/admin/dist/lib/mode-watcher.ts`);
-  expect(code).not.toContain(`/node_modules/@cms/${otherPackageName}/admin/dist/lib/ModeWatcher.svelte`);
+  expect(code).not.toContain(
+    `/node_modules/@cms/${otherPackageName}/admin/dist/lib/ModeWatcher.svelte`
+  );
   expect(code).not.toContain(`/node_modules/@cms/${otherPackageName}/admin/dist/lib/object.ts`);
   expect(code).not.toContain(`/node_modules/@cms/${otherPackageName}/admin/dist/lib/index.ts`);
-  expect(code).not.toContain(`/node_modules/@cms/${otherPackageName}/admin/dist/lib/mode-watcher.ts`);
+  expect(code).not.toContain(
+    `/node_modules/@cms/${otherPackageName}/admin/dist/lib/mode-watcher.ts`
+  );
   expect(code).not.toContain('@cms_test_admin');
   expect(code).toContain('default as ModeWatcher');
 }

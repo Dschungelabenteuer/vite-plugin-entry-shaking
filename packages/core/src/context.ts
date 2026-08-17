@@ -65,7 +65,7 @@ export class Context {
    */
   constructor(
     public options: Required<FinalPluginOptions>,
-    public config: ResolvedConfig,
+    public config: ResolvedConfig
   ) {
     this.logger = new Logger(config.logger, false);
     this.logger.info('Plugin configuration resolved');

@@ -29,7 +29,7 @@ export function useGridControls<Cols extends Record<string, Column>, Items exten
   props: GridProps<Cols, Items>,
   gridRef: Ref<HTMLElement | null>,
   data: UseGridDataReturn,
-  layout: UseGridLayoutReturn,
+  layout: UseGridLayoutReturn
 ) {
   const quickNavLabel = (direction: 'up' | 'down') =>
     `Jump ${data.pageSize.value} rows ${direction}`;
@@ -64,7 +64,7 @@ export function useGridControls<Cols extends Record<string, Column>, Items exten
   const scrollToActiveRow = () =>
     scrollTo(
       layout.scrollLeft.value,
-      data.activeRow.value * props.minItemSize - (gridRef.value?.clientHeight ?? 0) / 2,
+      data.activeRow.value * props.minItemSize - (gridRef.value?.clientHeight ?? 0) / 2
     );
 
   /** Whenever a line is mounted, let's add roving tabindex behaviour. */
@@ -134,19 +134,17 @@ export function useGridControls<Cols extends Record<string, Column>, Items exten
       if (gridScrollerBoundaries.value.bottom - bottom <= 1 * rowSize) {
         gridScrollerElement.value?.scrollTo(
           gridScrollerElement.value.scrollLeft,
-          gridScrollerElement.value.scrollTop + rowSize,
+          gridScrollerElement.value.scrollTop + rowSize
         );
       } else if (top - gridScrollerBoundaries.value.top <= 1 * rowSize) {
         gridScrollerElement.value?.scrollTo(
           gridScrollerElement.value.scrollLeft,
-          gridScrollerElement.value.scrollTop - rowSize,
+          gridScrollerElement.value.scrollTop - rowSize
         );
       }
     }
 
-    target.focus({
-      preventScroll: !autoscroll,
-    });
+    target.focus({ preventScroll: !autoscroll });
   }
 
   /**

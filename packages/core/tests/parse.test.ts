@@ -20,13 +20,10 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         const secondNamedImport = 'UserName';
         const parsed = Parsers.parseImportStatement(
           createStatementVariant(
-            `export { ${firstNamedImport}, ${secondNamedImport} } from '@model/user';`,
-          ),
+            `export { ${firstNamedImport}, ${secondNamedImport} } from '@model/user';`
+          )
         );
-        expect(parsed).toMatchObject({
-          namedImports: ['UserId', 'UserName'],
-          defaultImports: [],
-        });
+        expect(parsed).toMatchObject({ namedImports: ['UserId', 'UserName'], defaultImports: [] });
       });
 
       it('should correctly parse aggregated export statement with alias', () => {
@@ -34,8 +31,8 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         const secondNamedImport = 'UserName';
         const parsed = Parsers.parseImportStatement(
           createStatementVariant(
-            `export { ${firstNamedImport}, ${secondNamedImport} } from '@model/user';`,
-          ),
+            `export { ${firstNamedImport}, ${secondNamedImport} } from '@model/user';`
+          )
         );
         expect(parsed).toMatchObject({
           namedImports: [firstNamedImport, secondNamedImport],
@@ -46,12 +43,9 @@ describe.each([true, false])('with or without new line characters', (newLineChar
       it('should correctly parse aggregated export statement with only aliased default export', () => {
         const defaultImports = ['User'];
         const parsed = Parsers.parseImportStatement(
-          createStatementVariant(`export { default as ${defaultImports[0]} } from '@model/user';`),
+          createStatementVariant(`export { default as ${defaultImports[0]} } from '@model/user';`)
         );
-        expect(parsed).toMatchObject({
-          namedImports: [],
-          defaultImports,
-        });
+        expect(parsed).toMatchObject({ namedImports: [], defaultImports });
       });
 
       it('should correctly parse aggregated export statement with aliased default export', () => {
@@ -59,13 +53,10 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         const firstNamedImport = 'UserName';
         const parsed = Parsers.parseImportStatement(
           createStatementVariant(
-            `export { default as ${defaultImports[0]}, ${firstNamedImport} } from '@model/user';`,
-          ),
+            `export { default as ${defaultImports[0]}, ${firstNamedImport} } from '@model/user';`
+          )
         );
-        expect(parsed).toMatchObject({
-          namedImports: ['UserName'],
-          defaultImports,
-        });
+        expect(parsed).toMatchObject({ namedImports: ['UserName'], defaultImports });
       });
 
       it('should correctly parse multiline export statement', () => {
@@ -76,8 +67,8 @@ describe.each([true, false])('with or without new line characters', (newLineChar
             createStatementVariant(`export {
           ${firstNamedImport},
           ${secondNamedImport},
-        } from '@model/user';`),
-          ),
+        } from '@model/user';`)
+          )
         );
         expect(parsed).toMatchObject({
           namedImports: [firstNamedImport, secondNamedImport],
@@ -92,8 +83,8 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         const secondNamedImport = 'UserName';
         const parsed = Parsers.parseImportStatement(
           createStatementVariant(
-            `import { ${firstNamedImport}, ${secondNamedImport} } from '@model/user';`,
-          ),
+            `import { ${firstNamedImport}, ${secondNamedImport} } from '@model/user';`
+          )
         );
         expect(parsed).toMatchObject({
           namedImports: [firstNamedImport, secondNamedImport],
@@ -104,12 +95,9 @@ describe.each([true, false])('with or without new line characters', (newLineChar
       it('should correctly parse import statement when only importing default export', () => {
         const defaultImports = ['User'];
         const parsed = Parsers.parseImportStatement(
-          createStatementVariant(`import ${defaultImports.join(',')} from '@model/user';`),
+          createStatementVariant(`import ${defaultImports.join(',')} from '@model/user';`)
         );
-        expect(parsed).toMatchObject({
-          namedImports: [],
-          defaultImports,
-        });
+        expect(parsed).toMatchObject({ namedImports: [], defaultImports });
       });
 
       it('should correctly parse import statement when importing default export then named exports', () => {
@@ -118,8 +106,8 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         const secondNamedImport = 'UserName';
         const parsed = Parsers.parseImportStatement(
           createStatementVariant(
-            `import ${defaultImports[0]}, { ${firstNamedImport}, ${secondNamedImport} } from '@model/user';`,
-          ),
+            `import ${defaultImports[0]}, { ${firstNamedImport}, ${secondNamedImport} } from '@model/user';`
+          )
         );
         expect(parsed).toMatchObject({
           namedImports: [firstNamedImport, secondNamedImport],
@@ -134,8 +122,8 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         const secondNamedImport = 'UserName';
         const parsed = Parsers.parseImportStatement(
           createStatementVariant(
-            `import { ${firstNamedImport}, ${secondNamedImport} }, ${defaultImports[0]} from '@model/user';`,
-          ),
+            `import { ${firstNamedImport}, ${secondNamedImport} }, ${defaultImports[0]} from '@model/user';`
+          )
         );
         expect(parsed).toMatchObject({
           namedImports: [firstNamedImport, secondNamedImport],
@@ -149,8 +137,8 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         const secondNamedImport = 'UserName';
         const parsed = Parsers.parseImportStatement(
           createStatementVariant(
-            `import ${defaultImports[0]}, { ${firstNamedImport}, ${secondNamedImport} } from '@model/user';`,
-          ),
+            `import ${defaultImports[0]}, { ${firstNamedImport}, ${secondNamedImport} } from '@model/user';`
+          )
         );
         expect(parsed).toMatchObject({
           namedImports: [firstNamedImport, secondNamedImport],
@@ -163,13 +151,10 @@ describe.each([true, false])('with or without new line characters', (newLineChar
         const firstNamedImport = 'UserName';
         const parsed = Parsers.parseImportStatement(
           createStatementVariant(
-            `import { default as ${defaultImports[0]}, ${firstNamedImport} } from '@model/user';`,
-          ),
+            `import { default as ${defaultImports[0]}, ${firstNamedImport} } from '@model/user';`
+          )
         );
-        expect(parsed).toMatchObject({
-          namedImports: [firstNamedImport],
-          defaultImports,
-        });
+        expect(parsed).toMatchObject({ namedImports: [firstNamedImport], defaultImports });
       });
     });
   });
@@ -177,10 +162,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
   describe('parseImportParams', () => {
     it('should return correct structure when there is no alias', () => {
       const name = 'User';
-      expect(Parsers.parseImportParams(name)).toStrictEqual({
-        name,
-        alias: undefined,
-      });
+      expect(Parsers.parseImportParams(name)).toStrictEqual({ name, alias: undefined });
     });
 
     it('should return correct structure when there is an alias', () => {

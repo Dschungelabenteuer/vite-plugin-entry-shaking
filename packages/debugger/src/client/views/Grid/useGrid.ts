@@ -10,7 +10,7 @@ import { useGridLayout } from './useGridLayout';
 export function useGrid<Cols extends Record<string, Column>, Items extends any[]>(
   props: GridProps<Cols, Items>,
   gridRef: Ref<HTMLElement | null>,
-  $class: ClassNameFn,
+  $class: ClassNameFn
 ) {
   /** Scrollable grid content element. */
   const gridScrollerRef = ref<HTMLElement | null>(null);

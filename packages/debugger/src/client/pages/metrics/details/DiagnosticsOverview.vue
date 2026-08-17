@@ -14,10 +14,7 @@ const props = defineProps<DiagnosticsOverviewProps>();
 const defaultFilters: string[] = [];
 const total = computed(() => props.diagnostics.listPerPath.size);
 const source = computed(() =>
-  [...props.diagnostics.listPerPath.entries()].map(([path, ids]) => ({
-    count: ids.length,
-    path,
-  })),
+  [...props.diagnostics.listPerPath.entries()].map(([path, ids]) => ({ count: ids.length, path }))
 );
 
 const { id, title, sort, columns, items, matched, methods } = useBrowserData({
@@ -27,12 +24,7 @@ const { id, title, sort, columns, items, matched, methods } = useBrowserData({
   filterFn: () => true,
   defaultFilters,
   columns: {
-    icon: {
-      label: '',
-      width: '2.5rem',
-      minWidth: '100px',
-      class: 'no-padding',
-    },
+    icon: { label: '', width: '2.5rem', minWidth: '100px', class: 'no-padding' },
     count: {
       label: 'Count',
       class: 'centered',
@@ -42,20 +34,13 @@ const { id, title, sort, columns, items, matched, methods } = useBrowserData({
       ascLabel: 'Show entry with most diagnostics first',
       descLabel: 'Show entry with least diagnostics first',
     },
-    id: {
-      label: 'File',
-      width: '1fr',
-      searchable: true,
-    },
+    id: { label: 'File', width: '1fr', searchable: true },
   },
 });
 
 const rowClass = 'diagnostic';
 const minItemSize = 48;
-const page = {
-  name: 'Files with diagnostics',
-  pageIcon: 'alert-triangle',
-};
+const page = { name: 'Files with diagnostics', pageIcon: 'alert-triangle' };
 </script>
 
 <template>

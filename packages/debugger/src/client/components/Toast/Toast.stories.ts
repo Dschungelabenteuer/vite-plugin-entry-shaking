@@ -31,38 +31,16 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = {
-  args: {},
-};
+export const Simple: Story = { args: {} };
 
-export const Info: Story = {
-  args: {
-    type: 'info',
-  },
-};
+export const Info: Story = { args: { type: 'info' } };
 
-export const Success: Story = {
-  args: {
-    type: 'success',
-  },
-};
+export const Success: Story = { args: { type: 'success' } };
 
-export const Warning: Story = {
-  args: {
-    type: 'warning',
-  },
-};
+export const Warning: Story = { args: { type: 'warning' } };
 
-export const Error: Story = {
-  args: {
-    type: 'error',
-  },
-};
+export const Error: Story = { args: { type: 'error' } };
 
-export const Loading: Story = {
-  args: {
-    type: 'loading',
-  },
-};
+export const Loading: Story = { args: { type: 'loading' } };
 
 export default meta;
