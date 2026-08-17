@@ -14,5 +14,12 @@
   "singleAttributePerLine": true,
   "bracketSameLine": false,
   "bracketSpacing": true,
-  "ignorePatterns": ["**/dist", "**/lib"]
+  "ignorePatterns": [
+    "**/dist",
+    "**/lib",
+    "**/coverage",
+    "**/node_modules",
+    "**/tests/__mocks__",
+    "**/tests/cases"
+  ]
 }

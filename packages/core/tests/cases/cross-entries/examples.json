@@ -1,1 +1,4 @@
-{ "$schema": "../examples.schema.json", "examples": {} }
+{
+  "$schema": "../examples.schema.json",
+  "examples": {}
+}
