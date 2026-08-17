@@ -14,7 +14,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
     "sass": "^1.79.3",
-    "typescript": "^5.6.2",
+    "typescript": "catalog:",
     "vite": "^5.4.7",
     "vite-plugin-entry-shaking": "workspace:*",
     "vue-tsc": "^2.1.6"
