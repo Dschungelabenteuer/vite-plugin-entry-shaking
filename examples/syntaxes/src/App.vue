@@ -3,11 +3,7 @@ import summary from './data/summary.json';
 
 type GroupData = Record<string, ExampleData>;
 
-type ExampleData = {
-  exampleName: string;
-  examplePath: string;
-  exampleDescription: string;
-};
+type ExampleData = { exampleName: string; examplePath: string; exampleDescription: string };
 
 const groups = summary as [string, GroupData][];
 const openExample = async (path: string) => {
@@ -34,9 +30,7 @@ const openExample = async (path: string) => {
         <div>
           <h3>{{ exampleName }}</h3>
           <p>{{ exampleDescription }}</p>
-          <button @click="() => openExample(examplePath)">
-            Load file
-          </button>
+          <button @click="() => openExample(examplePath)">Load file</button>
         </div>
       </div>
     </div>
@@ -45,7 +39,7 @@ const openExample = async (path: string) => {
 
 <style>
 body {
-  font-family:sans-serif;
+  font-family: sans-serif;
   margin: 0;
   padding: 0;
   background-color: #f5f6f8;
@@ -59,7 +53,7 @@ body {
 
 .case {
   display: flex;
-  width: 100%;;
+  width: 100%;
   align-self: center;
   padding: 0.5rem 1rem;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);

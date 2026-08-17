@@ -66,10 +66,7 @@ export function useBrowserData<
       return 0;
     });
 
-  const sort = computed(() => ({
-    column: sortColumn.value,
-    direction: sortDirection.value,
-  }));
+  const sort = computed(() => ({ column: sortColumn.value, direction: sortDirection.value }));
 
   const matchesSearch = (item: Item) =>
     !(
@@ -92,10 +89,7 @@ export function useBrowserData<
     search.value = searched.length ? searched : undefined;
   };
 
-  const methods = {
-    onSortChange,
-    onSearch,
-  };
+  const methods = { onSortChange, onSearch };
 
   return {
     /** ID of the browser. */

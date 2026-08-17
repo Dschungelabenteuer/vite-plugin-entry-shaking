@@ -21,7 +21,7 @@ const model = defineModel<boolean | string[]>();
       :value="value"
       type="checkbox"
       :disabled="disabled"
-    >
+    />
     <label :for="id">
       {{ label }}
     </label>

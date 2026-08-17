@@ -32,16 +32,10 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = {
-  args: {
-    items: SimpleMenuItems,
-  },
-};
+export const Simple: Story = { args: { items: SimpleMenuItems } };
 
 export const WithIcons: Story = {
-  args: {
-    items: MenuItemsWithIcons,
-  },
+  args: { items: MenuItemsWithIcons },
   render: (args) => ({
     components: { DropdownMenu, Button, Icon },
     setup() {

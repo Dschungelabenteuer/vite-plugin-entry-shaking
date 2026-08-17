@@ -88,8 +88,4 @@ export type GridHeaderProps = {
 export type UseGridDataReturn = ReturnType<typeof useGridData>;
 export type UseGridControlsReturn = ReturnType<typeof useGridControls>;
 export type UseGridLayoutReturn = ReturnType<typeof useGridLayout>;
-export type RenderTracker = {
-  row: number;
-  resolve: (value: unknown) => void;
-  reject: () => void;
-};
+export type RenderTracker = { row: number; resolve: (value: unknown) => void; reject: () => void };

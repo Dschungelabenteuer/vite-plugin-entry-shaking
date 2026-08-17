@@ -7,12 +7,12 @@ import type { VerticalTab, VerticalTabsProps } from './VerticalTabs.types';
 
 export function useVerticalTabs(
   props: VerticalTabsProps,
-  tabs: Ref<(ButtonInstance | HTMLButtonElement | null)[]>,
+  tabs: Ref<(ButtonInstance | HTMLButtonElement | null)[]>
 ) {
   const activeTabId = props.activeTabId
     ? Math.max(
         0,
-        props.tabs.findIndex((tab) => tab.id === props.activeTabId),
+        props.tabs.findIndex((tab) => tab.id === props.activeTabId)
       )
     : 0;
   const menuItems = ref<(HTMLButtonElement | null)[]>([]);
@@ -26,7 +26,7 @@ export function useVerticalTabs(
 
   watchEffect(() => {
     menuItems.value = tabs.value.map((item) =>
-      isComponentInstance(item) ? item!.reference : item,
+      isComponentInstance(item) ? item!.reference : item
     );
   });
   return { ids, menu, tablistWidth, setActiveTab };
@@ -38,9 +38,5 @@ export function useVerticalTabsIds(props: VerticalTabsProps) {
   const getTabPanelId = (tabId: VerticalTab['id']) => `${getTabId(tabId)}_tab`;
   const getTabButtonId = (tabId: VerticalTab['id']) => `${getTabId(tabId)}_btn`;
 
-  return {
-    getTabId,
-    getTabPanelId,
-    getTabButtonId,
-  };
+  return { getTabId, getTabPanelId, getTabButtonId };
 }

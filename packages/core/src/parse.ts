@@ -11,7 +11,11 @@ export function parseImportStatement(statement: string): ParsedImportStatement {
     wildcardImport: undefined,
   };
 
-  const [, , importContent] = /(im|ex)port\s+((.|\n)*)\s+from/.exec(statement) ?? [, , undefined];
+  const [, , importContent] = /(im|ex)port\s+((.|\n)*)\s+from/.exec(statement) ?? [
+    undefined,
+    undefined,
+    undefined,
+  ];
   return importContent ? methods.parseImportStatementContent(importContent) : output;
 }
 
@@ -37,7 +41,7 @@ export function parseImportStatementContent(importContent: string) {
     output.wildcardImport = s.trim();
   };
 
-  const def = [, undefined];
+  const def = [undefined, undefined];
   const [namedImportsStatement, namedImportsContent] = /{([\s\S]*)}/.exec(importContent) ?? def;
   if (namedImportsStatement && namedImportsContent) {
     importContent = importContent.replace(namedImportsStatement, '');
@@ -77,10 +81,6 @@ export function parseImportParams(importString: string) {
   return { name, alias };
 }
 
-const methods = {
-  parseImportStatementContent,
-  parseImportStatement,
-  parseImportParams,
-};
+const methods = { parseImportStatementContent, parseImportStatement, parseImportParams };
 
 export default methods;

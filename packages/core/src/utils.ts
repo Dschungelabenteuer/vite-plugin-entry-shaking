@@ -5,12 +5,12 @@ import type { EntryPath, EntryTarget, TargetGlobPattern, TargetObject } from './
 
 export type Parallel = <T extends any[]>(
   items: T,
-  cb: ParallelCb<T>,
+  cb: ParallelCb<T>
 ) => Promise<any[]> | Promise<void>;
 export type ParallelCb<T> = (
   item: T extends (infer A)[] ? A : never,
   index: number,
-  array: any[],
+  array: any[]
 ) => Promise<any>;
 
 /** Runs multiple promises in parallel. */

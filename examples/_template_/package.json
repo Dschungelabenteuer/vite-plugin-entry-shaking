@@ -1,8 +1,8 @@
 {
   "name": "vite-plugin-entry-shaking-example-template",
-  "type": "module",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc && vite build",
@@ -14,7 +14,6 @@
   "devDependencies": {
     "@types/node": "^22.5.5",
     "@vitejs/plugin-vue": "^6.0.4",
-    "@yungezeit/eslint-vue": "^0.0.23",
     "sass": "^1.97.3",
     "typescript": "^5.6.2",
     "vite": "^6.4.1",

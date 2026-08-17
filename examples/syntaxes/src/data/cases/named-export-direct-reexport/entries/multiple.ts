@@ -11,5 +11,5 @@ export const ExportDefinedFromTarget = 'ExportDefinedFromTarget';
 const CodeDefinedFromTarget = `CodeDefinedFromTarget: ${ConsumedExport}`;
 console.info(
   'This is being printed from target, which means target was requested',
-  CodeDefinedFromTarget,
+  CodeDefinedFromTarget
 );

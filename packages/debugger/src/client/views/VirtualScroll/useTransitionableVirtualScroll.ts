@@ -11,7 +11,7 @@ export function useTransitionableVirtualScroll(
   contentRef: Ref<HTMLElement | null>,
   props: VirtualScrollProps,
   emit: ShortEmits<VirtualScrollEvents>,
-  beforeItemsCount: number | ComputedRef<number> = 0,
+  beforeItemsCount: number | ComputedRef<number> = 0
 ) {
   // Base virtual scroll behaviour.
   const {
@@ -56,7 +56,7 @@ export function useTransitionableVirtualScroll(
     () =>
       visibleItems.value.length +
       (props.prerenderedBeforeStart ?? 0) +
-      (props.prerenderAfterEnd ?? 0),
+      (props.prerenderAfterEnd ?? 0)
   );
 
   const getItemDelay = (index: number) => `${(index + toValue(beforeItemsCount)) * ITEM_DELAY}ms`;

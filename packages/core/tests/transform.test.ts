@@ -44,7 +44,7 @@ describe('transformIfNeeded', () => {
 
   beforeEach(() => {
     vi.spyOn(Transformer, 'transformImportsIfNeeded').mockImplementationOnce(() =>
-      Promise.resolve(''),
+      Promise.resolve('')
     );
   });
 

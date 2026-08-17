@@ -15,10 +15,10 @@ import type { EntryExports } from './types';
 export function cleanupEntry(
   rawEntry: string,
   entryMap: EntryExports,
-  exps: readonly ExportSpecifier[],
+  exps: readonly ExportSpecifier[]
 ) {
   return methods.reformatRemainingExports(
-    methods.removeEmptyExports(methods.removeResolvedExports(rawEntry, entryMap, exps)),
+    methods.removeEmptyExports(methods.removeResolvedExports(rawEntry, entryMap, exps))
   );
 }
 
@@ -53,7 +53,7 @@ const removeEmptyExports = (content: string) => content.replace(/(export {[^\w}]
 export function removeResolvedExports(
   rawEntry: string,
   entryMap: EntryExports,
-  exps: readonly ExportSpecifier[],
+  exps: readonly ExportSpecifier[]
 ): string {
   type ReplacementData = [number, number, string];
   const output = new MagicString(rawEntry);

@@ -1,7 +1,7 @@
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { cp, mkdir, readdir, rm, readFile, writeFile } from 'fs/promises';
-import { readFileSync, readdirSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,7 +35,7 @@ const getEntryContent = async (entryPath) =>
 })();
 
 async function cleanupExample() {
-  await rm(pathToSyntaxesExample, { recursive: true }).catch((e) => {});
+  await rm(pathToSyntaxesExample, { recursive: true }).catch(() => {});
   await mkdir(pathToSyntaxesExample);
 }
 
@@ -114,6 +114,6 @@ function parseGroupFiles(files) {
 
       return out;
     },
-    { entries: [], examples: [] },
+    { entries: [], examples: [] }
   );
 }

@@ -85,12 +85,7 @@ export function useMetricsPanel() {
       value: store.options.maxWildcardDepth ?? '0',
       type: 'raw',
     },
-    {
-      label: 'debug',
-      icon: 'bug',
-      value: String(store.options.debug ?? false),
-      type: 'raw',
-    },
+    { label: 'debug', icon: 'bug', value: String(store.options.debug ?? false), type: 'raw' },
   ]);
 
   return {

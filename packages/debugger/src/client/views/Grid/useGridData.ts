@@ -5,7 +5,7 @@ import type { Column, GridProps, GridRowProps } from './Grid.types';
 
 export function useGridData<Cols extends Record<string, Column>, Items extends any[]>(
   props: GridProps<Cols, Items>,
-  gridRef: Ref<HTMLElement | null>,
+  gridRef: Ref<HTMLElement | null>
 ) {
   const rows = computed(() => props.items);
   const rowCount = computed(() => props.items.length);

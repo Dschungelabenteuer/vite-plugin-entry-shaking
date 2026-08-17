@@ -16,10 +16,7 @@ const diagnostics = createDiagnostics(entries);
 
 const _ = wsMessageName;
 
-const consumer: ConsumerPackageInfo = {
-  name: 'vpes-debugger-with-mocks',
-  version: '0.0.0',
-};
+const consumer: ConsumerPackageInfo = { name: 'vpes-debugger-with-mocks', version: '0.0.0' };
 
 function devPlugin() {
   return {
@@ -28,7 +25,7 @@ function devPlugin() {
       ws.on(READY, () => {
         ws.send(
           READY,
-          JSONMap.stringify({ root, entries, logs, consumer, metrics, diagnostics, options }),
+          JSONMap.stringify({ root, entries, logs, consumer, metrics, diagnostics, options })
         );
         transforms.forEach((transform) => {
           ws.send(_('registerTransform'), JSONMap.stringify(transform));

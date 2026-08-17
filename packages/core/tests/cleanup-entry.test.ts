@@ -165,7 +165,7 @@ describe('removeResolvedExports', () => {
     const output = EntryCleaner.removeResolvedExports(
       mockedRawEntry,
       mockedEntryMap,
-      mockedExports,
+      mockedExports
     );
 
     expect(output).toStrictEqual(mockedRemovedResolvedEntry);

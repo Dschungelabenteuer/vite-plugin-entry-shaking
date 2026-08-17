@@ -90,7 +90,6 @@ export function testWithDefaultImportReexport(middleTarget?: CaseTarget) {
       await testCase(targetList, input, output);
     });
 
-
     it('should work when target imports then re-exports a simple default import multiple times', async () => {
       const resolved = await resolveModule('default-export');
       const target = await createCaseTarget(targetName, 2);

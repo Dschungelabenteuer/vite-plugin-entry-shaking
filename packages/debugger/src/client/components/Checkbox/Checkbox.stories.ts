@@ -14,25 +14,13 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = {
-  args: {
-    label: 'Is it allowed?',
-  },
-};
+export const Simple: Story = { args: { label: 'Is it allowed?' } };
 
-export const Disabled: Story = {
-  args: {
-    label: 'Is it allowed?',
-    disabled: true,
-  },
-};
+export const Disabled: Story = { args: { label: 'Is it allowed?', disabled: true } };
 
 export const DisabledAndChecked: Story = {
   render: getModelRenderFunction(Checkbox, true),
-  args: {
-    label: 'Is it allowed?',
-    disabled: true,
-  },
+  args: { label: 'Is it allowed?', disabled: true },
 };
 
 export default meta;

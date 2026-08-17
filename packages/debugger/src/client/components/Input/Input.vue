@@ -10,9 +10,7 @@ import type { InputProps, InputSlots } from './Input.types';
 const $class = useClassNames('input');
 const slots = defineSlots<InputSlots>();
 const model = defineModel<string>();
-const props = withDefaults(defineProps<InputProps>(), {
-  id: () => randomId('input'),
-});
+const props = withDefaults(defineProps<InputProps>(), { id: () => randomId('input') });
 
 const classes = computed(() => [$class('wrapper')]);
 const inputClasses = computed(() => [
@@ -48,7 +46,7 @@ defineOptions({ inheritAttrs: false });
         :readonly="readonly"
         type="text"
         :placeholder="placeholder"
-      >
+      />
 
       <Kbd
         v-if="shortcut"

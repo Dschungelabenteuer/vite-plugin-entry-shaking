@@ -1,4 +1,5 @@
-import { type Ref, type ComponentPublicInstance, toValue } from 'vue';
+import { toValue } from 'vue';
+import type { Ref, ComponentPublicInstance } from 'vue';
 
 type TemplateRefTypes =
   | Ref<HTMLElement | null>
@@ -16,14 +17,11 @@ const randomString = () =>
 export const randomId = (prefix = ''): string => prefix + randomString().toUpperCase();
 export const getElementBoundaries = (element: HTMLElement): { top: number; bottom: number } => {
   const { top, height } = element.getBoundingClientRect();
-  return {
-    top,
-    bottom: top + height,
-  };
+  return { top, bottom: top + height };
 };
 
 export const isComponentInstance = (
-  el: TemplateRefTypes,
+  el: TemplateRefTypes
 ): el is typeof el extends Ref
   ? Ref<ComponentPublicInstance | null>
   : ComponentPublicInstance | null => {

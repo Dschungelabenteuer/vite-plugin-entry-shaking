@@ -6,15 +6,7 @@ import { FooOne, FooTwo } from '@entries/foo';
 import { BarOne, BarTwo } from '@entries/bar';
 import { BazOne, BazTwo } from '@entries/baz';
 
-console.info({
-  Something,
-  FooOne,
-  FooTwo,
-  BarOne,
-  BarTwo,
-  BazOne,
-  BazTwo,
-});
+console.info({ Something, FooOne, FooTwo, BarOne, BarTwo, BazOne, BazTwo });
 
 const app = createApp(App);
 app.mount('#app');

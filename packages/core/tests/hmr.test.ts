@@ -5,12 +5,7 @@ import EntryAnalyzer from '../src/analyze-entry';
 import { addSourceQuerySuffix } from '../src/urls';
 import { createMockEntryData, createTestContext } from './utils';
 
-const createModule = (id: string, file = id.split('?')[0]) =>
-  ({
-    id,
-    file,
-    url: id,
-  }) as ModuleNode;
+const createModule = (id: string, file = id.split('?')[0]) => ({ id, file, url: id }) as ModuleNode;
 
 describe('HMR', () => {
   const entryId = '/path/to/entry.ts';
@@ -64,7 +59,7 @@ describe('HMR', () => {
     const modules = ctx.hmr.getHotUpdateModules(
       entryId,
       [normalModule, unrelatedModule],
-      moduleGraph,
+      moduleGraph
     );
 
     expect(new Set(modules)).toStrictEqual(new Set([normalModule, sourceModule]));
@@ -116,13 +111,7 @@ describe('HMR', () => {
     const ctx = await createTestContext({ targets: [] });
     const existingIgnore = /existing/;
     ctx.entries = new Map([[entryId, createMockEntryData()]]);
-    Object.assign(ctx.config, {
-      server: {
-        watch: {
-          ignored: existingIgnore,
-        },
-      },
-    });
+    Object.assign(ctx.config, { server: { watch: { ignored: existingIgnore } } });
 
     ctx.hmr.includeEntriesInWatcherOptions();
 
@@ -145,10 +134,7 @@ describe('HMR', () => {
     const ctx = await createTestContext({ targets: [] });
     const add = vi.fn();
     const lateEntryId = '/path/to/node_modules/late-entry.ts';
-    const watcher = {
-      add,
-      options: { ignored: ['**/node_modules/**'] },
-    };
+    const watcher = { add, options: { ignored: ['**/node_modules/**'] } };
 
     ctx.hmr.watchEntryFiles(watcher);
     ctx.hmr.watchEntryFile(lateEntryId);

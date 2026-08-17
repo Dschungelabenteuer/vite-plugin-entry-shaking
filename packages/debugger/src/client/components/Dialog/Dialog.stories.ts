@@ -29,12 +29,6 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = {
-  args: {
-    title: 'Dialog title',
-    width: '400px',
-    height: '200px',
-  },
-};
+export const Simple: Story = { args: { title: 'Dialog title', width: '400px', height: '200px' } };
 
 export default meta;

@@ -14,7 +14,7 @@ export function useNavigation() {
         name: route.name,
         icon: route.meta?.icon as string,
         count: getLinkCount(route.name ?? ''),
-      })),
+      }))
   );
 
   return links;

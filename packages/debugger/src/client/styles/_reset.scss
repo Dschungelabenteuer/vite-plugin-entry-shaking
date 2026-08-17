@@ -1,12 +1,20 @@
-* { margin: 0; }
-*, *::before, *::after { box-sizing: border-box; }
+* {
+  margin: 0;
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-img, canvas, svg {
+img,
+canvas,
+svg {
   display: block;
   max-width: 100%;
 }

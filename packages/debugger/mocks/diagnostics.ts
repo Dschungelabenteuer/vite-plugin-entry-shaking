@@ -23,14 +23,11 @@ export function createDiagnostics(entries: Context['entries']): any {
         list.push(
           faker.datatype.boolean()
             ? createMaxDepthReachedDiagnostic()
-            : createDefinedWithinEntryDiagnostic(),
+            : createDefinedWithinEntryDiagnostic()
         );
       });
     }
   });
 
-  return {
-    list,
-    listPerPath,
-  };
+  return { list, listPerPath };
 }

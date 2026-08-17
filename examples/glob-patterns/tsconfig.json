@@ -19,10 +19,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@lib/*": ["./src/lib/*"],
-      "@entries/*": ["./src/entries/*"]
-    }
+    "paths": { "@lib/*": ["./src/lib/*"], "@entries/*": ["./src/entries/*"] }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
   "references": [{ "path": "./tsconfig.node.json" }]

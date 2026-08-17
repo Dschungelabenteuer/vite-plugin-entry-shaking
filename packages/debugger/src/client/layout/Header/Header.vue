@@ -8,10 +8,7 @@ import { useViewTransition } from '@composables/useViewTransition';
 import type { HeaderProps } from './Header.types';
 
 const $class = useClassNames('header');
-const _props = withDefaults(defineProps<HeaderProps>(), {
-  showTitle: true,
-  showNavigation: true,
-});
+const _props = withDefaults(defineProps<HeaderProps>(), { showTitle: true, showNavigation: true });
 
 const headerRef = ref<HTMLElement | null>(null);
 useViewTransition({ names: { 'layout-header': headerRef } });

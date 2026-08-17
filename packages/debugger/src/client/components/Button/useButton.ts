@@ -17,7 +17,7 @@ export function useButton(
   className: string,
   reference: Ref<HTMLButtonElement | null>,
   tooltipRef: Ref<InstanceType<typeof Tooltip> | null>,
-  popoverRef: Ref<InstanceType<typeof Popover> | null>,
+  popoverRef: Ref<InstanceType<typeof Popover> | null>
 ) {
   const tooltipOptions = computed(() => ({
     placement: props.tooltipOptions?.placement ?? 'top',
@@ -54,11 +54,11 @@ function useButtonAttributes(props: ButtonProps, className: string, popover: Use
   const classes = computed(() => [attrs.class ?? '', className, { 'icon-only': props.iconOnly }]);
 
   const ariaControls = computed(() =>
-    slots.popover ? popoverId.value : (attrs['aria-controls'] as string),
+    slots.popover ? popoverId.value : (attrs['aria-controls'] as string)
   );
 
   const ariaExpanded = computed(
-    () => (slots.popover ? popover.isOpen : attrs['aria-expanded']) as Booleanish,
+    () => (slots.popover ? popover.isOpen : attrs['aria-expanded']) as Booleanish
   );
 
   return reactive({
@@ -76,7 +76,7 @@ function useButtonAttributes(props: ButtonProps, className: string, popover: Use
 function useButtonHandlers(
   emit: ShortEmits<ButtonEvents>,
   tooltip: UseFloatingReturn,
-  popover: UseFloatingReturn,
+  popover: UseFloatingReturn
 ) {
   const handleClick = () => {
     emit('click');
@@ -88,9 +88,5 @@ function useButtonHandlers(
     popover.close();
   };
 
-  return {
-    handleClick,
-    handleEscape,
-    tooltipHandlers: tooltip.handlers,
-  };
+  return { handleClick, handleEscape, tooltipHandlers: tooltip.handlers };
 }

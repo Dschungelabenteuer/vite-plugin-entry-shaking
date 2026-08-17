@@ -23,10 +23,5 @@ export default defineConfig(() => ({
     }),
     vue(),
   ],
-  resolve: {
-    alias: {
-      '@lib': pathToLib,
-      '@entries': pathToEntries,
-    },
-  },
+  resolve: { alias: { '@lib': pathToLib, '@entries': pathToEntries } },
 }));

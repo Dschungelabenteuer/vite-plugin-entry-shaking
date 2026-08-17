@@ -21,12 +21,7 @@ const { id, title, sort, columns, items, filters, matched, methods } = useBrowse
   filterFn: (item, levels) => levels.includes(item.level),
   defaultFilters,
   columns: {
-    level: {
-      label: '',
-      width: '2.5rem',
-      minWidth: '100px',
-      class: 'centered',
-    },
+    level: { label: '', width: '2.5rem', minWidth: '100px', class: 'centered' },
     timestamp: {
       label: 'Time',
       class: 'centered',
@@ -36,11 +31,7 @@ const { id, title, sort, columns, items, filters, matched, methods } = useBrowse
       ascLabel: 'Show newest first',
       descLabel: 'Show oldest first',
     },
-    content: {
-      label: 'Content',
-      width: '1fr',
-      searchable: true,
-    },
+    content: { label: 'Content', width: '1fr', searchable: true },
   },
 });
 const rowClass = (props: (typeof items.value)[number]) => `log ${props.level}`;

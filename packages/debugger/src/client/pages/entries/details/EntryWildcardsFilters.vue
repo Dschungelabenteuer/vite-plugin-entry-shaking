@@ -6,14 +6,8 @@ import { useClassNames } from '@composables/useClassNames';
 const $class = useClassNames('wildcards-filters');
 const model = defineModel<('direct' | 'named')[]>();
 const options: CheckboxProps[] = [
-  {
-    label: 'Named wildcards',
-    value: 'named',
-  },
-  {
-    label: 'Direct wildcards',
-    value: 'direct',
-  },
+  { label: 'Named wildcards', value: 'named' },
+  { label: 'Direct wildcards', value: 'direct' },
 ];
 </script>
 

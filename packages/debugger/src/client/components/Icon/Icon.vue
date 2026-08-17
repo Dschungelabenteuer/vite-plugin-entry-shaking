@@ -8,11 +8,7 @@ import { useIcon } from './useIcon';
 
 const props = withDefaults(defineProps<IconProps>(), {
   tooltip: undefined,
-  tooltipOptions: () => ({
-    placement: 'top',
-    autoupdatePosition: true,
-    disable: false,
-  }),
+  tooltipOptions: () => ({ placement: 'top', autoupdatePosition: true, disable: false }),
 });
 
 const reference = ref<HTMLButtonElement | null>(null);

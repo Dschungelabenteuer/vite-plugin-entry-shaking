@@ -57,7 +57,7 @@ export class HMR {
   public getHotUpdateModules(
     id: string,
     modules: ModuleNode[],
-    moduleGraph: Pick<ModuleGraph, 'getModuleById' | 'getModulesByFile'>,
+    moduleGraph: Pick<ModuleGraph, 'getModuleById' | 'getModulesByFile'>
   ) {
     const affectedModules = new Set<ModuleNode>();
     const moduleIds = this.getHotUpdateModuleIds(id);
@@ -141,7 +141,7 @@ export class HMR {
   public watchEntryFiles(watcher: Pick<FSWatcher, 'add' | 'options'>) {
     this.watcher = watcher;
     const entryIds = [...new Set([...this.context.entries.keys(), ...this.watchedEntries])].map(
-      (entryId) => this.registerEntryForWatching(entryId),
+      (entryId) => this.registerEntryForWatching(entryId)
     );
     if (!entryIds.length) return;
 
@@ -174,7 +174,7 @@ export class HMR {
   /** Returns negative ignored patterns for entry files watched explicitly by this plugin. */
   private getEntryWatchIgnoreExceptions() {
     return [...new Set([...this.context.entries.keys(), ...this.watchedEntries])].map(
-      (entryId) => `!${entryId}`,
+      (entryId) => `!${entryId}`
     );
   }
 

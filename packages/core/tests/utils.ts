@@ -150,7 +150,7 @@ export async function testCase(
   targets: CaseTarget[],
   input: string,
   output: string,
-  options?: Partial<PluginOptions>,
+  options?: Partial<PluginOptions>
 ) {
   if (!targets.length) throw new Error('Case target is undefined');
 
@@ -188,10 +188,7 @@ export async function testCase(
 export async function createTestContext(options: PluginOptions) {
   const resolver = await getTestResolver();
 
-  const config = {
-    createResolver: () => resolver,
-    logger: createLogger(),
-  } as ResolvedConfig;
+  const config = { createResolver: () => resolver, logger: createLogger() } as ResolvedConfig;
 
   const finalOptions = mergeOptions(options);
   const context = new Context(finalOptions, config);
@@ -204,12 +201,9 @@ export async function createTestContext(options: PluginOptions) {
  */
 export function createTestWildcardExports(
   named?: WildcardExports['named'],
-  direct?: WildcardExports['direct'],
+  direct?: WildcardExports['direct']
 ) {
-  return {
-    named: named ?? new Map(),
-    direct: direct ?? [],
-  };
+  return { named: named ?? new Map(), direct: direct ?? [] };
 }
 
 /**
@@ -238,7 +232,7 @@ export function createMockEntryData(exports: EntryData['exports'] = new Map()): 
  */
 export async function createCaseTarget(
   origin: string,
-  expectedImportRemainsCount?: number,
+  expectedImportRemainsCount?: number
 ): Promise<CaseTarget> {
   const path = await resolvePath(origin);
   if (!path) throw new Error(`Could not resolve mock entry "${origin}"`);

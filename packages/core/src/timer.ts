@@ -18,7 +18,7 @@ export class Timer {
   >(
     title: Title,
     callback: Callback,
-    silent?: Silent,
+    silent?: Silent
   ): Promise<PerformanceDuration & { out?: Awaited<Return> }> {
     if (!silent) this.logger.debug(`${title} started`);
     const startTime = performance.now();
@@ -37,7 +37,7 @@ export class Timer {
    */
   public async time(
     label: string,
-    callback: (nonSelfTime: number) => Promise<number>,
+    callback: (nonSelfTime: number) => Promise<number>
   ): Promise<Duration> {
     const nonselfTime = 0;
     const { time } = await this.measure(label, () => callback(nonselfTime), true);

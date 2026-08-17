@@ -16,18 +16,8 @@ const _emit = defineEmits<EntryDetailsEvents>();
 const props = defineProps<EntryDetailsProps>();
 const tabs = computed<VerticalTab[]>(() => {
   const list = [
-    {
-      id: 'metrics',
-      label: 'Metrics',
-      icon: 'target-arrow',
-      component: EntryMetrics,
-    },
-    {
-      id: 'diffs',
-      label: 'Diffs',
-      icon: 'file-diff',
-      component: EntryDiffs,
-    },
+    { id: 'metrics', label: 'Metrics', icon: 'target-arrow', component: EntryMetrics },
+    { id: 'diffs', label: 'Diffs', icon: 'file-diff', component: EntryDiffs },
     {
       id: 'exports',
       label: 'Exports',

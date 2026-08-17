@@ -12,18 +12,8 @@ const props = defineProps<TransformDetailsProps>();
 provide('transform-details', reactive(props));
 
 const tabs = computed<VerticalTab[]>(() => [
-  {
-    id: 'metrics',
-    label: 'Metrics',
-    icon: 'target-arrow',
-    component: TransformMetrics,
-  },
-  {
-    id: 'diffs',
-    label: 'Diffs',
-    icon: 'file-diff',
-    component: TransformDiffs,
-  },
+  { id: 'metrics', label: 'Metrics', icon: 'target-arrow', component: TransformMetrics },
+  { id: 'diffs', label: 'Diffs', icon: 'file-diff', component: TransformDiffs },
 ]);
 
 provide('depth', 1);

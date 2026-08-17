@@ -10,7 +10,7 @@ const NAVIGATION_KEYS = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', '
 export function useDropdownMenu(
   props: DropdownMenuProps,
   emit: any,
-  items: Ref<(ButtonInstance | HTMLButtonElement | null)[]>,
+  items: Ref<(ButtonInstance | HTMLButtonElement | null)[]>
 ) {
   const isOpen = toRef(props, 'isOpen');
   const isTransitioning = toRef(props, 'isTransitioning');
@@ -26,7 +26,7 @@ export function useDropdownMenu(
 
   watchEffect(() => {
     menuItems.value = items.value.map((item) =>
-      isComponentInstance(item) ? item!.reference : item,
+      isComponentInstance(item) ? item!.reference : item
     );
   });
 

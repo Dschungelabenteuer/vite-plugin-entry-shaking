@@ -12,23 +12,16 @@ const addons: StorybookConfig['addons'] = [
   '@storybook/addon-interactions',
 ];
 
-const docs: StorybookConfig['docs'] = {
-  autodocs: 'tag',
-};
+const docs: StorybookConfig['docs'] = { autodocs: 'tag' };
 
 const core: StorybookConfig['core'] = {
   builder: {
     name: '@storybook/builder-vite',
-    options: {
-      viteConfigPath: './src/client/vite.config.ts',
-    },
+    options: { viteConfigPath: './src/client/vite.config.ts' },
   },
 };
 
-const framework: StorybookConfig['framework'] = {
-  name: '@storybook/vue3-vite',
-  options: {},
-};
+const framework: StorybookConfig['framework'] = { name: '@storybook/vue3-vite', options: {} };
 
 const config: StorybookConfig = {
   core,

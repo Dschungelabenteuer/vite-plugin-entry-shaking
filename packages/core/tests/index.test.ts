@@ -6,12 +6,7 @@ import { createEntryShakingPlugin } from '../src';
 import { addSourceQuerySuffix } from '../src/urls';
 import { resolveUnitEntry, VITE_CONFIG } from './utils';
 
-const createModule = (id: string, file = id.split('?')[0]) =>
-  ({
-    id,
-    file,
-    url: id,
-  }) as ModuleNode;
+const createModule = (id: string, file = id.split('?')[0]) => ({ id, file, url: id }) as ModuleNode;
 
 const createServer = (modules: ModuleNode[]) => {
   const modulesById = new Map(modules.map((module) => [module.id, module]));
@@ -21,20 +16,15 @@ const createServer = (modules: ModuleNode[]) => {
   const moduleGraph = {
     getModuleById: vi.fn((id: string) => modulesById.get(id)),
     getModulesByFile: vi.fn(
-      (file: string) => new Set(modules.filter((module) => module.file === file)),
+      (file: string) => new Set(modules.filter((module) => module.file === file))
     ),
     invalidateModule,
   } as unknown as ModuleGraph;
 
   const server = {
     moduleGraph,
-    watcher: {
-      add,
-      options: { ignored: [] },
-    },
-    ws: {
-      send,
-    },
+    watcher: { add, options: { ignored: [] } },
+    ws: { send },
   } as unknown as ViteDevServer;
 
   return { add, invalidateModule, send, server };
@@ -94,21 +84,21 @@ describe('createEntryShakingPlugin handleHotUpdate', () => {
       normalModule,
       expect.any(Set),
       timestamp,
-      true,
+      true
     );
     expect(invalidateModule).toHaveBeenNthCalledWith(
       2,
       sourceModule,
       expect.any(Set),
       timestamp,
-      true,
+      true
     );
     expect(invalidateModule).toHaveBeenNthCalledWith(
       3,
       importerModule,
       expect.any(Set),
       timestamp,
-      true,
+      true
     );
     expect(send).toHaveBeenCalledWith({ type: 'full-reload' });
   });

@@ -5,13 +5,21 @@
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fade-out {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes scale-in {
@@ -108,7 +116,6 @@
     opacity: 0;
     transform: translateY(var(--slide-in-distance, 0.5rem));
   }
-
 }
 
 @keyframes slide-out-left {
@@ -161,7 +168,6 @@
   opacity: 0;
   transform: translateX(var(--list-translate-x));
 }
-
 
 .toaster-enter-active,
 .toaster-leave-active {

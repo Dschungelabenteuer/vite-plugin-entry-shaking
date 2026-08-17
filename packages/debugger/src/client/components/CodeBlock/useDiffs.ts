@@ -24,7 +24,7 @@ export function useDiffs() {
     const input: DiffsRequestPayload = { id, from, to };
     worker?.postMessage(input);
     const output: DiffsResponsePayload['result'] = await new Promise((resolve) =>
-      queue.set(id, resolve),
+      queue.set(id, resolve)
     );
     return output;
   };

@@ -1,49 +1,40 @@
 {
   "name": "vite-plugin-entry-shaking-root",
-  "type": "module",
   "version": "0.0.0",
   "private": true,
-  "author": "Charles Gruenais",
-  "license": "MIT",
   "homepage": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/#readme",
+  "bugs": {
+    "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
+  },
+  "license": "MIT",
+  "author": "Charles Gruenais",
   "repository": {
     "type": "git",
     "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking"
   },
-  "bugs": {
-    "url": "https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/issues"
-  },
-  "engines": {
-    "node": ">=20.1.0"
-  },
+  "type": "module",
   "scripts": {
     "build": "pnpm --filter \"./packages/core\" build && pnpm --filter \"./packages/debugger\" build",
     "test": "pnpm -r test",
-    "lint": "pnpm -r lint",
-    "format": "biome format . --fix",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt --write .",
     "generate-example": "node scripts/generate-example",
     "check": "pnpm format && pnpm lint && pnpm test",
     "changeset:release": "pnpm build && changeset publish",
     "changeset:version": "changeset version && pnpm install --lockfile-only"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.2",
     "@changesets/changelog-github": "^0.5.2",
     "@changesets/cli": "^2.29.8",
     "@types/prompts": "^2.4.9",
-    "@yungezeit/eslint-base": "^0.0.23",
-    "eslint": "^9.11.0",
-    "eslint-config-prettier": "^9.1.0",
     "ora": "^8.1.0",
+    "oxfmt": "^0.63.0",
+    "oxlint": "^1.78.0",
+    "oxlint-tsgolint": "^7.0.2001",
     "prompts": "^2.4.2"
   },
-  "pnpm": {
-    "packageExtensions": {
-      "vite": {
-        "dependencies": {
-          "postcss": "^8.4.31"
-        }
-      }
-    }
+  "engines": {
+    "node": ">=20.1.0"
   }
 }

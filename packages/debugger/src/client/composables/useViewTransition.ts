@@ -72,10 +72,7 @@ export function useViewTransition(options: UseViewTransitionOptions) {
     });
   }
 
-  return {
-    startViewTransition,
-    transition,
-  };
+  return { startViewTransition, transition };
 }
 
 function startViewTransition(callback?: () => Promise<void>): AugmentedViewTransition {
@@ -92,7 +89,6 @@ function startViewTransition(callback?: () => Promise<void>): AugmentedViewTrans
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (document.startViewTransition) {
     const capturedPromise = new Promise<void>((resolve) => {
       const cb = async () => {

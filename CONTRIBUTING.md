@@ -27,7 +27,7 @@ free to create a
 ## Pre-requisites
 
 This project is written in TypeScript and uses [Node.js](https://nodejs.org/en/download) as a
-JavaScript runtime and [pnpm](https://pnpm.io/fr/installation) as a package manager. Please make
+JavaScript runtime and [pnpm](https://pnpm.io/installation) as a package manager. Please make
 sure those are installed and that their versions match the ones specified in the `engines` field of
 the root `package.json` file.
 
@@ -40,8 +40,8 @@ pnpm -v
 
 This project also uses:
 
-- [ESLint](https://eslint.org/docs/latest/use/getting-started) as a linter
-- [Biome](https://biomejs.dev/) as a formatter
+- [oxlint](https://oxc.rs/docs/guide/usage/linter) as a linter
+- [oxfmt](https://oxc.rs/docs/guide/usage/formatter.html) as a formatter
 - [Vitest](https://vitest.dev) as a test framework
 
 It is recommended (but optional) to plug these tools into your IDE by using their respective

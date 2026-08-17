@@ -6,8 +6,5 @@
     "stylelint-config-recess-order"
   ],
   "plugins": ["stylelint-scss"],
-  "rules": {
-    "value-keyword-case": null,
-    "no-descending-specificity": null
-  }
+  "rules": { "value-keyword-case": null, "no-descending-specificity": null }
 }

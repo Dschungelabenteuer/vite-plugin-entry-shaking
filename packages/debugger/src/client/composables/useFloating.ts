@@ -24,7 +24,7 @@ export type UseFloatingReturn = {
 export type UseFloating = <Reference extends Ref<HTMLButtonElement | null>, Floating extends Ref>(
   reference: Reference,
   floatingEl: Floating,
-  options?: UseFloatingOptions,
+  options?: UseFloatingOptions
 ) => UseFloatingReturn;
 
 export const FLOATING_CONTAINER_ID_VAR = 'floatingContainerId';

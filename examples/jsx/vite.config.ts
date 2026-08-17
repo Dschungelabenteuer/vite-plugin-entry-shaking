@@ -12,18 +12,9 @@ const pathToLib = resolve(__dirname, './src/lib');
 
 export default defineConfig(() => ({
   plugins: [
-    EntryShakingPlugin({
-      targets: [pathToLib],
-      debug: true,
-    }) as Plugin,
-    vueJsxPlugin({
-      include: [/\.tesx$/, /\.[jt]sx$/],
-    }),
+    EntryShakingPlugin({ targets: [pathToLib], debug: true }) as Plugin,
+    vueJsxPlugin({ include: [/\.tesx$/, /\.[jt]sx$/] }),
     vue(),
   ],
-  resolve: {
-    alias: {
-      '@lib': pathToLib,
-    },
-  },
+  resolve: { alias: { '@lib': pathToLib } },
 }));

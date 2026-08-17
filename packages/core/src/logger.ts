@@ -3,10 +3,7 @@ import type { EventBus } from './event-bus';
 import type { BaseLogger, Log, LogLevel } from './types';
 
 const EOS = `\x1b[0m\x1b[29m`;
-const COLORS = {
-  cyan: `\x1b[36m`,
-  gray: `\x1b[9m\x1b[90m`,
-};
+const COLORS = { cyan: `\x1b[36m`, gray: `\x1b[9m\x1b[90m` };
 
 /** Adds color to log message. */
 const paint = (color: keyof typeof COLORS, text: string) => `${COLORS[color]}${text}${EOS}`;
@@ -29,7 +26,7 @@ export class Logger implements BaseLogger {
     /** Base Vite logger. */
     private baseLogger: ViteLogger,
     /** Is debug mode enabled? */
-    private debugMode: boolean,
+    private debugMode: boolean
   ) {}
 
   /**

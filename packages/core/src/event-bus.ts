@@ -24,7 +24,7 @@ export class EventBus {
    */
   public on = <T extends keyof DebuggerEvents>(
     eventName: T,
-    callback: (...args: DebuggerEvents[T]) => void,
+    callback: (...args: DebuggerEvents[T]) => void
   ) => this.emitter.on(eventName, callback as any);
 
   /**

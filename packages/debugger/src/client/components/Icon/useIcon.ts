@@ -8,7 +8,7 @@ import type { IconProps } from './Icon.types';
 export function useIcon(
   props: IconProps,
   reference: Ref<HTMLButtonElement | null>,
-  tooltipRef: Ref<InstanceType<typeof Tooltip> | null>,
+  tooltipRef: Ref<InstanceType<typeof Tooltip> | null>
 ) {
   const tooltipOptions = computed(() => ({
     placement: props.tooltipOptions?.placement ?? 'top',

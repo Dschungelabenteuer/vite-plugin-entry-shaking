@@ -8,10 +8,7 @@ export const TOASTER_CONTAINER_ID_VAR = 'toasterContainerId';
 export const TOASTER_MAIN_CONTAINER_ID = 'toaster-container-main';
 export const TOASTER_CONTAINER_CLASS = 'toaster-container';
 
-const defaultToastOptions: ToastOptions = {
-  autoclose: true,
-  duration: 5000,
-};
+const defaultToastOptions: ToastOptions = { autoclose: true, duration: 5000 };
 
 /**
  * Toaster composable.
@@ -32,11 +29,7 @@ export const useToaster = (toasterEl: Ref<InstanceType<typeof Toaster> | null>, 
     if (diff > 0) {
       toasterEl.value!.$el.animate(
         [{ transform: `translateY(${diff}px)` }, { transform: 'translateY(0)' }],
-        {
-          duration: 600,
-          easing: 'ease',
-          fill: 'forwards',
-        },
+        { duration: 600, easing: 'ease', fill: 'forwards' }
       );
     }
   });

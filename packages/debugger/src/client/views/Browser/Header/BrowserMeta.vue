@@ -12,10 +12,7 @@ const _props = defineProps<Required<BrowserProps>>();
 const headerTitleRef = ref<HTMLElement | null>(null);
 const headerIconRef = ref<HTMLElement | null>(null);
 const _transitions = useViewTransition({
-  names: {
-    'browser-header-title': headerTitleRef,
-    'browser-header-icon': headerIconRef,
-  },
+  names: { 'browser-header-title': headerTitleRef, 'browser-header-icon': headerIconRef },
 });
 </script>
 
