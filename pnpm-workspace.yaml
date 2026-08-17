@@ -6,3 +6,57 @@ allowBuilds:
   cypress: true
   esbuild: true
   vue-demi: true
+catalog:
+  '@changesets/changelog-github': ^0.5.2
+  '@changesets/cli': ^2.31.1
+  '@chromatic-com/storybook': 1.8.0
+  '@faker-js/faker': ^8.4.1
+  '@floating-ui/vue': ^1.1.5
+  '@iconify/vue': ^4.1.2
+  '@shikijs/transformers': ^1.18.0
+  '@shikijs/twoslash': ^1.18.0
+  '@storybook/addon-essentials': ^8.3.2
+  '@storybook/addon-interactions': ^8.3.2
+  '@storybook/addon-links': ^8.3.2
+  '@storybook/blocks': ^8.3.2
+  '@storybook/test': ^8.3.2
+  '@storybook/vue3': ^8.3.2
+  '@storybook/vue3-vite': ^8.3.2
+  '@types/diff-match-patch': ^1.0.36
+  '@types/node': ^22.5.5
+  '@types/prompts': ^2.4.9
+  '@vitejs/plugin-vue-jsx': ^4.0.1
+  '@vitest/coverage-istanbul': ^2.1.1
+  '@vueuse/core': ^11.1.0
+  cypress: ^13.14.2
+  diff-match-patch: ^1.0.5
+  es-module-lexer: ^1.5.4
+  esbuild: ^0.23.1
+  fast-glob: ^3.3.2
+  globals: ^15.9.0
+  idb-keyval: ^6.2.1
+  magic-string: ^0.30.11
+  open: ^10.1.0
+  ora: ^8.2.0
+  oxfmt: ^0.63.0
+  oxlint: ^1.78.0
+  oxlint-tsgolint: ^7.0.2001
+  picocolors: ^1.1.0
+  postcss-html: ^1.7.0
+  prompts: ^2.4.2
+  shiki: ^1.18.0
+  sirv: ^2.0.4
+  storybook: ^8.3.2
+  stylelint: ^16.9.0
+  stylelint-config-recess-order: ^5.1.0
+  stylelint-config-recommended-vue: ^1.5.0
+  stylelint-config-standard-scss: ^13.1.0
+  stylelint-scss: ^6.7.0
+  ts-dedent: ^2.2.0
+  twoslash-cdn: ^0.3.9
+  typescript: ^5.6.2
+  unbuild: ^2.0.0
+  unstorage: ^1.12.0
+  vite-plugin-vue-devtools: ^8.0.6
+  vitest: ^2.1.1
+  vue-router: ^4.4.5

@@ -45,28 +45,28 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "es-module-lexer": "^1.5.4",
-    "magic-string": "^0.30.11"
+    "es-module-lexer": "catalog:",
+    "magic-string": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^22.5.5",
-    "@vitest/coverage-istanbul": "^2.1.1",
-    "esbuild": "^0.23.1",
-    "fast-glob": "^3.3.2",
-    "globals": "^15.9.0",
-    "ts-dedent": "^2.2.0",
-    "typescript": "^5.6.2",
-    "unbuild": "^2.0.0",
+    "@types/node": "catalog:",
+    "@vitest/coverage-istanbul": "catalog:",
+    "esbuild": "catalog:",
+    "fast-glob": "catalog:",
+    "globals": "catalog:",
+    "ts-dedent": "catalog:",
+    "typescript": "catalog:",
+    "unbuild": "catalog:",
     "vite": "^5.4.7",
     "vite-plugin-entry-shaking-debugger": "workspace:*",
-    "vitest": "^2.1.1"
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "vite": ">=5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "^0.23.1",
-    "fast-glob": "^3.3.2",
+    "esbuild": "catalog:",
+    "fast-glob": "catalog:",
     "vite-plugin-entry-shaking-debugger": "workspace:*"
   },
   "engines": {
