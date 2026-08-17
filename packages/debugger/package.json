@@ -21,21 +21,8 @@
     "directory": "packages/debugger"
   },
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
+  "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
-      },
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      }
-    }
-  },
   "scripts": {
     "dev": "vite src/client",
     "build": "vite build src/client && obuild",

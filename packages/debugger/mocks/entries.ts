@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 
 import type { Context, EntryData, EntryExports, WildcardExports } from 'vite-plugin-entry-shaking';
-import { getRandomProjectPath } from './utils';
+import { getRandomProjectPath } from './utils.ts';
 
 const mockedEntryCount = 28;
 

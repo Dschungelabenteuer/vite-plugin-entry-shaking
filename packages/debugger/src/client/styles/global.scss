@@ -1,4 +1,4 @@
-@import 'mixins';
-@import 'tokens';
-@import 'typefaces';
-@import 'animations';
+@use './_mixins.scss' as *;
+@use './_tokens.scss' as *;
+@use './_typefaces.scss' as *;
+@use './_animations.scss' as *;

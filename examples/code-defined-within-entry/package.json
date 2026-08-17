@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "catalog:",
-    "sass": "catalog:",
+    "sass-embedded": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plugin-entry-shaking": "workspace:*",

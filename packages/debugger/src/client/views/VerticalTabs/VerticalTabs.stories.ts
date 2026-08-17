@@ -10,6 +10,8 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = { args: {} };
+export const Simple: Story = {
+  args: { id: 'VerticalTabs-Simple', label: 'Pick your tab', tabs: [], width: '220px' },
+};
 
 export default meta;

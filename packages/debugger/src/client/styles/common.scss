@@ -1,5 +1,5 @@
-@import './reset';
-@import './global';
+@use './reset';
+@use './global';
 
 body,
 #root {
@@ -99,7 +99,7 @@ h3 {
   padding: 0;
   margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+  clip-path: rect(0, 0, 0, 0);
 }

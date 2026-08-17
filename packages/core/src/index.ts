@@ -11,6 +11,7 @@ import type {
   EntryExports,
   LogLevel,
   Log,
+  ImportParams,
 } from './types';
 
 import { Context } from './context';
@@ -30,6 +31,7 @@ export type {
   LogLevel,
   Log,
   Context,
+  ImportParams,
 };
 
 export { DiagnosticKinds } from './diagnostics';

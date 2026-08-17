@@ -10,6 +10,6 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = { args: {} };
+export const Simple: Story = { args: { items: [], itemSize: 48 } };
 
 export default meta;

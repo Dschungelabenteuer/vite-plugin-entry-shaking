@@ -1,3 +1,6 @@
+/* stylelint-disable no-invalid-position-declaration */
+@use './mixins.scss' as *;
+
 /// Note: component-related tokens are defined in the component's style layer.
 
 /// Light color scheme.
@@ -166,10 +169,3 @@
     --transition-duration-medium: 0ms;
   }
 }
-
-/// Breakpoints
-/// Defined as sass variables because container queries and
-/// custom properties do not seem to be well supported yet.
-$breakpoint-xs: 460px;
-$breakpoint-sm: 610px;
-$breakpoint-md: 820px;

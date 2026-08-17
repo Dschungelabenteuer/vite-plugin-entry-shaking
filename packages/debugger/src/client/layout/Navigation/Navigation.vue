@@ -6,11 +6,15 @@ import RouterButton from '@components/RouterButton/RouterButton.vue';
 import { useClassNames } from '@composables/useClassNames';
 import type { Panel } from '@views/Panel/Panel.types';
 import { useNavigation } from './useNavigation';
+import { RouteRecordNameGeneric } from 'vue-router';
 
 const $class = useClassNames('navigation');
 const links = useNavigation();
 const metricsPanel = inject<Panel>('metricsPanel')!;
 const { toggle, isOpen, openBtnId } = metricsPanel;
+
+const getLabelFromRouteName = (routeName: RouteRecordNameGeneric) =>
+  typeof routeName === 'string' ? routeName : 'Untitled route';
 </script>
 
 <template>
@@ -23,7 +27,7 @@ const { toggle, isOpen, openBtnId } = metricsPanel;
         <RouterButton
           :href="link.href"
           :icon="link.icon"
-          :label="link.name"
+          :label="getLabelFromRouteName(link.name)"
           :count="link.count"
         />
       </li>

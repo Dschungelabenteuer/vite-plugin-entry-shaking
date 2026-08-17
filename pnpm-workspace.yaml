@@ -6,6 +6,9 @@ allowBuilds:
   cypress: true
   esbuild: true
   vue-demi: true
+catalogs:
+  next:
+    typescript: ^7.0.2
 catalog:
   '@changesets/changelog-github': ^1.0.0
   '@changesets/cli': ^3.0.0
@@ -58,7 +61,7 @@ catalog:
   obuild: ^0.4.37
   unstorage: ^1.17.5
   vite-plugin-vue-devtools: ^8.2.1
-  sass: ^1.102.0
+  sass-embedded: ^1.102.0
   vitest: ^4.1.10
   vite: ^8.2.1
   '@vitejs/plugin-vue': ^6.0.8
