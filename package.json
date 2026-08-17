@@ -19,6 +19,7 @@
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --write .",
+    "typecheck": "pnpm -r typecheck",
     "generate-example": "node scripts/generate-example",
     "check": "pnpm format && pnpm lint && pnpm test",
     "changeset:release": "pnpm build && changeset publish",

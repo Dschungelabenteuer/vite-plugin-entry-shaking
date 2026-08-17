@@ -7,7 +7,7 @@ const outDir = '../../dist/client';
 
 export default defineConfig({
   base: './',
-  build: { outDir },
+  build: { outDir, emptyOutDir: true },
   plugins: [vue(), dev()],
   resolve: {
     alias: {
