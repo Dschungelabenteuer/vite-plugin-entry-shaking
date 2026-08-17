@@ -9,16 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.5.29"
+    "vue": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@vitejs/plugin-vue": "^6.0.4",
-    "sass": "^1.97.3",
+    "@vitejs/plugin-vue": "catalog:",
+    "sass": "catalog:",
     "typescript": "catalog:",
-    "vite": "^6.4.1",
+    "vite": "catalog:",
     "vite-plugin-entry-shaking": "workspace:*",
     "vite-plugin-vue-devtools": "catalog:",
-    "vue-tsc": "^3.2.5"
+    "vue-tsc": "catalog:"
   }
 }

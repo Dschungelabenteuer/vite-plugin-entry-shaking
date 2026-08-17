@@ -68,7 +68,7 @@
     "@storybook/vue3-vite": "catalog:",
     "@types/diff-match-patch": "catalog:",
     "@types/node": "catalog:",
-    "@vitejs/plugin-vue": "^5.1.4",
+    "@vitejs/plugin-vue": "catalog:",
     "cypress": "catalog:",
     "globals": "catalog:",
     "picocolors": "catalog:",
@@ -83,9 +83,9 @@
     "twoslash-cdn": "catalog:",
     "typescript": "catalog:",
     "unbuild": "catalog:",
-    "vite": "^5.4.7",
+    "vite": "catalog:",
     "vite-plugin-entry-shaking": "workspace:*",
-    "vue": "^3.5.7",
+    "vue": "catalog:",
     "vue-router": "catalog:"
   },
   "peerDependencies": {

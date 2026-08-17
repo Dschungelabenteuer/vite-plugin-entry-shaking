@@ -8,9 +8,9 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "sass": "^1.79.3",
+    "sass": "catalog:",
     "typescript": "catalog:",
-    "vite": "^5.4.7",
+    "vite": "catalog:",
     "vite-plugin-entry-shaking": "workspace:*"
   }
 }
