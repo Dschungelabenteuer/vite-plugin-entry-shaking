@@ -108,8 +108,8 @@ pnpm check
 
 This should trigger a series of actions that you may also launch manually:
 
-1. Running biome to format code: `pnpm format`
-2. Running ESLint to lint code: `pnpm lint`
+1. Running oxfmt to format code: `pnpm format`
+2. Running oxlint to lint code: `pnpm lint`
 3. Running tests through Vitest: `pnpm test`
 
 ## Adding a changeset
