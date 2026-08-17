@@ -88,7 +88,7 @@ You can then start developing by running the following command from the `package
 pnpm dev
 ```
 
-This will start [unbuild](https://github.com/unjs/unbuild)'s passive watcher so that you can test
+This will start [obuild](https://github.com/unjs/obuild)'s passive watcher so that you can test
 your changes without having to actually rebuild anything. When the passive watcher is launched, you
 can test your changes against on of the provided
 [examples](https://github.com/Dschungelabenteuer/vite-plugin-entry-shaking/tree/main/examples).

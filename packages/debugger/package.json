@@ -38,8 +38,9 @@
   },
   "scripts": {
     "dev": "vite src/client",
-    "build": "vite build src/client && unbuild",
-    "stub": "unbuild --stub",
+    "build": "vite build src/client && obuild",
+    "typecheck": "vue-tsc --noEmit",
+    "stub": "obuild --stub",
     "storybook:dev": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "cypress:open": "cypress open"
@@ -69,8 +70,10 @@
     "@types/diff-match-patch": "catalog:",
     "@types/node": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
+    "@vue/compiler-sfc": "catalog:",
     "cypress": "catalog:",
     "globals": "catalog:",
+    "obuild": "catalog:",
     "picocolors": "catalog:",
     "postcss-html": "catalog:",
     "shiki": "catalog:",
@@ -82,11 +85,11 @@
     "stylelint-scss": "catalog:",
     "twoslash-cdn": "catalog:",
     "typescript": "catalog:",
-    "unbuild": "catalog:",
     "vite": "catalog:",
     "vite-plugin-entry-shaking": "workspace:*",
     "vue": "catalog:",
-    "vue-router": "catalog:"
+    "vue-router": "catalog:",
+    "vue-tsc": "catalog:"
   },
   "peerDependencies": {
     "vite": ">=5.1.0",

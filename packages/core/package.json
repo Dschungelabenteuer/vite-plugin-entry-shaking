@@ -38,8 +38,8 @@
     "types": "dist/index.d.ts"
   },
   "scripts": {
-    "dev": "pnpm unbuild --stub",
-    "build": "pnpm unbuild",
+    "dev": "pnpm obuild --stub",
+    "build": "pnpm obuild",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
@@ -54,9 +54,9 @@
     "esbuild": "catalog:",
     "fast-glob": "catalog:",
     "globals": "catalog:",
+    "obuild": "catalog:",
     "ts-dedent": "catalog:",
     "typescript": "catalog:",
-    "unbuild": "catalog:",
     "vite": "catalog:",
     "vite-plugin-entry-shaking-debugger": "workspace:*",
     "vitest": "catalog:"
