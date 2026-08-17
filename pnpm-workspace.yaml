@@ -7,56 +7,61 @@ allowBuilds:
   esbuild: true
   vue-demi: true
 catalog:
-  '@changesets/changelog-github': ^0.5.2
-  '@changesets/cli': ^2.31.1
-  '@chromatic-com/storybook': 1.8.0
-  '@faker-js/faker': ^8.4.1
-  '@floating-ui/vue': ^1.1.5
-  '@iconify/vue': ^4.1.2
-  '@shikijs/transformers': ^1.18.0
-  '@shikijs/twoslash': ^1.18.0
-  '@storybook/addon-essentials': ^8.3.2
-  '@storybook/addon-interactions': ^8.3.2
-  '@storybook/addon-links': ^8.3.2
-  '@storybook/blocks': ^8.3.2
-  '@storybook/test': ^8.3.2
-  '@storybook/vue3': ^8.3.2
-  '@storybook/vue3-vite': ^8.3.2
+  '@changesets/changelog-github': ^1.0.0
+  '@changesets/cli': ^3.0.0
+  '@chromatic-com/storybook': 5.3.0
+  '@faker-js/faker': ^10.6.0
+  '@floating-ui/vue': ^2.0.1
+  '@iconify/vue': ^5.0.1
+  '@shikijs/transformers': ^4.4.3
+  '@shikijs/twoslash': ^4.4.3
+  '@storybook/addon-essentials': ^8.6.14
+  '@storybook/addon-interactions': ^8.6.14
+  '@storybook/addon-links': ^10.5.8
+  '@storybook/blocks': ^8.6.14
+  '@storybook/test': ^8.6.15
+  '@storybook/vue3': ^10.5.8
+  '@storybook/vue3-vite': ^10.5.8
   '@types/diff-match-patch': ^1.0.36
-  '@types/node': ^22.5.5
+  '@types/node': ^26.2.0
   '@types/prompts': ^2.4.9
-  '@vitejs/plugin-vue-jsx': ^4.0.1
-  '@vitest/coverage-istanbul': ^2.1.1
-  '@vueuse/core': ^11.1.0
-  cypress: ^13.14.2
+  '@vitejs/plugin-vue-jsx': ^5.1.6
+  '@vitest/coverage-istanbul': ^4.1.10
+  '@vueuse/core': ^14.4.0
+  cypress: ^15.20.1
   diff-match-patch: ^1.0.5
-  es-module-lexer: ^1.5.4
-  esbuild: ^0.23.1
-  fast-glob: ^3.3.2
-  globals: ^15.9.0
-  idb-keyval: ^6.2.1
-  magic-string: ^0.30.11
-  open: ^10.1.0
-  ora: ^8.2.0
+  es-module-lexer: ^2.3.1
+  esbuild: ^0.28.2
+  fast-glob: ^3.3.3
+  globals: ^17.11.0
+  idb-keyval: ^6.3.0
+  magic-string: ^1.2.0
+  open: ^11.0.1
+  ora: ^9.4.1
   oxfmt: ^0.63.0
   oxlint: ^1.78.0
   oxlint-tsgolint: ^7.0.2001
-  picocolors: ^1.1.0
-  postcss-html: ^1.7.0
+  picocolors: ^1.1.1
+  postcss-html: ^2.0.0
   prompts: ^2.4.2
-  shiki: ^1.18.0
-  sirv: ^2.0.4
-  storybook: ^8.3.2
-  stylelint: ^16.9.0
-  stylelint-config-recess-order: ^5.1.0
-  stylelint-config-recommended-vue: ^1.5.0
-  stylelint-config-standard-scss: ^13.1.0
-  stylelint-scss: ^6.7.0
-  ts-dedent: ^2.2.0
+  shiki: ^4.4.3
+  sirv: ^3.0.2
+  storybook: ^10.5.8
+  stylelint: ^17.14.1
+  stylelint-config-recess-order: ^7.8.0
+  stylelint-config-recommended-vue: ^2.0.0
+  stylelint-config-standard-scss: ^17.0.0
+  stylelint-scss: ^7.2.0
+  ts-dedent: ^2.3.0
   twoslash-cdn: ^0.3.9
-  typescript: ^5.6.2
-  unbuild: ^2.0.0
-  unstorage: ^1.12.0
-  vite-plugin-vue-devtools: ^8.0.6
-  vitest: ^2.1.1
-  vue-router: ^4.4.5
+  typescript: ^7.0.2
+  unbuild: ^3.6.1
+  unstorage: ^1.17.5
+  vite-plugin-vue-devtools: ^8.2.1
+  sass: ^1.102.0
+  vitest: ^4.1.10
+  vite: ^8.2.1
+  '@vitejs/plugin-vue': ^6.0.8
+  vue: ^3.5.41
+  vue-tsc: ^3.3.10
+  vue-router: ^5.2.0
