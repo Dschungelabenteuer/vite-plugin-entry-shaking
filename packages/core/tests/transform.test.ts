@@ -38,14 +38,14 @@ beforeAll(async () => {
 });
 
 describe('transformIfNeeded', () => {
-  beforeAll(() => {
-    vi.restoreAllMocks();
-  });
-
   beforeEach(() => {
     vi.spyOn(Transformer, 'transformImportsIfNeeded').mockImplementationOnce(() =>
       Promise.resolve('')
     );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('should call transformImportsIfNeeded when the file is candidate', async () => {
@@ -66,17 +66,13 @@ describe('transformIfNeeded', () => {
 });
 
 describe('transformImportsIfNeeded', () => {
-  beforeAll(() => {
-    vi.restoreAllMocks();
-  });
-
   beforeEach(() => {
     vi.spyOn(Transformer, 'transformImports').mockImplementationOnce(() => Promise.resolve(''));
     vi.doMock('es-module-lexer', () => ({ parse: vi.fn().mockReturnValue([]) }));
   });
 
   afterEach(() => {
-    vi.doUnmock('es-module-lexer');
+    vi.restoreAllMocks();
   });
 
   it('should call transformImports when the file is candidate', async () => {
@@ -109,10 +105,6 @@ describe('transformImportsIfNeeded', () => {
  */
 
 describe('transformImports', () => {
-  beforeAll(() => {
-    vi.restoreAllMocks();
-  });
-
   beforeEach(() => {
     vi.spyOn(ImportAnalyzer, 'analyzeImportStatement');
   });
@@ -214,7 +206,7 @@ describe('transformImports', () => {
 });
 
 describe('requiresTransform', () => {
-  beforeAll(() => {
+  afterEach(() => {
     vi.restoreAllMocks();
   });
 
@@ -241,7 +233,7 @@ describe('requiresTransform', () => {
 describe('getEntryImports', () => {
   const imports = [{ n: aliasA }, { n: undefined }] as ImportSpecifier[];
 
-  beforeAll(() => {
+  afterEach(() => {
     vi.restoreAllMocks();
   });
 
@@ -262,6 +254,10 @@ describe('getEntryImports', () => {
 });
 
 describe('createReexportStatement', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('should return valid named re-exports statement', () => {
     const unnamedExport = {};
     const exports = [{ n: 'A_MODULE_A' }, unnamedExport, { n: 'A_MODULE_C' }] as ExportSpecifier[];

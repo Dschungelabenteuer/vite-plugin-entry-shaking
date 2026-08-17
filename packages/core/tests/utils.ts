@@ -29,6 +29,21 @@ export interface CaseTarget {
   expectedImportRemainsCount?: number;
 }
 
+/** Expected payload of `assertOutput`. */
+interface ExpectedFileOutput {
+  /** Expected imports. */
+  imports?: ExpectedOutputDefinition;
+  // /** Expected exports. */
+  // exports?: ExpectedOutputDefinition;
+}
+
+type ExpectedOutputDefinition = Map<
+  /** Resolved path of the import/export */
+  string,
+  /**  Expected import/export content item (e.g. `"MyModule as SomeModule"`)  */
+  string[]
+>;
+
 /** Vite resolver for tests. */
 let testResolver: Awaited<ReturnType<typeof getTestResolver>> | undefined;
 
@@ -179,6 +194,38 @@ export async function testCase(
       expect(targetContentEnd).toStrictEqual(targetRemains);
     }
   });
+}
+
+/**
+ * Takes an output string (file as rewritten by the plugin) and asserts
+ * that it contains all expected imports and exports.
+ * @param output Output string.
+ * @param expected Expected imports and exports.
+ */
+export async function assertOutput(output: string, expected: ExpectedFileOutput) {
+  await init;
+  const [imports, _exports] = parse(output);
+
+  if (expected.imports) {
+    expect(imports.length, 'Expected imports but none were found').toBeGreaterThan(0);
+    const expectedImports = expected.imports;
+    imports.forEach((importParams, _i) => {
+      const { n, ss: startPosition, se: endPosition } = importParams;
+      const outputPath = n ?? 'no-op';
+      const importContent = output.slice(startPosition, endPosition);
+      expect(importContent.startsWith('import ')).toBe(true);
+      expect(
+        expectedImports.has(outputPath),
+        `Expected an import from ${outputPath} were not found`
+      ).toBe(true);
+      expectedImports.get(outputPath)?.forEach((expectedImportMember) => {
+        expect(
+          importContent.includes(expectedImportMember),
+          `Expected import "${expectedImportMember}" was not found\n (expected from ${outputPath})`
+        ).toBe(true);
+      });
+    });
+  }
 }
 
 /**

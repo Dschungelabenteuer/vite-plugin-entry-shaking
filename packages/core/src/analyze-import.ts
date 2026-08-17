@@ -16,7 +16,7 @@ const VITE_IGNORE_REGEX = /\/\*\s*@vite-ignore\s*\*\//;
 /**
  * Analyzes and transforms a single target import.
  * @param ctx _reference_ Plugin context.
- * @param src MagicString instance to prepare transforms.
+ * @param src _reference_ MagicString instance to prepare transforms.
  * @param code Source code of the file.
  * @param entry Imported entry data.
  * @param entryPath Absolute path to the target entry.
@@ -382,7 +382,7 @@ function catchWildcardImport(
 
 /**
  * Catches and handles a dynamic/async import statement.
- * @param src MagicString instance to prepare transforms.
+ * @param src _reference_ MagicString instance to prepare transforms.
  * @param code Source code of the file.
  * @param startPosition Start position of the import statement.
  * @param endPosition End position of the import statement.
