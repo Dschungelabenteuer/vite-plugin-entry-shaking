@@ -3,7 +3,14 @@
   "plugins": ["import", "typescript"],
   "options": { "typeAware": true },
   "categories": { "correctness": "warn" },
-  "ignorePatterns": ["**/dist", "**/tests/__mocks__", "**/tests/cases"],
+  "ignorePatterns": [
+    "**/dist",
+    "**/lib",
+    "**/coverage",
+    "**/node_modules",
+    "**/tests/__mocks__",
+    "**/tests/cases"
+  ],
   "rules": {
     "typescript/no-floating-promises": "off",
     "typescript/no-redundant-type-constituents": "off",
