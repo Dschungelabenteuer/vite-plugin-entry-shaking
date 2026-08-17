@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { beforeAll, describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import dedent from 'ts-dedent';
 
 import type { Duration, EntryExports, EntryImports, PluginEntries } from '../src/types';
@@ -16,10 +16,13 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     newLineChar ? srcString.replaceAll(' ', '\n') : srcString;
 
   describe('analyzeEntries', () => {
-    beforeAll(async () => {
-      vi.restoreAllMocks();
+    beforeEach(async () => {
       const realFs = (await vi.importActual('fs')) as any;
       vi.mocked(fs.readFileSync).mockImplementation(realFs.readFileSync);
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
     });
 
     it('should correctly analyze entries', async () => {
@@ -39,10 +42,13 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     const path = '@entry/path';
 
     beforeEach(() => {
-      vi.restoreAllMocks();
       vi.spyOn(EntryAnalyzer, 'doAnalyzeEntry').mockImplementation(async () =>
         Promise.resolve(mockedDuration)
       );
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
     });
 
     it('should directly return void if entry was already parsed', async () => {
@@ -72,7 +78,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
   });
 
   describe('doAnalyzeEntry', () => {
-    beforeAll(() => {
+    afterEach(() => {
       vi.restoreAllMocks();
     });
 
@@ -200,6 +206,10 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     const withImport = 'import { Something } from "somewhere"; export const a = "my" + Something';
     const withoutImport = 'export const a = `my thing`';
 
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
     it('should call entry cleaner', async () => {
       const ctx = await createTestContext({
         targets: [],
@@ -257,7 +267,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     const ctx = await createTestContext({ targets: [entryPath] });
     const wildcardImports = createTestWildcardExports();
 
-    beforeAll(() => {
+    afterEach(() => {
       vi.restoreAllMocks();
     });
 
@@ -282,6 +292,10 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     };
 
     describe('aggregated export statements', () => {
+      afterEach(() => {
+        vi.restoreAllMocks();
+      });
+
       it('should feed the `analyzedImports` map if this is an aggregated export', async () => {
         const originalName = 'UserId';
         const output = await run(
@@ -323,6 +337,10 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     });
 
     describe('import statements', () => {
+      afterEach(() => {
+        vi.restoreAllMocks();
+      });
+
       it('should feed the `analyzedImports` map if it imports named exports', async () => {
         const originalName = `GroupId`;
         const output = await run(
@@ -376,6 +394,10 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     });
 
     describe('wildcard export', () => {
+      afterEach(() => {
+        vi.restoreAllMocks();
+      });
+
       it('should not feed the `analyzedImports` map ', async () => {
         const output = await run(`export * from "${path}"`);
         expect(output.analyzedImports.size).toStrictEqual(0);
@@ -395,6 +417,10 @@ describe.each([true, false])('with or without new line characters', (newLineChar
     });
 
     describe('wildcard import', () => {
+      afterEach(() => {
+        vi.restoreAllMocks();
+      });
+
       it('should not feed the `analyzedImports` map ', async () => {
         const output = await run(`import * from "${path}"`);
         expect(output.analyzedImports.size).toStrictEqual(0);
@@ -417,7 +443,7 @@ describe.each([true, false])('with or without new line characters', (newLineChar
   describe('analyzeEntryExport', () => {
     const entryPath = '@mocks/entry-a';
 
-    beforeAll(() => {
+    afterEach(() => {
       vi.restoreAllMocks();
     });
 
@@ -487,17 +513,21 @@ describe.each([true, false])('with or without new line characters', (newLineChar
   });
 
   describe('registerWildcardImportIfNeeded', () => {
-    beforeAll(() => {
-      vi.restoreAllMocks();
-    });
-
     beforeEach(() => {
       vi.spyOn(EntryAnalyzer, 'registerWildcardImport');
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
     });
 
     describe('if wildcard-imported is another target entry', () => {
       const entryOnePath = '/path/to/entry';
       const otherTargetEntryPath = '/path/to/other';
+
+      afterEach(() => {
+        vi.restoreAllMocks();
+      });
 
       it('should call `registerWildcardImport` even if `maxWildcardDepth` was not set', async () => {
         const ctx = await createTestContext({ targets: [entryOnePath, otherTargetEntryPath] });
@@ -577,6 +607,10 @@ describe.each([true, false])('with or without new line characters', (newLineChar
       const entryOnePath = '/path/to/entry';
       const wildcardExportedPath = '/path/to/wildcard';
 
+      afterEach(() => {
+        vi.restoreAllMocks();
+      });
+
       it('should not call `registerWildcardImport` if `maxWildcardDepth` was not set', async () => {
         const ctx = await createTestContext({ targets: [entryOnePath] });
         await EntryAnalyzer.registerWildcardImportIfNeeded(
@@ -622,10 +656,13 @@ describe.each([true, false])('with or without new line characters', (newLineChar
   });
 
   describe('registerWildcardImport', () => {
-    beforeAll(async () => {
-      vi.restoreAllMocks();
+    beforeEach(async () => {
       const realFs = (await vi.importActual('fs')) as any;
       vi.mocked(fs.readFileSync).mockImplementation(realFs.readFileSync);
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
     });
 
     it('should not register wildcard-imported module as a target if it could not be resolved', async () => {

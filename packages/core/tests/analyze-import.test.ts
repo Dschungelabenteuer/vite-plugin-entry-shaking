@@ -2,11 +2,10 @@ import fs from 'fs';
 import { resolve } from 'path';
 import type { ResolveFn } from 'vite';
 import MagicString from 'magic-string';
-import dedent from 'ts-dedent';
-import { beforeAll, describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeAll, describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import ImportAnalyzer from '../src/analyze-import';
-import { MOCK_IMPORT_INPUT, MOCKS_FOLDER_UNIT, STUB_PATH } from './utils';
+import { assertOutput, MOCK_IMPORT_INPUT, MOCKS_FOLDER_UNIT, STUB_PATH } from './utils';
 import { createTestContext, getTestResolver, resolveUnitEntry } from './utils';
 import type { EntryData, ImportInput, PluginEntries, TargetImports } from '../src/types';
 
@@ -37,7 +36,7 @@ beforeAll(async () => {
 });
 
 describe('analyzeImportStatement', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.restoreAllMocks();
   });
 
@@ -113,23 +112,23 @@ describe('analyzeImportStatement', () => {
       input.length - 1
     );
 
-    expect(src.toString()).toStrictEqual(
-      dedent(`
-      import { test } from '${entryPath}';
-      import { default as A_MODULE_A, default as A_COPY } from '${await resolver(
-        `${path}/modules/A.ts`
-      )}';
-      import { default as B } from '${await resolver(`${path}/modules/B.ts`)}';
-      import { G as A_MODULE_G } from '${await resolver(`${path}/modules/G.ts`)}';
-      import { J as JJ } from '${await resolver(`${path}/modules/IJ.ts`)}';
-      import { default as A_MODULE_D } from '${await resolver(`${path}/modules/D.ts`)}';
-    `)
-    );
+    const output = src.toString();
+    const resPath = (p: string) => resolver(p) as Promise<string>;
+    await assertOutput(output, {
+      imports: new Map([
+        [entryPath, ['test']],
+        [await resPath(`${path}/modules/A.ts`), ['default as A_MODULE_A', 'default as A_COPY']],
+        [await resPath(`${path}/modules/B.ts`), ['default as B']],
+        [await resPath(`${path}/modules/G.ts`), ['G as A_MODULE_G']],
+        [await resPath(`${path}/modules/IJ.ts`), ['J as JJ']],
+        [await resPath(`${path}/modules/D.ts`), ['default as A_MODULE_D']],
+      ]),
+    });
   });
 });
 
 describe('getImportedEntryExports', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.restoreAllMocks();
   });
 
@@ -157,7 +156,7 @@ describe('getImportedEntryExports', () => {
 });
 
 describe('getImportsMap', async () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.restoreAllMocks();
   });
 
@@ -283,10 +282,13 @@ describe('getImportsMap', async () => {
 
 describe('resolveImport', () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
     vi.spyOn(ImportAnalyzer, 'findNamedImport');
     vi.spyOn(ImportAnalyzer, 'findNamedWildcard');
     vi.spyOn(ImportAnalyzer, 'findDirectWildcardExports');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   const notFound = () => Promise.resolve(undefined);
@@ -326,7 +328,7 @@ describe('resolveImport', () => {
 });
 
 describe('findNamedImport', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.restoreAllMocks();
   });
 
@@ -392,7 +394,7 @@ describe('findNamedImport', () => {
 });
 
 describe('findNamedWildcard', () => {
-  beforeEach(() => {
+  afterEach(() => {
     vi.restoreAllMocks();
   });
 
@@ -472,8 +474,11 @@ describe('findNamedWildcard', () => {
 
 describe('findDirectWildcardExports', () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
     vi.spyOn(ImportAnalyzer, 'resolveImport');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('should not do/return anything if direct-exported path could not be resolved', async () => {
@@ -531,6 +536,10 @@ describe('findDirectWildcardExports', () => {
   });
 
   describe('should recursively resolve import if resolved direct-exported does not have an export of the given name and has registered wildcard exports', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
     it('should return true if recursive called ended up resolving the export', async () => {
       const entryPath = 'path/to/entry';
       const name = 'name';
@@ -578,6 +587,10 @@ describe('findDirectWildcardExports', () => {
 });
 
 describe('getImportReplacements', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('should call resolveImportedEntities for each import', async () => {
     vi.spyOn(ImportAnalyzer, 'resolveImportedEntities');
     const ctx = await createTestContext({ targets: [] });
@@ -600,9 +613,12 @@ describe('resolveImportedEntities', () => {
   const imported: ImportInput[] = [MOCK_IMPORT_INPUT];
 
   beforeEach(() => {
-    vi.restoreAllMocks();
     vi.spyOn(ImportAnalyzer, 'resolveImportedCircularEntities');
     vi.spyOn(ImportAnalyzer, 'formatImportReplacement');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it(`should call "${expectedFn}" if there are circular imports ${when}`, async () => {
@@ -630,6 +646,10 @@ describe('resolveImportedEntities', () => {
 });
 
 describe('resolveImportedCircularEntities', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('should preserve the requested binding name when resolving an aliased re-export', async () => {
     const entryPath = '/entry.ts';
     const sourcePath = '/source.ts';
@@ -657,6 +677,10 @@ describe('resolveImportedCircularEntities', () => {
 });
 
 describe('formatImportReplacement', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('should correctly format import which resolves to the default export of the target module', () => {
     const name = 'A';
     const importDefault = true;
@@ -740,6 +764,10 @@ describe('formatImportReplacement', () => {
 describe('catchWildcardImport', () => {
   const entryPath = 'path/to/entry';
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('should return true and rewrite if the import is a wildcard import', () => {
     const input = `import * as Utils from './somewhere';`;
     const src = new MagicString(input);
@@ -759,6 +787,10 @@ describe('catchWildcardImport', () => {
 
 describe('catchDynamicImport', () => {
   const entryPath = 'path/to/entry';
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
   /**
    * Next two suites suppose the following statement:
