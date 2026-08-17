@@ -1,4 +1,4 @@
-import type { HMRBroadcaster, ViteDevServer } from 'vite';
+import type { NormalizedHotChannel, ViteDevServer } from 'vite';
 import type { Context } from 'vite-plugin-entry-shaking';
 import type { ConsumerPackageInfo } from '../types';
 import { wsMessageName, READY } from '../shared';
@@ -43,7 +43,7 @@ export function createChannel(
  * @param ws Vite's Web Socket server.
  * @param ctx Detached plugin context.
  */
-function subscribeToEventBus(hot: HMRBroadcaster, ctx: Context) {
+function subscribeToEventBus(hot: NormalizedHotChannel, ctx: Context) {
   ctx.eventBus?.subscribe((event, data) => {
     hot.send(_(event), JSONMap.stringify(data.length > 1 ? [...data] : data[0]));
   });

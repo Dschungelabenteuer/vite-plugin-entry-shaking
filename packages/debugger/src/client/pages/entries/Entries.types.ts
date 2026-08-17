@@ -1,5 +1,5 @@
 import type { EntryData } from 'vite-plugin-entry-shaking';
-import type { ImportParams } from 'vite-plugin-entry-shaking/src/types';
+import type { ImportParams } from 'vite-plugin-entry-shaking';
 import type { Paths } from '#types';
 import type { GridRowProps } from '@views/Grid/Grid.types';
 

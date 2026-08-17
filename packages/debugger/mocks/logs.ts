@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 
 import type { Context } from 'vite-plugin-entry-shaking';
-import { getChronologicalTime } from './utils';
+import { getChronologicalTime } from './utils.ts';
 
 const mockedLogCount = 444; // Népal 🙏
 

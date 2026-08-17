@@ -14,16 +14,6 @@ export type ShortEmits<T extends Record<string, any>> = UnionToIntersection<
 export type Booleanish = 'true' | 'false';
 
 declare global {
-  interface ViewTransition {
-    finished: Promise<void>;
-    updateCallbackDone: Promise<void>;
-    ready: Promise<void>;
-  }
-
-  interface Document {
-    startViewTransition?: (callback: () => Promise<void> | void) => ViewTransition;
-  }
-
   interface CSSStyleDeclaration {
     viewTransitionName: string;
   }

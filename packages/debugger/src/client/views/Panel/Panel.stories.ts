@@ -8,6 +8,12 @@ const meta = { component: Panel, title: 'Views/Panel', tags: ['autodocs'] } sati
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = { args: { content: 'Textual badge' } };
+export const Simple: Story = {
+  args: {
+    closePanelLabel: 'Close panel sample label',
+    panelId: 'Panel-Simple',
+    title: 'My panel title',
+  },
+};
 
 export default meta;

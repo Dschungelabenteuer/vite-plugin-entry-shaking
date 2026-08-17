@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'url';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import dev from './dev.plugin';
+import dev from './dev.plugin.ts';
 
 const outDir = '../../dist/client';
 
@@ -26,5 +26,11 @@ export default defineConfig({
       '@styles': fileURLToPath(new URL('./styles', import.meta.url)),
     },
   },
-  css: { preprocessorOptions: { scss: { additionalData: `@import "@styles/global.scss";` } } },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use "/styles/_mixins.scss" as *;\n@use "/styles/_variables.scss" as *;`,
+      },
+    },
+  },
 });

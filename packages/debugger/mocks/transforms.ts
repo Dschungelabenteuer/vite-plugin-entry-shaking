@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 
 import type { TransformData } from 'vite-plugin-entry-shaking';
-import { getChronologicalTime, getRandomProjectPath } from './utils';
+import { getChronologicalTime, getRandomProjectPath } from './utils.ts';
 
 const mockedTransformCount = 64;
 

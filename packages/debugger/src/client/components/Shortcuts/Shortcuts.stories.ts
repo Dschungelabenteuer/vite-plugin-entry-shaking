@@ -27,12 +27,12 @@ type Story = StoryObj<typeof meta>;
 
 export const ShortcutHint: Story = {
   decorators: [() => ({ template: `<div style="height: 12px"><story /></div>` })],
-  args: { showTooltip: true },
+  args: { id: 'Shortcuts-ShortcutHint', showTooltip: true },
 };
 
 export const ShortcutList: Story = {
   decorators: [() => ({ template: `<div style="height: 154px"><story /></div>` })],
-  args: { showList: true },
+  args: { id: 'Shortcuts-ShortcutList', showList: true },
 };
 
 export default meta;

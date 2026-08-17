@@ -12,7 +12,7 @@ const addons: StorybookConfig['addons'] = [
   '@storybook/addon-interactions',
 ];
 
-const docs: StorybookConfig['docs'] = { autodocs: 'tag' };
+const docs: StorybookConfig['docs'] = {};
 
 const core: StorybookConfig['core'] = {
   builder: {

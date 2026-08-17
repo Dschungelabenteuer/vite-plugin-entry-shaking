@@ -33,13 +33,13 @@
     }
   },
   "publishConfig": {
-    "main": "dist/index.cjs",
-    "module": "dist/index.mjs",
+    "main": "dist/index.mjs",
     "types": "dist/index.d.ts"
   },
   "scripts": {
     "dev": "pnpm obuild --stub",
     "build": "pnpm obuild",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
@@ -56,7 +56,7 @@
     "globals": "catalog:",
     "obuild": "catalog:",
     "ts-dedent": "catalog:",
-    "typescript": "catalog:",
+    "typescript": "catalog:next",
     "vite": "catalog:",
     "vite-plugin-entry-shaking-debugger": "workspace:*",
     "vitest": "catalog:"

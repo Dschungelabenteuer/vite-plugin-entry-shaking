@@ -3,7 +3,8 @@ import { inject, onBeforeUnmount, onMounted } from 'vue';
 
 import { getElement } from '#utils';
 
-type AugmentedViewTransition = ViewTransition & { captured: Promise<void> };
+type Mutable<T> = { -readonly [P in keyof T]: T[P] };
+type AugmentedViewTransition = Mutable<ViewTransition & { captured: Promise<void> }>;
 type TransitionableElement = Ref<HTMLElement | null> | Ref<ComponentPublicInstance>;
 type ViewTransitionName = string;
 type ViewTransitionNameItem = Map<number, TransitionableElement>;
@@ -86,6 +87,8 @@ function startViewTransition(callback?: () => Promise<void>): AugmentedViewTrans
       updateCallbackDone: callbackPromise,
       ready: callbackPromise,
       finished: callbackPromise,
+      types: new Set(),
+      skipTransition: () => {},
     };
   }
 

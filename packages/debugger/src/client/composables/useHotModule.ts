@@ -1,4 +1,4 @@
-import type { ViteHotContext } from 'vite/types/hot';
+import type { NormalizedHotChannel } from 'vite';
 import type { DebuggerEvents } from 'vite-plugin-entry-shaking';
 import { store } from '#store';
 import { READY, VITE_DISCONNECTED, VITE_CONNECTING, wsMessageName } from '../../shared';
@@ -10,10 +10,10 @@ type DebuggerEventHandlers = {
   [Key in keyof DebuggerEvents]: (...args: DebuggerEvents[Key]) => void;
 };
 
-let hot: ViteHotContext | undefined;
+let hot: NormalizedHotChannel | undefined;
 
 /** Uses the communication channel created between debugger's server and client. */
-export async function useHotModule(): Promise<ViteHotContext> {
+export async function useHotModule(): Promise<NormalizedHotChannel> {
   if (hot) return hot;
 
   const { createHotContext } = await import(/* @vite-ignore */ pathToClient);
@@ -53,7 +53,7 @@ export async function useHotModule(): Promise<ViteHotContext> {
  * Returns the initial state of the plugin (based on plugin's context once the server is ready).
  * @param hotContext Vite's hot context.
  */
-function getInitialState(hotContext: ViteHotContext) {
+function getInitialState(hotContext: NormalizedHotChannel) {
   hotContext.send(READY);
   hotContext.on(READY, (res) => {
     const data = JSONMap.parse(res);
@@ -72,11 +72,11 @@ function getInitialState(hotContext: ViteHotContext) {
  * Gets in plugin's event bus and handles received events.
  * @param hotContext Vite's hot context.
  */
-function getOnEventBus(hotContext: ViteHotContext, handlers: DebuggerEventHandlers) {
+function getOnEventBus(hotContext: NormalizedHotChannel, handlers: DebuggerEventHandlers) {
   const events = Object.keys(handlers) as (keyof DebuggerEvents)[];
   events.forEach((event) => {
     hotContext.on(wsMessageName(event), (payload) => {
-      handlers[event](JSONMap.parse(payload));
+      handlers[event](JSONMap.parse(payload) as never);
     });
   });
 }
@@ -85,7 +85,7 @@ function getOnEventBus(hotContext: ViteHotContext, handlers: DebuggerEventHandle
  * Watches Vite's server status and handles changes.
  * @param hotContext Vite's hot context.
  */
-function watchServerStatus(hotContext: ViteHotContext) {
+function watchServerStatus(hotContext: NormalizedHotChannel) {
   hotContext.on(VITE_DISCONNECTED, () => {
     store.status = 'disconnected';
   });
