@@ -8,13 +8,8 @@ export default defineBuildConfig({
       dts: true,
       minify: true,
       rolldown: {
-        external: ['vite', 'vite-plugin-entry-shaking-debugger', 'fast-glob', 'esbuild'],
+        external: ['vite', 'vite-plugin-entry-shaking-debugger', 'tinyglobby', 'esbuild'],
       },
     },
   ],
-  // clean: true,
-  // entries: ['./src/index'],
-  // declaration: true,
-  // externals: ['vite', 'vite-plugin-entry-shaking-debugger', 'fast-glob', 'esbuild'],
-  // rollup: { output: { exports: 'named' }, emitCJS: true, inlineDependencies: true },
 });

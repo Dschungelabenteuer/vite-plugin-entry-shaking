@@ -13,12 +13,7 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          persist-credentials: false
-
-      - name: Install node & pnpm dependencies
+      - name: Setup pnpm
         uses: ./.github/actions/install
 
       - name: Create Release Pull Request or Publish to npm

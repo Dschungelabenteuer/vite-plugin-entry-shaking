@@ -15,10 +15,10 @@ export const themeDecorator = (storyFn: () => ReturnType<StoryFn>, context: Stor
 
 export const colorScheme = {
   description: 'Global theme for components',
-  defaultValue: 'light',
+  defaultValue: 'light' as const,
   toolbar: {
     title: 'Color scheme',
-    icon: 'circlehollow',
+    icon: 'circlehollow' as const,
     items: ['light', 'dark'],
     dynamicTitle: true,
   },

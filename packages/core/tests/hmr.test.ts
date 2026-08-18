@@ -1,16 +1,14 @@
 import type { ModuleGraph, ModuleNode } from 'vite';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import EntryAnalyzer from '../src/analyze-entry';
 import { addSourceQuerySuffix } from '../src/urls';
-import { createMockEntryData, createTestContext } from './utils';
-
-const createModule = (id: string, file = id.split('?')[0]) => ({ id, file, url: id }) as ModuleNode;
+import { createMockEntryData, createTestContext, createModuleNode } from './utils';
 
 describe('HMR', () => {
   const entryId = '/path/to/entry.ts';
 
-  beforeEach(() => {
+  afterEach(() => {
     vi.restoreAllMocks();
   });
 
@@ -40,10 +38,10 @@ describe('HMR', () => {
   it('should collect entry modules and plugin source variants from Vite module graph', async () => {
     const ctx = await createTestContext({ targets: [] });
     const sourceId = addSourceQuerySuffix(entryId);
-    const normalModule = createModule(entryId);
-    const sourceModule = createModule(sourceId, entryId);
-    const unrelatedQueryModule = createModule(`${entryId}?raw`, entryId);
-    const unrelatedModule = createModule('/path/to/other.ts');
+    const normalModule = createModuleNode(entryId);
+    const sourceModule = createModuleNode(sourceId, entryId);
+    const unrelatedQueryModule = createModuleNode(`${entryId}?raw`, entryId);
+    const unrelatedModule = createModuleNode('/path/to/other.ts');
     const modulesById = new Map([
       [entryId, normalModule],
       [sourceId, sourceModule],
@@ -71,8 +69,8 @@ describe('HMR', () => {
   it('should collect transformed importers that depended on the changed entry analysis', async () => {
     const ctx = await createTestContext({ targets: [] });
     const importerId = '/path/to/consumer.ts';
-    const normalModule = createModule(entryId);
-    const importerModule = createModule(importerId);
+    const normalModule = createModuleNode(entryId);
+    const importerModule = createModuleNode(importerId);
     const modulesById = new Map([
       [entryId, normalModule],
       [importerId, importerModule],

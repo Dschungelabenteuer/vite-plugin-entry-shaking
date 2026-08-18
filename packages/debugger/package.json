@@ -22,7 +22,7 @@
   },
   "type": "module",
   "main": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "types": "dist/index.d.mts",
   "scripts": {
     "dev": "vite src/client",
     "build": "vite build src/client && obuild",
@@ -70,6 +70,7 @@
     "stylelint-config-recommended-vue": "catalog:",
     "stylelint-config-standard-scss": "catalog:",
     "stylelint-scss": "catalog:",
+    "tinyglobby": "catalog:",
     "twoslash-cdn": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

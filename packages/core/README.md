@@ -69,7 +69,7 @@ export default defineConfig({
         <ul>
        <li><code>string[]</code></li>
        <li><code>{ path: string }[]</code></li>
-       <li><code>{ glob: string; globOptions: import('fast-glob').Options }[]</code></li>
+       <li><code>{ glob: string; globOptions: import('tinyglobby').GlobOptions }[]</code></li>
         </ul>
       </td>
       <td>N/A</td>

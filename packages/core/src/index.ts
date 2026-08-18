@@ -1,6 +1,7 @@
 import type { ModuleNode, Plugin, ResolvedConfig } from 'vite';
 import type {
   Diagnostic,
+  DiagnosticsConfig,
   PluginMetrics,
   PluginEntries,
   PluginOptions,
@@ -20,6 +21,7 @@ import { loadDebugger } from './utils';
 
 export type {
   Diagnostic,
+  DiagnosticsConfig,
   PluginEntries,
   PluginMetrics,
   PluginOptions,

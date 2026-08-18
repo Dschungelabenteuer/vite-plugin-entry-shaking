@@ -12,7 +12,8 @@
     "paths": {
       "@mocks/*": ["./tests/__mocks__/*"],
       "@test-modules/*": ["./tests/__mocks__/modules/*"],
-      "@test-cases/*": ["./tests/cases/*"]
+      "@test-cases/*": ["./tests/cases/*"],
+      "mode-watcher": ["./tests/__mocks__/remap/node_modules/@cms/core/admin/dist/lib/mode-watcher"]
     }
   },
   "exclude": ["coverage", "dist", "node_modules"]
