@@ -1,4 +1,4 @@
-import type { Ref } from 'vue';
+import type { ShallowRef } from 'vue';
 import { ref, toRef, watch, watchEffect } from 'vue';
 import { isComponentInstance } from '#utils';
 import type { ButtonInstance } from '@components/Button/Button.types';
@@ -10,7 +10,7 @@ const NAVIGATION_KEYS = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', '
 export function useDropdownMenu(
   props: DropdownMenuProps,
   emit: any,
-  items: Ref<(ButtonInstance | HTMLButtonElement | null)[]>
+  items: Readonly<ShallowRef<(HTMLButtonElement | ButtonInstance)[] | null>>
 ) {
   const isOpen = toRef(props, 'isOpen');
   const isTransitioning = toRef(props, 'isTransitioning');
@@ -25,7 +25,7 @@ export function useDropdownMenu(
   };
 
   watchEffect(() => {
-    menuItems.value = items.value.map((item) =>
+    menuItems.value = (items.value ?? []).map((item) =>
       isComponentInstance(item) ? item!.reference : item
     );
   });

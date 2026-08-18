@@ -1,4 +1,4 @@
-import type { Ref } from 'vue';
+import type { ShallowRef } from 'vue';
 import { computed, ref, watchEffect } from 'vue';
 import { isComponentInstance } from '#utils';
 import type { ButtonInstance } from '@components/Button/Button.types';
@@ -7,7 +7,7 @@ import type { VerticalTab, VerticalTabsProps } from './VerticalTabs.types';
 
 export function useVerticalTabs(
   props: VerticalTabsProps,
-  tabs: Ref<(ButtonInstance | HTMLButtonElement | null)[]>
+  tabs: Readonly<ShallowRef<ButtonInstance[] | null>>
 ) {
   const activeTabId = props.activeTabId
     ? Math.max(
@@ -25,7 +25,7 @@ export function useVerticalTabs(
   };
 
   watchEffect(() => {
-    menuItems.value = tabs.value.map((item) =>
+    menuItems.value = (tabs.value ?? []).map((item) =>
       isComponentInstance(item) ? item!.reference : item
     );
   });

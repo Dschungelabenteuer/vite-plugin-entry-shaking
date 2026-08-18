@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 
 import Button from '@components/Button/Button.vue';
 import { useClassNames } from '@composables/useClassNames';
 
 import type { DropdownMenuProps, DropdownMenuEvents } from './DropdownMenu.types';
 import { useDropdownMenu } from './useDropdownMenu';
+import { ButtonInstance } from '@components/Button/Button.types';
 
 const $class = useClassNames('dropdown-menu');
 const emit = defineEmits<DropdownMenuEvents>();
 const props = defineProps<DropdownMenuProps>();
 
-const menuItemRefs = ref<HTMLButtonElement[] | null[]>([]);
+const menuItemRefs = useTemplateRef<(HTMLButtonElement | ButtonInstance)[]>('menuItemRefs');
 const { handleKeydown } = useDropdownMenu(props, emit, menuItemRefs);
 </script>
 

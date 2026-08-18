@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, useTemplateRef } from 'vue';
 
 import Popover from '@components/Popover/Popover.vue';
 import { usePopover } from '@components/Popover/usePopover';
@@ -14,7 +14,7 @@ const emit = defineEmits<ShortcutsEvents>();
 const props = defineProps<ShortcutsListProps>();
 
 const reference = inject<Ref<HTMLButtonElement | null>>('reference')!;
-const popoverRef = ref<InstanceType<typeof Popover> | null>(null);
+const popoverRef = useTemplateRef<InstanceType<typeof Popover>>('popoverRef');
 const popover = usePopover(reference, popoverRef);
 const popoverId = computed(() => `${props.id}-shortcuts-popover`);
 </script>

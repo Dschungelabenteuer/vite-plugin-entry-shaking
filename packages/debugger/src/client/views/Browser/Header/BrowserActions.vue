@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject, ref } from 'vue';
-
+import { useTemplateRef } from 'vue';
 import Input from '@components/Input/Input.vue';
 import Button from '@components/Button/Button.vue';
 import type { ClassNameFn } from '@composables/useClassNames';
@@ -10,8 +10,8 @@ import type { BrowserProps, BrowserSlots, BrowserSearchFn } from '../Browser.typ
 const $class = inject<ClassNameFn>('$class')!;
 const _props = defineProps<Required<BrowserProps>>();
 const _slots = defineSlots<Pick<BrowserSlots, 'filters'>>();
-const headerSearchRef = ref<HTMLElement | null>(null);
-const headerFilterButtonRef = ref<HTMLElement | null>(null);
+const headerSearchRef = useTemplateRef<HTMLElement>('headerSearchRef');
+const headerFilterButtonRef = useTemplateRef<HTMLElement>('headerFilterButtonRef');
 const _transitions = useViewTransition({
   names: {
     'browser-header-search': headerSearchRef,

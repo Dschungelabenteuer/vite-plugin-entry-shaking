@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref } from 'vue';
+import { inject, ref, useTemplateRef } from 'vue';
 
 import Icon from '@components/Icon/Icon.vue';
 import type { ClassNameFn } from '@composables/useClassNames';
@@ -9,8 +9,8 @@ import type { BrowserProps } from '../Browser.types';
 const $class = inject<ClassNameFn>('$class')!;
 const _props = defineProps<Required<BrowserProps>>();
 
-const headerTitleRef = ref<HTMLElement | null>(null);
-const headerIconRef = ref<HTMLElement | null>(null);
+const headerTitleRef = useTemplateRef<HTMLElement>('headerTitleRef');
+const headerIconRef = useTemplateRef<HTMLElement>('headerIconRef');
 const _transitions = useViewTransition({
   names: { 'browser-header-title': headerTitleRef, 'browser-header-icon': headerIconRef },
 });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { useTemplateRef } from 'vue';
 import { Icon } from '@iconify/vue';
 import Tooltip from '@components/Tooltip/Tooltip.vue';
 
@@ -11,8 +11,8 @@ const props = withDefaults(defineProps<IconProps>(), {
   tooltipOptions: () => ({ placement: 'top', autoupdatePosition: true, disable: false }),
 });
 
-const reference = ref<HTMLButtonElement | null>(null);
-const tooltipRef = ref<InstanceType<typeof Tooltip> | null>(null);
+const reference = useTemplateRef<HTMLButtonElement>('reference');
+const tooltipRef = useTemplateRef<InstanceType<typeof Tooltip>>('tooltipRef');
 const { icon, tooltip, teleport } = useIcon(props, reference, tooltipRef);
 </script>
 
@@ -31,6 +31,7 @@ const { icon, tooltip, teleport } = useIcon(props, reference, tooltipRef);
       />
     </span>
     <Teleport
+      defer
       :disabled="teleport.disabled.value"
       :to="teleport.to.value"
     >

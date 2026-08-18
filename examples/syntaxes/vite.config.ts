@@ -3,7 +3,7 @@ import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import vue from '@vitejs/plugin-vue';
 import EntryShakingPlugin from 'vite-plugin-entry-shaking';
-import targets from './entries.json';
+import targets from './entries.json' with { type: 'json' };
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -15,7 +15,7 @@ export default defineConfig(() => ({
   plugins: [
     EntryShakingPlugin({
       targets: targets.map((target) => resolve(rootDir, target)),
-      enableDiagnostics: true,
+      diagnostics: true,
       maxWildcardDepth: 1,
       debug: true,
     }),
