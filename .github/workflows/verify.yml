@@ -12,6 +12,11 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
       - name: Setup pnpm
         uses: ./.github/actions/install
 
@@ -24,6 +29,11 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
       - name: Setup pnpm
         uses: ./.github/actions/install
 
@@ -36,6 +46,11 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
       - name: Setup pnpm
         uses: ./.github/actions/install
 
@@ -48,6 +63,11 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
       - name: Setup pnpm
         uses: ./.github/actions/install
 
@@ -60,6 +80,11 @@ jobs:
     timeout-minutes: 5
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
       - name: Setup pnpm
         uses: ./.github/actions/install
 
