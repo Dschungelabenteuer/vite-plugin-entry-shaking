@@ -1,3 +1,104 @@
+---
+lockfileVersion: '9.0'
+
+importers:
+
+  .:
+    configDependencies: {}
+    packageManagerDependencies:
+      pnpm:
+        specifier: 12.0.0-beta.4
+        version: 12.0.0-beta.4
+
+packages:
+
+  '@pnpm/exe.darwin-arm64@12.0.0-beta.4':
+    resolution: {integrity: sha512-tiQOpZ3nvl/OXZmHg57I6NyrOIdo3Vv+EH8AVmvZ+FkZtXAA9QVt/+o5SSilxJRr5TvsCcVX/8D0gGfHtEziOQ==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@pnpm/exe.darwin-x64@12.0.0-beta.4':
+    resolution: {integrity: sha512-4wScigCUT6hGJZy+kZQw4cDOlVKS4ZeZ9KkuGZKef04raiP39CRjvkRzWaWmqEWi8cKwvloSeEb6jMI05PtEzg==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@pnpm/exe.linux-arm64-musl@12.0.0-beta.4':
+    resolution: {integrity: sha512-Os1S0gu03154KMjkMGu50bytF5pvCZ9WSizxsmpfNY+iWM1zcqVj2z5DbbZI3Nf6s2uYuSdtyPvnapIgionAag==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [musl]
+
+  '@pnpm/exe.linux-arm64@12.0.0-beta.4':
+    resolution: {integrity: sha512-TRsw6j2Xk99HudsANfD98OsHuxMRF/tYZRHyTWghmmFdXFKKo8q/khI5cqDtqnR+oPMMV/5k207ZLZBIrgwOmA==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@pnpm/exe.linux-x64-musl@12.0.0-beta.4':
+    resolution: {integrity: sha512-mlelD8F71awsolUkcYb2pOkcEKDn4I63WGAhi1Fcad/1WuW/OAli4uXMgpKl4XpUXEIDUZTMVCdJYjuC2H72ag==}
+    cpu: [x64]
+    os: [linux]
+    libc: [musl]
+
+  '@pnpm/exe.linux-x64@12.0.0-beta.4':
+    resolution: {integrity: sha512-n9e5JgFAmwt5a5aIHy15Yeaij0qwnNEobkC4IRqjntDq90hD89hSijvIpcIdkbaOkGH88UKrY1TwJxzypfRGjQ==}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@pnpm/exe.win32-arm64@12.0.0-beta.4':
+    resolution: {integrity: sha512-xDPLWGcin2aW73ch1uzVSzyLomo9pqlfZ+CvHs9KV2bS7CInt2bEMrO8jeDtuzzPp5zwpqVz3l571mABu6ZDYw==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@pnpm/exe.win32-x64@12.0.0-beta.4':
+    resolution: {integrity: sha512-QWwxzbw06M4qYSgl320vp+Li4ByNk03G2qE3z+NXzmN04JWGBnvkzl0+GE2T4KtWqEbbpCGZHm4XeHQqXzrPhw==}
+    cpu: [x64]
+    os: [win32]
+
+  pnpm@12.0.0-beta.4:
+    resolution: {integrity: sha512-WTAGbV+l1QdYxbbSowk45DLC0fyzh8SyQHOFBB6dvg8Nj8qcg2nIWm0CfmNu4pNjlDxgwFzC6bWE39GjarbiBA==}
+    engines: {node: '>=18.*'}
+    hasBin: true
+
+snapshots:
+
+  '@pnpm/exe.darwin-arm64@12.0.0-beta.4':
+    optional: true
+
+  '@pnpm/exe.darwin-x64@12.0.0-beta.4':
+    optional: true
+
+  '@pnpm/exe.linux-arm64-musl@12.0.0-beta.4':
+    optional: true
+
+  '@pnpm/exe.linux-arm64@12.0.0-beta.4':
+    optional: true
+
+  '@pnpm/exe.linux-x64-musl@12.0.0-beta.4':
+    optional: true
+
+  '@pnpm/exe.linux-x64@12.0.0-beta.4':
+    optional: true
+
+  '@pnpm/exe.win32-arm64@12.0.0-beta.4':
+    optional: true
+
+  '@pnpm/exe.win32-x64@12.0.0-beta.4':
+    optional: true
+
+  pnpm@12.0.0-beta.4:
+    optionalDependencies:
+      '@pnpm/exe.darwin-arm64': 12.0.0-beta.4
+      '@pnpm/exe.darwin-x64': 12.0.0-beta.4
+      '@pnpm/exe.linux-arm64': 12.0.0-beta.4
+      '@pnpm/exe.linux-arm64-musl': 12.0.0-beta.4
+      '@pnpm/exe.linux-x64': 12.0.0-beta.4
+      '@pnpm/exe.linux-x64-musl': 12.0.0-beta.4
+      '@pnpm/exe.win32-arm64': 12.0.0-beta.4
+      '@pnpm/exe.win32-x64': 12.0.0-beta.4
+
+---
 lockfileVersion: '9.0'
 
 settings:
