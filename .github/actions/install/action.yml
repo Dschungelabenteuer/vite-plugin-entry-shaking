@@ -1,26 +1,14 @@
-name: Install node & pnpm dependencies
+name: Setup pnpm
 description: Prepare repository and all dependencies
 
 runs:
   using: composite
   steps:
-    - name: Install Node.js
-      uses: actions/setup-node@v4
+    - uses: actions/checkout@v6
       with:
-        node-version: lts/*
-        cache: pnpm
-
-    - uses: pnpm/action-setup@v4
-      name: Install pnpm
-      id: pnpm-install
+        persist-credentials: false
+    - name: Install pnpm and Node.js
+      uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2.0.2
       with:
-        version: latest
-        run_install: false
-
-    - name: Enable peerdeps auto-install
-      shell: bash
-      run: pnpm config set auto-install-peers true
-
-    - name: Install dependencies
-      shell: bash
-      run: pnpm install --frozen-lockfile
+        runtime: node@$24
+        cache: true
