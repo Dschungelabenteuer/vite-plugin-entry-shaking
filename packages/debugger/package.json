@@ -25,7 +25,7 @@
   "types": "dist/index.d.mts",
   "scripts": {
     "dev": "vite src/client",
-    "build": "vite build src/client && obuild",
+    "build": "obuild && vite build src/client",
     "typecheck": "vue-tsc --noEmit",
     "stub": "obuild --stub",
     "storybook:dev": "storybook dev -p 6006",

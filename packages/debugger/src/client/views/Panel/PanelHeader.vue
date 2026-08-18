@@ -13,7 +13,6 @@ const _props = defineProps<PanelHeaderProps>();
   <header :class="$class('header')">
     <Button
       v-if="isOpen"
-      ref="closeBtnRef"
       class="size"
       :aria-controls="panelId"
       :aria-expanded="true"

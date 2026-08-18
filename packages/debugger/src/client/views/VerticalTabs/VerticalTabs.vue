@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 import Button from '@components/Button/Button.vue';
 import type { ButtonInstance } from '@components/Button/Button.types';
 import Badge from '@components/Badge/Badge.vue';
@@ -10,8 +10,7 @@ import { useVerticalTabs } from './useVerticalTabs';
 const $class = useClassNames('vertical-tabs');
 const props = defineProps<VerticalTabsProps>();
 
-const tabButtonsRef = ref<(ButtonInstance | null)[]>([]);
-const tabPanelsRef = ref<(HTMLElement | null)[]>([]);
+const tabButtonsRef = useTemplateRef<ButtonInstance[]>('tabButtonsRef');
 const { menu, ids, tablistWidth, setActiveTab } = useVerticalTabs(props, tabButtonsRef);
 </script>
 
@@ -54,7 +53,6 @@ const { menu, ids, tablistWidth, setActiveTab } = useVerticalTabs(props, tabButt
       <div
         v-for="(tab, index) in tabs"
         :id="ids.getTabPanelId(tab.id)"
-        ref="tabPanelsRef"
         :key="ids.getTabPanelId(tab.id)"
         :class="[$class('panel'), { active: menu.isActiveIndex(index) }]"
         :aria-labelledby="ids.getTabButtonId(tab.id)"

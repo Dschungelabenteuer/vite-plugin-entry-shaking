@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-
+import { useTemplateRef } from 'vue';
 import Icon from '@components/Icon/Icon.vue';
 import Tooltip from '@components/Tooltip/Tooltip.vue';
 import Popover from '@components/Popover/Popover.vue';
@@ -16,9 +15,9 @@ const props = withDefaults(defineProps<ButtonProps>(), {
   tooltipOptions: () => ({ placement: 'top', autoupdatePosition: true, disable: false }),
 });
 
-const reference = ref<HTMLButtonElement | null>(null);
-const tooltipRef = ref<InstanceType<typeof Tooltip> | null>(null);
-const popoverRef = ref<InstanceType<typeof Popover> | null>(null);
+const reference = useTemplateRef<HTMLButtonElement>('reference');
+const tooltipRef = useTemplateRef<InstanceType<typeof Tooltip>>('tooltipRef');
+const popoverRef = useTemplateRef<InstanceType<typeof Popover>>('popoverRef');
 const button = useButton(props, emit, $class(), reference, tooltipRef, popoverRef);
 const { attributes, handlers, tooltip, popover, teleport } = button;
 const { popoverId } = attributes;
@@ -66,6 +65,7 @@ defineExpose({ reference });
   </button>
 
   <Teleport
+    defer
     :disabled="teleport.disabled.value"
     :to="teleport.to.value"
   >

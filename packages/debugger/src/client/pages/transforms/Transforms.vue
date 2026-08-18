@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, toRefs } from 'vue';
+import { computed, ref, toRefs, useTemplateRef } from 'vue';
 import { useRoute } from 'vue-router';
 import type { TransformData } from 'vite-plugin-entry-shaking';
 
@@ -15,7 +15,7 @@ import Transform from './Transform.vue';
 import TransformDetails from './TransformDetails.vue';
 
 const route = useRoute();
-const dialogRef = ref<InstanceType<typeof Dialog> | null>(null);
+const dialogRef = useTemplateRef<InstanceType<typeof Dialog>>('dialogRef');
 const ctxStore = toRefs(store);
 const source = computed(() =>
   [...ctxStore.transforms.value.entries()].map(([path, transform]) => ({

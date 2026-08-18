@@ -1,4 +1,4 @@
-import type { Ref } from 'vue';
+import type { ShallowRef } from 'vue';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import type { ShortEmits } from '#uitypes';
 import { useFocusTrap } from '@composables/useFocusTrap';
@@ -18,7 +18,7 @@ export const DIALOG_CONTAINER_CLASS = 'dialog-container';
 export function useDialog(
   props: DialogProps,
   emit: ShortEmits<DialogEvents>,
-  element: Ref<HTMLDialogElement | null>
+  element: Readonly<ShallowRef<HTMLDialogElement | null>>
 ) {
   const trap = useFocusTrap(element);
   const timeout = ref<ReturnType<typeof setTimeout>>();
@@ -45,8 +45,9 @@ export function useDialog(
 
   /** Triggered when closing the dialog. */
   const handleClose = () => {
+    if (!element.value) return;
     const animationCustomProp = '--transition-duration-short';
-    const computedStyle = getComputedStyle(element.value!);
+    const computedStyle = getComputedStyle(element.value);
     const duration = computedStyle.getPropertyValue(animationCustomProp);
     const delay = duration.endsWith('ms')
       ? Number(duration.slice(0, -2))
@@ -68,7 +69,8 @@ export function useDialog(
       isOpen.value = element.value?.open ?? false;
     });
 
-    observer.observe(element.value!, { attributes: true, attributeFilter: ['open'] });
+    if (!element.value) return console.warn('Dialog element is not defined.');
+    observer.observe(element.value, { attributes: true, attributeFilter: ['open'] });
   });
 
   onUnmounted(() => {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
-import { computed, inject, ref } from 'vue';
+import { computed, inject, ref, useTemplateRef } from 'vue';
 
 import Popover from '@components/Popover/Popover.vue';
 import { usePopover } from '@components/Popover/usePopover';
@@ -12,7 +12,7 @@ const $class = inject<ClassNameFn>('$class')!;
 const props = defineProps<ShortcutsHintProps>();
 
 const reference = inject<Ref<HTMLButtonElement | null>>('reference')!;
-const tooltipRef = ref<InstanceType<typeof Popover> | null>(null);
+const tooltipRef = useTemplateRef<InstanceType<typeof Popover>>('tooltipRef');
 const tooltip = usePopover(reference, tooltipRef);
 const tooltipId = computed(() => `${props.id}-shortcuts-tooltip`);
 </script>

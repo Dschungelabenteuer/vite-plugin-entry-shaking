@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, onMounted, provide, ref } from 'vue';
+import { inject, onMounted, provide, ref, useTemplateRef } from 'vue';
 
 import Header from '@layout/Header/Header.vue';
 import Footer from '@layout/Footer/Footer.vue';
@@ -17,7 +17,7 @@ const dialogContainerId = inject<string>(DIALOG_CONTAINER_ID_VAR)!;
 const floatingContainerId = inject<string>(FLOATING_CONTAINER_ID_VAR)!;
 
 const enableTeleports = ref(false);
-const toasterRef = ref<InstanceType<typeof Toaster> | null>(null);
+const toasterRef = useTemplateRef<InstanceType<typeof Toaster>>('toasterRef');
 const { colorScheme, swapColorScheme } = useColorScheme();
 const metricsPanel = usePanel('metrics');
 const toaster = useToaster(toasterRef);

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide, ref } from 'vue';
+import { provide, useTemplateRef } from 'vue';
 
 import { randomId } from '#utils';
 import { useClassNames } from '@composables/useClassNames';
@@ -11,7 +11,7 @@ const $class = useClassNames('shortcuts-helper');
 const emit = defineEmits<ShortcutsEvents>();
 const _props = withDefaults(defineProps<ShortcutsProps>(), { id: () => randomId('shortcuts') });
 
-const reference = ref<HTMLButtonElement | null>(null);
+const reference = useTemplateRef<HTMLButtonElement>('reference');
 provide('$class', $class);
 provide('reference', reference);
 </script>

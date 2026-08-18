@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref } from 'vue';
+import { inject, ref, useTemplateRef } from 'vue';
 
 import type { ClassNameFn } from '@composables/useClassNames';
 import { useViewTransition } from '@composables/useViewTransition';
@@ -8,7 +8,7 @@ import type { BrowserProps } from '../Browser.types';
 const $class = inject<ClassNameFn>('$class')!;
 const _props = defineProps<Required<BrowserProps>>();
 
-const headerCountsRef = ref<HTMLElement | null>(null);
+const headerCountsRef = useTemplateRef<HTMLElement>('headerCountsRef');
 const _transitions = useViewTransition({ names: { 'browser-header-counts': headerCountsRef } });
 </script>
 

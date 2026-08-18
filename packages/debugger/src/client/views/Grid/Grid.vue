@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="Cols extends Record<string, Column>, Items extends any[]">
-import { ref, computed, provide, onMounted } from 'vue';
+import { ref, computed, provide, onMounted, useTemplateRef } from 'vue';
 
 import Shortcuts from '@components/Shortcuts/Shortcuts.vue';
 import { useClassNames } from '@composables/useClassNames';
@@ -16,10 +16,11 @@ const _slots = defineSlots<GridSlots<Items>>();
 
 const onSort: GridSortFn = (column) => emit('sort', column.key);
 const classes = computed(() => [$class(), props.condensed ? 'condensed' : '']);
-const gridRef = ref<HTMLElement | null>(null);
+const gridRef = useTemplateRef<HTMLElement>('gridRef');
 const ready = ref<boolean>(false);
 const { data, controls, layout } = useGrid(props, gridRef, $class);
 const { gridTemplateCols, rowHeight } = layout;
+
 onMounted(() => {
   ready.value = true;
 });

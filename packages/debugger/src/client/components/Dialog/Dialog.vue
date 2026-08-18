@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, provide, onMounted } from 'vue';
+import { ref, computed, provide, onMounted, useTemplateRef } from 'vue';
 import { randomId } from '#utils';
 import Button from '@components/Button/Button.vue';
 import {
@@ -24,8 +24,8 @@ const props = withDefaults(defineProps<DialogProps>(), {
   height: 'auto',
 });
 
-const element = ref<HTMLDialogElement | null>(null)!;
-const toasterRef = ref<InstanceType<typeof Toaster> | null>(null);
+const element = useTemplateRef<HTMLDialogElement>('element');
+const toasterRef = useTemplateRef<InstanceType<typeof Toaster>>('toasterRef');
 const classes = computed(() => [$class(), { unpad: props.unpad }]);
 const dialog = useDialog(props, emit, element);
 const toaster = useToaster(toasterRef);
@@ -53,6 +53,7 @@ defineExpose({
 
 <template>
   <Teleport
+    defer
     :disabled="teleport.disabled.value"
     :to="teleport.to.value"
   >

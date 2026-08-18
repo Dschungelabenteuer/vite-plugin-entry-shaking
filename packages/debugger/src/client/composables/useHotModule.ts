@@ -29,6 +29,10 @@ export async function useHotModule(): Promise<NormalizedHotChannel> {
       store.metrics.transform += a;
     },
     incrementJsRequests: () => {
+      console.log(
+        'on event incrementJsRequests, store.metrics.jsRequests',
+        store.metrics.jsRequests
+      );
       store.metrics.jsRequests += 1;
     },
     incrementOtherRequests: () => {
@@ -76,7 +80,8 @@ function getOnEventBus(hotContext: NormalizedHotChannel, handlers: DebuggerEvent
   const events = Object.keys(handlers) as (keyof DebuggerEvents)[];
   events.forEach((event) => {
     hotContext.on(wsMessageName(event), (payload) => {
-      handlers[event](JSONMap.parse(payload) as never);
+      const pl = payload !== undefined ? JSONMap.parse(payload) : undefined;
+      handlers[event](pl as never);
     });
   });
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useSlots } from 'vue';
+import { computed, useSlots, useTemplateRef } from 'vue';
 import { VIRTUAL_SCROLL_WRAPPER_CLASS } from './useVirtualScroll';
 import { useTransitionableVirtualScroll } from './useTransitionableVirtualScroll';
 import type {
@@ -19,8 +19,8 @@ const props = withDefaults(defineProps<VirtualScrollProps>(), {
 });
 
 const slotList = useSlots();
-const containerRef = ref<HTMLElement | null>(null);
-const contentRef = ref<HTMLElement | null>(null);
+const containerRef = useTemplateRef<HTMLElement>('containerRef');
+const contentRef = useTemplateRef<HTMLElement>('contentRef');
 const beforeItemsCount = computed(() => (slotList.before ? 1 : 0));
 const {
   getItemDelay,

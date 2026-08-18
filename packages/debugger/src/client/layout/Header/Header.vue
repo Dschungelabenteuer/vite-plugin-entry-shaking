@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 
 import Navigation from '@layout/Navigation/Navigation.vue';
 import RouterButton from '@components/RouterButton/RouterButton.vue';
@@ -10,7 +10,7 @@ import type { HeaderProps } from './Header.types';
 const $class = useClassNames('header');
 const _props = withDefaults(defineProps<HeaderProps>(), { showTitle: true, showNavigation: true });
 
-const headerRef = ref<HTMLElement | null>(null);
+const headerRef = useTemplateRef<HTMLElement>('headerRef');
 useViewTransition({ names: { 'layout-header': headerRef } });
 </script>
 
