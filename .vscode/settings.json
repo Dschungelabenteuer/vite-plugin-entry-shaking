@@ -11,7 +11,7 @@
   "stylelint.validate": ["css", "scss"],
 
   "editor.quickSuggestions": { "strings": "on" },
-  "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
+  "js/ts.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
 
   // So you're still using them for legacy codebases, right? Not this time!
   "eslint.enable": false,

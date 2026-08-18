@@ -27,14 +27,13 @@
   "types": "src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs"
     }
   },
   "publishConfig": {
     "main": "dist/index.mjs",
-    "types": "dist/index.d.ts"
+    "types": "dist/index.d.mts"
   },
   "scripts": {
     "dev": "pnpm obuild --stub",
@@ -52,11 +51,11 @@
     "@types/node": "catalog:",
     "@vitest/coverage-istanbul": "catalog:",
     "esbuild": "catalog:",
-    "fast-glob": "catalog:",
     "globals": "catalog:",
     "obuild": "catalog:",
+    "tinyglobby": "catalog:",
     "ts-dedent": "catalog:",
-    "typescript": "catalog:next",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plugin-entry-shaking-debugger": "workspace:*",
     "vitest": "catalog:"
@@ -66,7 +65,7 @@
   },
   "optionalDependencies": {
     "esbuild": "catalog:",
-    "fast-glob": "catalog:",
+    "tinyglobby": "catalog:",
     "vite-plugin-entry-shaking-debugger": "workspace:*"
   },
   "engines": {

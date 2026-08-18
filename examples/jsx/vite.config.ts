@@ -1,4 +1,3 @@
-import type { Plugin } from 'vite';
 import { defineConfig } from 'vite';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
@@ -12,7 +11,7 @@ const pathToLib = resolve(__dirname, './src/lib');
 
 export default defineConfig(() => ({
   plugins: [
-    EntryShakingPlugin({ targets: [pathToLib], debug: true }) as Plugin,
+    EntryShakingPlugin({ targets: [pathToLib], debug: true }),
     vueJsxPlugin({ include: [/\.tesx$/, /\.[jt]sx$/] }),
     vue(),
   ],

@@ -44,7 +44,7 @@ export function useBrowserData<
   const sortDirection = ref<SortDirection>('asc');
   const sortColumn = ref<SortableColumn<T> | undefined>(undefined);
   const search = ref<string | undefined>(undefined);
-  const filters = ref<T['defaultFilters']>(data.defaultFilters);
+  const filters: Ref<T['defaultFilters']> = ref(data.defaultFilters);
   const matched = computed<number>(() => items.value.length);
   const searchColumns = getSearchableColumns(data.columns);
   const items = computed<Item[]>(() => {

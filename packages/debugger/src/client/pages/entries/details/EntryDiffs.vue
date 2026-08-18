@@ -11,7 +11,7 @@ const entryDetails = inject<EntryDetailsProps>('entry-details')!;
 
 <template>
   <CodeBlock
-    :id="entryDetails.path ?? ''"
+    :id="entryDetails.relativePath ?? ''"
     :class="$class()"
     :source="entryDetails.entry?.source ?? ''"
     :target="entryDetails.entry?.updatedSource ?? ''"

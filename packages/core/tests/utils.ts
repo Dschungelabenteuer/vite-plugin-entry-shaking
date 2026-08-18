@@ -1,4 +1,11 @@
-import type { ResolvedConfig } from 'vite';
+import type {
+  FSWatcher,
+  ModuleGraph,
+  ModuleNode,
+  ResolvedConfig,
+  ViteDevServer,
+  WebSocketServer,
+} from 'vite';
 import { resolve } from 'path';
 import { resolveConfig, createLogger } from 'vite';
 import { init, parse } from 'es-module-lexer';
@@ -324,7 +331,12 @@ export async function resolveModule(relPath: string) {
   return await resolver(`@test-modules/${relPath}`);
 }
 
-/** Constructs a circular import. */
+/**
+ * Constructs a circular import.
+ * @param path Path to the module to import from.
+ * @param entities List of entities to import.
+ * @param alias Alias to use for the imported entities.
+ */
 export function constructCircularImport(path: string, entities: string[], alias: string) {
   const importedEntitied = entities.map((entity) => `${entity} as ${alias}${entity}`).join(', ');
   const aliasContent = entities.map((entity) => `${entity}: ${alias}${entity}`).join(', ');
@@ -332,4 +344,36 @@ export function constructCircularImport(path: string, entities: string[], alias:
     `import { ${importedEntitied} } from '${path}'`,
     `export const ${alias} = { ${aliasContent} };\n`,
   ].join('\n');
+}
+
+/**
+ * Creates a mocked ModuleNode for Vite's module graph.
+ * @param id Module id.
+ * @param file File path of the module.
+ */
+export const createModuleNode = (id: string, file = id.split('?')[0]) =>
+  ({ id, file, url: id }) as ModuleNode;
+
+/**
+ * Mocks a Vite Dev Server with given modules.
+ * @param modules List of modules to include in the server's module graph.
+ */
+export function createDevServer(mods: ModuleNode[]) {
+  const createMockOf = <T>(value: Partial<T>): T => value as T;
+  const modulesById = new Map(mods.map((module) => [module.id, module]));
+  const invalidateModule = vi.fn();
+  const send = vi.fn();
+  const add = vi.fn();
+
+  const server = createMockOf<ViteDevServer>({
+    watcher: createMockOf<FSWatcher>({ add, options: { ignored: [] } }),
+    ws: createMockOf<WebSocketServer>({ send }),
+    moduleGraph: createMockOf<ModuleGraph>({
+      getModuleById: vi.fn((id: string) => modulesById.get(id)),
+      getModulesByFile: vi.fn((file: string) => new Set(mods.filter((mod) => mod.file === file))),
+      invalidateModule,
+    }),
+  });
+
+  return { add, invalidateModule, send, server };
 }

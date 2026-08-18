@@ -1,4 +1,4 @@
-import type { Options as FastGlobOptions } from 'fast-glob';
+import type { GlobOptions as TinyGlobOptions } from 'tinyglobby';
 import type { Logger as ViteLogger } from 'vite';
 
 /** Vite plugin options. */
@@ -185,7 +185,7 @@ export interface TargetObject {
 /** Tagret definition through Glob patterns. */
 export interface TargetGlobPattern {
   glob: string;
-  globOptions?: FastGlobOptions;
+  globOptions?: TinyGlobOptions;
 }
 
 /** Entry target passed to plugin options. */

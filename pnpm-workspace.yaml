@@ -35,7 +35,7 @@ catalog:
   diff-match-patch: ^1.0.5
   es-module-lexer: ^2.3.1
   esbuild: ^0.28.2
-  fast-glob: ^3.3.3
+  tinyglobby: ^0.2.15
   globals: ^17.11.0
   idb-keyval: ^6.3.0
   magic-string: ^1.2.0

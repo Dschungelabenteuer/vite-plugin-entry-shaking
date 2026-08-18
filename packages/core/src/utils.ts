@@ -41,7 +41,7 @@ export const getAllTargetPaths = async (targets: EntryTarget[]) => {
     else if (isObjectDefinition(target)) paths.push(target.path);
     else if (isGlobPatternDefinition(target)) {
       const { glob, globOptions } = target;
-      const globSync = await loadFastGlob();
+      const globSync = await loadTinyglobby();
       const options = { ignore: ['**/node_modules/**'], ...(globOptions ?? {}) };
       const matches = globSync(glob, options).map((path) => path);
 
@@ -67,11 +67,9 @@ export const getCodeFromPath = async (path: string) => {
 export const getCode = async (code: string, path: string) =>
   requiresEsbuildTransform(path) ? (await transformWithEsbuild(code, path)).code : code;
 
-const loadFastGlob = async () => {
-  const {
-    default: { globSync },
-  } = await import('fast-glob').catch(() => {
-    throw new Error('Could not find fast-glob');
+const loadTinyglobby = async () => {
+  const { globSync } = await import('tinyglobby').catch(() => {
+    throw new Error('Could not find tinyglobby');
   });
   return globSync;
 };

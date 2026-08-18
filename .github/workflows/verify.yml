@@ -30,6 +30,18 @@ jobs:
       - name: Check formatting (oxfmt)
         run: pnpm exec oxfmt --check .
 
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Setup pnpm
+        uses: ./.github/actions/install
+
+      - name: Typecheck
+        run: pnpm typecheck
+
   test:
     name: Test (vitest)
     runs-on: ubuntu-latest
