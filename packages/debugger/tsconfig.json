@@ -25,7 +25,8 @@
       "@layout/*": ["./src/client/layout/*"],
       "@views/*": ["./src/client/views/*"],
       "@pages/*": ["./src/client/pages/*"],
-      "@styles/*": ["./src/client/styles/*"]
+      "@styles/*": ["./src/client/styles/*"],
+      "@workers/*": ["./src/client/workers/*"]
     }
   },
   "include": ["**/*", ".storybook/**/*"],

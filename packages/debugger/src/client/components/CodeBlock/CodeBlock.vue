@@ -1,332 +1,305 @@
 <script setup lang="ts">
+import type * as Monaco from 'monaco-editor';
 import type { CodeBlockProps } from './CodeBlock.types';
-import { useCodeBlock } from './useCodeBlock';
+import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui';
+import { computed, nextTick, onBeforeUnmount, onMounted, useTemplateRef, watch } from 'vue';
+import { colorScheme } from '@composables/useColorScheme';
+import {
+  applyMonacoTheme,
+  createReadOnlyMonacoEditor,
+  getMonaco,
+  getMonacoWordWrap,
+  guessMonacoLanguage,
+  setModelLanguageIfNeeded,
+  setupMonacoScrollSync,
+  syncMonacoEditorScrolls,
+} from './monaco';
+import { calculateDiffWithWorker } from '@workers/diffs/diff';
+import Dialog from '@components/Dialog/Dialog.vue';
+import Button from '@components/Button/Button.vue';
 
-const props = withDefaults(defineProps<CodeBlockProps>(), {
-  lang: 'plain',
-  target: undefined,
-  theme: 'dracula-soft',
-  transformers: () => [],
+const props = defineProps<CodeBlockProps>();
+
+const diffPanelSize = defineModel<number>('diffPanelSize', { required: true });
+const dialogRef = useTemplateRef<InstanceType<typeof Dialog>>('dialogRef');
+
+const fromEl = useTemplateRef('fromEl');
+const toEl = useTemplateRef('toEl');
+
+let monaco: typeof Monaco | null = null;
+let fromEditor: Monaco.editor.IStandaloneCodeEditor | null = null;
+let toEditor: Monaco.editor.IStandaloneCodeEditor | null = null;
+let fromModel: Monaco.editor.ITextModel | null = null;
+let toModel: Monaco.editor.ITextModel | null = null;
+let fromDecorations: Monaco.editor.IEditorDecorationsCollection | null = null;
+let toDecorations: Monaco.editor.IEditorDecorationsCollection | null = null;
+let disposeScrollSync: (() => void) | null = null;
+let diffVersion = 0;
+
+function setModelValue(model: Monaco.editor.ITextModel, value: string) {
+  if (model.getValue() !== value) model.setValue(value);
+}
+
+function applyDiffDecorations(changes: Array<[number, string]>) {
+  if (!monaco || !fromModel || !toModel || !fromDecorations || !toDecorations) return;
+
+  const fromEntries: Monaco.editor.IModelDeltaDecoration[] = [];
+  const toEntries: Monaco.editor.IModelDeltaDecoration[] = [];
+
+  const addedLines = new Set<number>();
+  const removedLines = new Set<number>();
+
+  let fromIndex = 0;
+  let toIndex = 0;
+
+  for (const [type, change] of changes) {
+    if (type === 1) {
+      const start = toModel.getPositionAt(toIndex);
+      toIndex += change.length;
+      const end = toModel.getPositionAt(toIndex);
+
+      if (start.lineNumber !== end.lineNumber || start.column !== end.column) {
+        toEntries.push({
+          range: new monaco.Range(start.lineNumber, start.column, end.lineNumber, end.column),
+          options: { inlineClassName: 'diff-added-inline' },
+        });
+      }
+
+      for (let i = start.lineNumber; i <= end.lineNumber; i++) addedLines.add(i);
+    } else if (type === -1) {
+      const start = fromModel.getPositionAt(fromIndex);
+      fromIndex += change.length;
+      const end = fromModel.getPositionAt(fromIndex);
+
+      if (start.lineNumber !== end.lineNumber || start.column !== end.column) {
+        fromEntries.push({
+          range: new monaco.Range(start.lineNumber, start.column, end.lineNumber, end.column),
+          options: { inlineClassName: 'diff-removed-inline' },
+        });
+      }
+
+      for (let i = start.lineNumber; i <= end.lineNumber; i++) removedLines.add(i);
+    } else {
+      fromIndex += change.length;
+      toIndex += change.length;
+    }
+  }
+
+  for (const line of removedLines) {
+    fromEntries.push({
+      range: new monaco.Range(line, 1, line, 1),
+      options: { className: 'diff-removed', isWholeLine: true },
+    });
+  }
+
+  for (const line of addedLines) {
+    toEntries.push({
+      range: new monaco.Range(line, 1, line, 1),
+      options: { className: 'diff-added', isWholeLine: true },
+    });
+  }
+
+  fromDecorations.set(fromEntries);
+  toDecorations.set(toEntries);
+}
+
+onMounted(async () => {
+  if (!fromEl.value || !toEl.value) return;
+
+  monaco = await getMonaco();
+
+  fromEditor = createReadOnlyMonacoEditor(monaco, fromEl.value, {
+    wordWrap: getMonacoWordWrap(props.lineWrap),
+  });
+  toEditor = createReadOnlyMonacoEditor(monaco, toEl.value, {
+    wordWrap: getMonacoWordWrap(props.lineWrap),
+  });
+
+  fromModel = monaco.editor.createModel(props.from, guessMonacoLanguage(props.from));
+  toModel = monaco.editor.createModel(props.to, guessMonacoLanguage(props.to));
+
+  fromEditor.setModel(fromModel);
+  toEditor.setModel(toModel);
+
+  fromDecorations = fromEditor.createDecorationsCollection();
+  toDecorations = toEditor.createDecorationsCollection();
+
+  disposeScrollSync = setupMonacoScrollSync(fromEditor, toEditor);
+
+  applyMonacoTheme(monaco);
+
+  if (!props.oneColumn) syncMonacoEditorScrolls(toEditor, fromEditor);
+
+  await updateDiffDecorations(props.from, props.to, props.diff);
 });
 
-const { code } = useCodeBlock(props);
+watch(
+  () => props.lineWrap,
+  (enabled) => {
+    const wordWrap = getMonacoWordWrap(enabled);
+    fromEditor?.updateOptions({ wordWrap });
+    toEditor?.updateOptions({ wordWrap });
+  },
+  { immediate: true }
+);
+
+watch(colorScheme, () => {
+  if (monaco) applyMonacoTheme(monaco);
+});
+
+watch(
+  () => props.oneColumn,
+  async (oneColumn) => {
+    if (!fromEditor || !toEditor) return;
+
+    fromEl.value!.style.display = oneColumn ? 'none' : '';
+
+    await nextTick();
+
+    fromEditor.layout();
+    toEditor.layout();
+
+    if (!oneColumn) syncMonacoEditorScrolls(toEditor, fromEditor);
+  },
+  { immediate: true }
+);
+
+async function updateDiffDecorations(from: string, to: string, diffEnabled: boolean) {
+  if (!monaco || !fromModel || !toModel || !fromDecorations || !toDecorations) return;
+
+  const currentVersion = ++diffVersion;
+
+  setModelValue(fromModel, from);
+  setModelValue(toModel, to);
+
+  setModelLanguageIfNeeded(monaco, fromModel, guessMonacoLanguage(from));
+  setModelLanguageIfNeeded(monaco, toModel, guessMonacoLanguage(to));
+
+  fromDecorations.set([]);
+  toDecorations.set([]);
+
+  if (!diffEnabled || !from || from === to) return;
+
+  const changes = await calculateDiffWithWorker(from, to);
+  if (currentVersion !== diffVersion) return;
+
+  applyDiffDecorations(changes);
+}
+
+watch(
+  () => [props.from, props.to, props.diff] as const,
+  ([from, to, diffEnabled]) => {
+    updateDiffDecorations(from, to, diffEnabled);
+  }
+);
+
+const leftPanelSize = computed(() => {
+  return props.oneColumn ? 0 : diffPanelSize.value;
+});
+
+function onUpdate() {
+  fromEditor?.layout();
+  toEditor?.layout();
+}
+
+onBeforeUnmount(() => {
+  disposeScrollSync?.();
+  fromEditor?.dispose();
+  toEditor?.dispose();
+  fromModel?.dispose();
+  toModel?.dispose();
+});
+
+const openSideBySide = (path: string) => {
+  dialogRef.value?.element?.showModal();
+};
 </script>
 
 <template>
-  <div v-html="code" />
+  <Button
+    v-if="props.from && props.to && props.diff"
+    label="ohohoh"
+    @click="openSideBySide('some/path')"
+  />
+  <SplitterGroup
+    direction="horizontal"
+    style="height: 100%; width: 100%"
+  >
+    <SplitterPanel
+      v-show="!oneColumn"
+      class="code-panel"
+    >
+      <div
+        ref="fromEl"
+        class="code-block"
+      />
+    </SplitterPanel>
+    <SplitterResizeHandle
+      v-show="!oneColumn"
+      class="code-panel-resize-handler"
+    />
+    <SplitterPanel class="code-panel">
+      <div
+        ref="toEl"
+        class="code-block"
+      />
+    </SplitterPanel>
+  </SplitterGroup>
+  <Dialog
+    ref="dialogRef"
+    title="Transform diff side-by-side"
+    width="960px"
+    height="640px"
+  >
+    coucou
+
+    <template #footer>
+      <Button
+        label="Close"
+        icon="x"
+        shortcut="ESC"
+        :bordered="true"
+        :class="['bordered', 'small']"
+        @click="dialogRef?.element?.close()"
+      />
+    </template>
+  </Dialog>
 </template>
 
-<style lang="scss">
-.shiki {
-  overflow: auto;
-  background: #1c151b !important;
-  border-radius: var(--radius-md);
+<style>
+.diff-added {
+  background: rgba(16, 185, 129, 0.15);
 }
-
-.shiki code {
-  display: block;
-  width: fit-content;
-  min-width: 100%;
-  padding: var(--spacing-lg);
-  line-height: 1.72;
-  transition: color 0.5s;
-
-  .line {
-    padding-inline: var(--spacing-lg);
-    margin-inline: calc(var(--spacing-lg) * -1);
-
-    &.diff {
-      display: inline-block;
-      width: calc(100% + 2 * var(--spacing-lg));
-    }
-
-    &.remove {
-      background: #ff04043b;
-      opacity: 0.7;
-    }
-
-    &.add {
-      background: #21e84b2b;
-    }
-  }
+.diff-removed {
+  background: rgba(239, 68, 68, 0.15);
+}
+.diff-added-inline {
+  background-color: rgba(16, 185, 129, 0.3);
+}
+.diff-removed-inline {
+  background-color: rgba(239, 68, 68, 0.3);
 }
 </style>
 
-<style>
-:root {
-  --twoslash-border-color: #8888;
-  --twoslash-underline-color: currentColor;
-  --twoslash-highlighted-border: #c37d0d50;
-  --twoslash-highlighted-bg: #c37d0d20;
-  --twoslash-popup-bg: #f8f8f8;
-  --twoslash-popup-color: inherit;
-  --twoslash-popup-shadow: rgb(0 0 0 / 8%) 0px 1px 4px;
-  --twoslash-docs-color: #888;
-  --twoslash-docs-font: sans-serif;
-  --twoslash-code-font: inherit;
-  --twoslash-code-font-size: 1em;
-  --twoslash-matched-color: inherit;
-  --twoslash-unmatched-color: #888;
-  --twoslash-cursor-color: #8888;
-  --twoslash-error-color: #d45656;
-  --twoslash-error-bg: #d4565620;
-  --twoslash-warn-color: #c37d0d;
-  --twoslash-warn-bg: #c37d0d20;
-  --twoslash-tag-color: #3772cf;
-  --twoslash-tag-bg: #3772cf20;
-  --twoslash-tag-warn-color: var(--twoslash-warn-color);
-  --twoslash-tag-warn-bg: var(--twoslash-warn-bg);
-  --twoslash-tag-annotate-color: #1ba673;
-  --twoslash-tag-annotate-bg: #1ba67320;
-}
-
-/* Respect people's wishes to not have animations */
-@media (prefers-reduced-motion: reduce) {
-  .twoslash * {
-    transition: none !important;
-  }
-}
-
-.twoslash .twoslash-hover {
-  position: relative;
-  border-bottom: 1px dotted transparent;
-  transition: border-color 0.3s;
-  transition-timing-function: ease;
-}
-
-.twoslash:hover .twoslash-hover {
-  border-color: var(--twoslash-underline-color);
-}
-
-.twoslash .twoslash-popup-container {
-  position: absolute;
-  z-index: 10;
-  display: inline-flex;
-  flex-direction: column;
-  color: var(--twoslash-popup-color);
-  text-align: left;
-  pointer-events: none;
-  user-select: none;
-  background: var(--twoslash-popup-bg);
-  border: 1px solid var(--twoslash-border-color);
-  border-radius: 4px;
-  box-shadow: var(--twoslash-popup-shadow);
-  opacity: 0;
-  transition: opacity 0.3s;
-  transform: translateY(1.1em);
-}
-
-.twoslash .twoslash-query-presisted .twoslash-popup-container {
-  z-index: 9;
-  transform: translateY(1.5em);
-}
-
-.twoslash .twoslash-popup-container:hover {
-  user-select: auto;
-}
-
-.twoslash .twoslash-hover:hover .twoslash-popup-container,
-.twoslash .twoslash-error-hover:hover .twoslash-popup-container,
-.twoslash .twoslash-query-presisted .twoslash-popup-container {
-  pointer-events: auto;
-  opacity: 1;
-}
-
-.twoslash .twoslash-popup-arrow {
-  position: absolute;
-  top: -4px;
-  left: 1em;
-  width: 6px;
-  height: 6px;
-  pointer-events: none;
-  background: var(--twoslash-popup-bg);
-  border-top: 1px solid var(--twoslash-border-color);
-  border-right: 1px solid var(--twoslash-border-color);
-  transform: rotate(-45deg);
-}
-
-.twoslash .twoslash-popup-code,
-.twoslash .twoslash-popup-error,
-.twoslash .twoslash-popup-docs {
-  padding: 6px 8px !important;
-}
-
-.twoslash .twoslash-popup-code {
-  font-family: var(--twoslash-code-font);
-  font-size: var(--twoslash-code-font-size);
-}
-
-.twoslash .twoslash-popup-docs {
-  font-family: var(--twoslash-docs-font);
-  font-size: 0.8em;
-  color: var(--twoslash-docs-color);
-  border-top: 1px solid var(--twoslash-border-color);
-}
-
-.twoslash .twoslash-popup-error {
-  font-family: var(--twoslash-docs-font);
-  font-size: 0.8em;
-  color: var(--twoslash-error-color);
-  background-color: var(--twoslash-error-bg);
-}
-
-.twoslash .twoslash-popup-docs-tags {
+<style scoped>
+.code-panel {
   display: flex;
-  flex-direction: column;
-  font-family: var(--twoslash-docs-font);
-}
-
-.twoslash .twoslash-popup-docs-tags,
-.twoslash .twoslash-popup-docs-tag-name {
-  margin-right: 0.5em;
-}
-
-.twoslash .twoslash-popup-docs-tag-name {
-  font-family: var(--twoslash-code-font);
-}
-
-.twoslash .twoslash-error-line {
-  position: relative;
-  width: max-content;
-  min-width: 100%;
-  padding: 6px 12px;
-  margin: 0.2em 0;
-  color: var(--twoslash-error-color);
-  background-color: var(--twoslash-error-bg);
-  border-left: 3px solid var(--twoslash-error-color);
-}
-
-.twoslash .twoslash-error-line.twoslash-error-level-warning {
-  color: var(--twoslash-warn-color);
-  background-color: var(--twoslash-warn-bg);
-  border-left: 3px solid var(--twoslash-warn-color);
-}
-
-.twoslash .twoslash-error {
-  padding-bottom: 2px;
-  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%206%203'%20enable-background%3D'new%200%200%206%203'%20height%3D'3'%20width%3D'6'%3E%3Cg%20fill%3D'%23c94824'%3E%3Cpolygon%20points%3D'5.5%2C0%202.5%2C3%201.1%2C3%204.1%2C0'%2F%3E%3Cpolygon%20points%3D'4%2C0%206%2C2%206%2C0.6%205.4%2C0'%2F%3E%3Cpolygon%20points%3D'0%2C2%201%2C3%202.4%2C3%200%2C0.6'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E")
-    repeat-x bottom left;
-}
-
-.twoslash .twoslash-error.twoslash-error-level-warning {
-  padding-bottom: 2px;
-  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%206%203'%20enable-background%3D'new%200%200%206%203'%20height%3D'3'%20width%3D'6'%3E%3Cg%20fill%3D'%23c37d0d'%3E%3Cpolygon%20points%3D'5.5%2C0%202.5%2C3%201.1%2C3%204.1%2C0'%2F%3E%3Cpolygon%20points%3D'4%2C0%206%2C2%206%2C0.6%205.4%2C0'%2F%3E%3Cpolygon%20points%3D'0%2C2%201%2C3%202.4%2C3%200%2C0.6'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E")
-    repeat-x bottom left;
-}
-
-.twoslash .twoslash-completion-cursor {
-  position: relative;
-}
-
-.twoslash-completion-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 240px;
-  padding: 4px;
-  font-size: 0.8rem;
-}
-
-.twoslash-completion-list:hover {
-  user-select: auto;
-}
-
-.twoslash .twoslash-completion-cursor .twoslash-completion-list {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 8;
-  display: inline-block;
-  margin: 3px 0 0 -1px;
-  user-select: none;
-  background: var(--twoslash-popup-bg);
-  border: 1px solid var(--twoslash-border-color);
-  box-shadow: var(--twoslash-popup-shadow);
-  transform: translate(0, 1.2em);
-}
-
-.twoslash-completion-list::before {
-  position: absolute;
-  top: -1.6em;
-  left: -1px;
-  width: 2px;
-  height: 1.4em;
-  content: ' ';
-  background-color: var(--twoslash-cursor-color);
-}
-
-.twoslash-completion-list li {
-  display: flex;
-  gap: 0.25em;
   align-items: center;
+  justify-content: center;
+}
+
+.code-panel-resize-handler[data-orientation='horizontal'] {
+  width: 0.5rem;
+}
+
+.code-panel-resize-handler[data-orientation='vertical'] {
+  height: 0.5rem;
+}
+
+.code-block {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  line-height: 1em;
-}
-
-.twoslash-completion-list li span.twoslash-completions-unmatched {
-  color: var(--twoslash-unmatched-color);
-}
-
-.twoslash-completion-list .deprecated {
-  text-decoration: line-through;
-  opacity: 0.5;
-}
-
-.twoslash-completion-list li span.twoslash-completions-matched {
-  color: var(--twoslash-matched-color);
-}
-
-/* Highlights */
-.twoslash-highlighted {
-  padding: 1px 2px;
-  margin: -1px -3px;
-  background-color: var(--twoslash-highlighted-bg);
-  border: 1px solid var(--twoslash-highlighted-border);
-  border-radius: 4px;
-}
-
-/* Icons */
-.twoslash-completion-list .twoslash-completions-icon {
-  flex: none;
-  width: 1em;
-  color: var(--twoslash-unmatched-color);
-}
-
-/* Custom Tags */
-.twoslash .twoslash-tag-line {
-  position: relative;
-  display: flex;
-  gap: 0.3em;
-  align-items: center;
-  width: max-content;
-  min-width: 100%;
-  padding: 6px 10px;
-  margin: 0.2em 0;
-  color: var(--twoslash-tag-color);
-  background-color: var(--twoslash-tag-bg);
-  border-left: 3px solid var(--twoslash-tag-color);
-}
-
-.twoslash .twoslash-tag-line .twoslash-tag-icon {
-  width: 1.1em;
-  color: inherit;
-}
-
-.twoslash .twoslash-tag-line.twoslash-tag-error-line {
-  color: var(--twoslash-error-color);
-  background-color: var(--twoslash-error-bg);
-  border-left: 3px solid var(--twoslash-error-color);
-}
-
-.twoslash .twoslash-tag-line.twoslash-tag-warn-line {
-  color: var(--twoslash-tag-warn-color);
-  background-color: var(--twoslash-tag-warn-bg);
-  border-left: 3px solid var(--twoslash-tag-warn-color);
-}
-
-.twoslash .twoslash-tag-line.twoslash-tag-annotate-line {
-  color: var(--twoslash-tag-annotate-color);
-  background-color: var(--twoslash-tag-annotate-bg);
-  border-left: 3px solid var(--twoslash-tag-annotate-color);
 }
 </style>
