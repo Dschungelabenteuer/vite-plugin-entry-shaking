@@ -16,8 +16,6 @@ catalog:
   '@faker-js/faker': ^10.6.0
   '@floating-ui/vue': ^2.0.1
   '@iconify/vue': ^5.0.1
-  '@shikijs/transformers': ^4.4.3
-  '@shikijs/twoslash': ^4.4.3
   '@storybook/addon-essentials': ^8.6.14
   '@storybook/addon-interactions': ^8.6.14
   '@storybook/addon-links': ^10.5.8
@@ -47,7 +45,6 @@ catalog:
   picocolors: ^1.1.1
   postcss-html: ^2.0.0
   prompts: ^2.4.2
-  shiki: ^4.4.3
   sirv: ^3.0.2
   storybook: ^10.5.8
   stylelint: ^17.14.1
@@ -56,7 +53,6 @@ catalog:
   stylelint-config-standard-scss: ^17.0.0
   stylelint-scss: ^7.2.0
   ts-dedent: ^2.3.0
-  twoslash-cdn: ^0.3.9
   typescript: ^6.0.0
   obuild: ^0.4.37
   unstorage: ^1.17.5
@@ -69,3 +65,10 @@ catalog:
   vue: ^3.5.41
   vue-tsc: ^3.3.10
   vue-router: ^5.2.0
+  comlink: ^4.4.2
+  diff-match-patch-es: ^2.0.1
+  '@vitejs/devtools': ^0.4.12
+  '@vitejs/devtools-rolldown': ^0.4.12
+  '@vitejs/devtools-vite': ^0.4.12
+  monaco-editor: ^0.56.0
+  reka-ui: ^2.10.3
