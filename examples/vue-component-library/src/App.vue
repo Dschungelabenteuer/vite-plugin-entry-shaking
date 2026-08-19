@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Comp250 } from './lib';
+import { Comp4 } from './lib';
 </script>
 
 <template>
-  <div>Example displaying <Comp250 /></div>
+  <div>Example displaying <Comp4 /></div>
 </template>
