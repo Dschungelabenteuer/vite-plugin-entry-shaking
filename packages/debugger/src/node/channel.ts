@@ -28,6 +28,7 @@ export function createChannel(
         consumer,
         entries: ctx.entries,
         metrics: ctx.metrics,
+        transforms: ctx.transforms,
         logs: ctx.logger.logs,
         options: { diagnostics: ctx.options.diagnostics, debug: ctx.options.debug },
         diagnostics: { list: ctx.diagnostics.list, listPerPath: ctx.diagnostics.listPerPath },
