@@ -5,6 +5,7 @@ import type {
   PluginMetrics,
   PluginEntries,
   PluginOptions,
+  PluginTransforms,
   DebuggerEvents,
   EntryData,
   TransformData,
@@ -25,6 +26,7 @@ export type {
   PluginEntries,
   PluginMetrics,
   PluginOptions,
+  PluginTransforms,
   DebuggerEvents,
   EntryData,
   TransformData,
@@ -113,4 +115,5 @@ export function createEntryShakingPlugin(userOptions: PluginOptions): Plugin[] {
   ];
 }
 
+/** @alias */
 export default createEntryShakingPlugin;

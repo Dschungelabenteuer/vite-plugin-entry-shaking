@@ -17,6 +17,9 @@ export interface PluginOptions {
   debug?: boolean;
 }
 
+/** List of extended targets being processed by the plugin. */
+export type ExtendedTargets = Map<EntryPath, number>;
+
 /** Diagnostics configuration. */
 export interface DiagnosticsConfig {
   /** Warn if an entry file defines code ? */
@@ -80,12 +83,6 @@ export interface EntryData {
   hits: number;
 }
 
-/** Target entry metrics (debug). */
-export interface EntryMetrics {
-  /** Time spent analyzing the entry. */
-  analysis: PerformanceDuration;
-}
-
 /** Transformed file data. */
 export interface TransformData {
   /** Absolute path to transformed file. */
@@ -123,10 +120,7 @@ export type PluginEntries = Map<EntryPath, EntryData>;
 export type PluginTransforms = Map<string, TransformData>;
 
 /** Named import. */
-export type ImportName = string;
-
-/** Path of the imported item. */
-export type ImportPath = string;
+type ImportName = string;
 
 /** Import parameters. */
 export interface ImportParams<T = string> {
@@ -160,19 +154,13 @@ export type ImportInput = Omit<ImportParams, 'path'> & {
 export type EntryImports = Map<ImportName, ImportParams>;
 
 /** Named export. */
-export type ExportName = string;
-
-/** Resolved path of aggregated export (`export … from …`). */
-export type ExportOriginPath = string;
+type ExportName = string;
 
 /** Entry exports map. */
 export type EntryExports = Map<ExportName, ImportParams>;
 
 /** Target imports map */
 export type TargetImports = Map<string, ImportInput[]>;
-
-/** Target's path/alias as used in imports. */
-export type TargetPath = string;
 
 /** Resolved absolute path of target. */
 export type EntryPath = string;
@@ -182,7 +170,7 @@ export interface TargetObject {
   path: EntryPath;
 }
 
-/** Tagret definition through Glob patterns. */
+/** Target definition through Glob patterns. */
 export interface TargetGlobPattern {
   glob: string;
   globOptions?: TinyGlobOptions;
@@ -192,16 +180,7 @@ export interface TargetGlobPattern {
 export type EntryTarget = EntryPath | TargetObject | TargetGlobPattern;
 
 /** List of targets being processed by the plugin. */
-export type PluginTargets = EntryTarget[];
-
-/** List of extended targets being processed by the plugin. */
-export type ExtendedTargets = Map<EntryPath, number>;
-
-/** Extended target. */
-export interface ExtendedTarget {
-  path: EntryPath;
-  depth: number;
-}
+type PluginTargets = EntryTarget[];
 
 /** Parsed import statement output. */
 export interface ParsedImportStatement {

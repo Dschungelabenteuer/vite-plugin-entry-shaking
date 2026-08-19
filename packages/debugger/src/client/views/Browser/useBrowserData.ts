@@ -27,11 +27,6 @@ export type SortableColumn<T extends BrowserData> =
       [K in keyof T['columns'] as T['columns'][K]['sortable'] extends true ? K : never]: true;
     };
 
-/** Type utility that returns keys of columns that may be searched through. */
-export type SearchableColumn<T extends BrowserData> = keyof {
-  [K in keyof T['columns'] as T['columns'][K]['searchable'] extends true ? K : never]: true;
-};
-
 /**
  * Composable used to abstract common logic used on browser views.
  * @param data Data of the browser view.

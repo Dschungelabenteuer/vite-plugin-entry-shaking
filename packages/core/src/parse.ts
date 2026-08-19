@@ -4,7 +4,7 @@ import type { ParsedImportStatement } from './types';
  * Parses an import statement to extract default and named exports.
  * @param statement Import statement to parse.
  */
-export function parseImportStatement(statement: string): ParsedImportStatement {
+function parseImportStatement(statement: string): ParsedImportStatement {
   const output: ParsedImportStatement = {
     namedImports: [],
     defaultImports: [],
@@ -23,7 +23,7 @@ export function parseImportStatement(statement: string): ParsedImportStatement {
  * Parses an import statement's content to extract default and named exports.
  * @param statement Import statement to parse.
  */
-export function parseImportStatementContent(importContent: string) {
+function parseImportStatementContent(importContent: string) {
   const output: ParsedImportStatement = {
     namedImports: [],
     defaultImports: [],
@@ -75,7 +75,7 @@ export function parseImportStatementContent(importContent: string) {
  * Returns the import params of a single imported entity.
  * @param importString Import statement string.
  */
-export function parseImportParams(importString: string) {
+function parseImportParams(importString: string) {
   const [name, matchAlias] = importString.trim().split(/\s+as\s+/);
   const alias = matchAlias as string | undefined;
   return { name, alias };

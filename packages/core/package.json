@@ -52,13 +52,11 @@
     "@types/node": "catalog:",
     "@vitest/coverage-istanbul": "catalog:",
     "esbuild": "catalog:",
-    "globals": "catalog:",
     "obuild": "catalog:",
     "tinyglobby": "catalog:",
     "ts-dedent": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vite-plugin-entry-shaking-debugger": "workspace:*",
     "vitest": "catalog:"
   },
   "peerDependencies": {

@@ -35,14 +35,11 @@
   "dependencies": {
     "@vueuse/core": "catalog:",
     "comlink": "catalog:",
-    "diff-match-patch": "catalog:",
     "diff-match-patch-es": "catalog:",
-    "idb-keyval": "catalog:",
     "monaco-editor": "catalog:",
     "open": "catalog:",
     "reka-ui": "catalog:",
-    "sirv": "catalog:",
-    "unstorage": "catalog:"
+    "sirv": "catalog:"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "catalog:",
@@ -52,8 +49,6 @@
     "@storybook/addon-essentials": "catalog:",
     "@storybook/addon-interactions": "catalog:",
     "@storybook/addon-links": "catalog:",
-    "@storybook/blocks": "catalog:",
-    "@storybook/test": "catalog:",
     "@storybook/vue3": "catalog:",
     "@storybook/vue3-vite": "catalog:",
     "@types/node": "catalog:",
@@ -63,8 +58,6 @@
     "@vitejs/plugin-vue": "catalog:",
     "@vue/compiler-sfc": "catalog:",
     "cypress": "catalog:",
-    "globals": "catalog:",
-    "monaco-editor": "catalog:",
     "obuild": "catalog:",
     "picocolors": "catalog:",
     "postcss-html": "catalog:",
@@ -74,7 +67,6 @@
     "stylelint-config-recommended-vue": "catalog:",
     "stylelint-config-standard-scss": "catalog:",
     "stylelint-scss": "catalog:",
-    "tinyglobby": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plugin-entry-shaking": "workspace:*",

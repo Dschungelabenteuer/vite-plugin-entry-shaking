@@ -6,7 +6,7 @@ import type {
   FinalPluginOptions,
   PluginEntries,
   PluginMetrics,
-  TransformData,
+  PluginTransforms,
 } from './types';
 
 import { Logger } from './logger';
@@ -51,7 +51,7 @@ export class Context {
   public eventBus?: EventBus;
 
   /** Plugin's transforms. */
-  public transforms: Map<string, TransformData> = new Map();
+  public transforms: PluginTransforms = new Map();
 
   /** Plugin's metrics. */
   public metrics: PluginMetrics = {

@@ -1,7 +1,6 @@
 import type { SortDirection } from '#types';
 import type { SortableColumn } from '@views/Browser/useBrowserData';
 import type { useGridData } from './useGridData';
-import type { useGridControls } from './useGridControls';
 import type { useGridLayout } from './useGridLayout';
 
 export type GridRowProps<T = any> = {
@@ -30,9 +29,9 @@ export type Column = {
   descLabel?: string;
 };
 
-export type KeyedColumn = Column & { key: string };
+type KeyedColumn = Column & { key: string };
 
-export type GridSortOptions<Cols = Record<string, Column>> = {
+type GridSortOptions<Cols = Record<string, Column>> = {
   /** Sort direction. */
   direction?: SortDirection;
   /** Sort parameters. */
@@ -86,6 +85,5 @@ export type GridHeaderProps = {
 };
 
 export type UseGridDataReturn = ReturnType<typeof useGridData>;
-export type UseGridControlsReturn = ReturnType<typeof useGridControls>;
 export type UseGridLayoutReturn = ReturnType<typeof useGridLayout>;
 export type RenderTracker = { row: number; resolve: (value: unknown) => void; reject: () => void };

@@ -10,7 +10,7 @@ catalogs:
   next:
     typescript: ^7.0.2
 catalog:
-  '@changesets/changelog-github': ^1.0.0
+  knip: ^6.32.2
   '@changesets/cli': ^3.0.0
   '@chromatic-com/storybook': 5.3.0
   '@faker-js/faker': ^10.6.0
@@ -19,23 +19,17 @@ catalog:
   '@storybook/addon-essentials': ^8.6.14
   '@storybook/addon-interactions': ^8.6.14
   '@storybook/addon-links': ^10.5.8
-  '@storybook/blocks': ^8.6.14
-  '@storybook/test': ^8.6.15
   '@storybook/vue3': ^10.5.8
   '@storybook/vue3-vite': ^10.5.8
-  '@types/diff-match-patch': ^1.0.36
   '@types/node': ^26.2.0
   '@types/prompts': ^2.4.9
   '@vitejs/plugin-vue-jsx': ^5.1.6
   '@vitest/coverage-istanbul': ^4.1.10
   '@vueuse/core': ^14.4.0
   cypress: ^15.20.1
-  diff-match-patch: ^1.0.5
   es-module-lexer: ^2.3.1
   esbuild: ^0.28.2
   tinyglobby: ^0.2.15
-  globals: ^17.11.0
-  idb-keyval: ^6.3.0
   magic-string: ^1.2.0
   open: ^11.0.1
   ora: ^9.4.1
@@ -53,9 +47,8 @@ catalog:
   stylelint-config-standard-scss: ^17.0.0
   stylelint-scss: ^7.2.0
   ts-dedent: ^2.3.0
-  typescript: ^6.0.0
+  typescript: ^6.0.3
   obuild: ^0.4.37
-  unstorage: ^1.17.5
   vite-plugin-vue-devtools: ^8.2.1
   sass-embedded: ^1.102.0
   vitest: ^4.1.10

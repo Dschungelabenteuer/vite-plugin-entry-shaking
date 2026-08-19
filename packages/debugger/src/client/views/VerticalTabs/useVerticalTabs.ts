@@ -32,7 +32,7 @@ export function useVerticalTabs(
   return { ids, menu, tablistWidth, setActiveTab };
 }
 
-export function useVerticalTabsIds(props: VerticalTabsProps) {
+function useVerticalTabsIds(props: VerticalTabsProps) {
   const prefix = computed(() => `tabs_${props.id}`);
   const getTabId = (tabId: VerticalTab['id']) => `${prefix.value}_${tabId}`;
   const getTabPanelId = (tabId: VerticalTab['id']) => `${getTabId(tabId)}_tab`;

@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/knip/schema.json",
+  "tags": ["-lintignore"],
+  "ignore": [
+    "**/build.config.ts",
+    "**/examples/**",
+    "**/scripts/**",
+    "**/tests/cases/**",
+    "**/tests/__mocks__/**",
+    "**/*.mocks.ts",
+    "**/*.types.ts",
+    "**/App.vue"
+  ],
+  "workspaces": {
+    "packages/debugger": { "entry": ["src/index.ts", "src/client/main.ts", "src/client/index.ts"] }
+  }
+}

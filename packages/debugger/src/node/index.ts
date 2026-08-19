@@ -85,4 +85,5 @@ function openBrowser(address: string, delay = 0) {
   }, delay);
 }
 
+/** @alias */
 export default attachDebugger;

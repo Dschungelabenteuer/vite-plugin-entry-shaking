@@ -7,14 +7,15 @@ export type Parallel = <T extends any[]>(
   items: T,
   cb: ParallelCb<T>
 ) => Promise<any[]> | Promise<void>;
-export type ParallelCb<T> = (
+
+type ParallelCb<T> = (
   item: T extends (infer A)[] ? A : never,
   index: number,
   array: any[]
 ) => Promise<any>;
 
 /** Runs multiple promises in parallel. */
-export const parallelize: Parallel = async (a, cb) => Promise.all(a.map(cb));
+const parallelize: Parallel = async (a, cb) => Promise.all(a.map(cb));
 
 /** Loads plugin's event bus. */
 export const loadEventBus = async () => await import('./event-bus');
@@ -34,7 +35,7 @@ export const loadDebugger = async () => {
  * Returns paths to targets.
  * Supports either strings or glob patterns.
  */
-export const getAllTargetPaths = async (targets: EntryTarget[]) => {
+const getAllTargetPaths = async (targets: EntryTarget[]) => {
   const paths: EntryPath[] = [];
   for (const target of targets) {
     if (typeof target === 'string') paths.push(target);
@@ -57,7 +58,7 @@ export const getAllTargetPaths = async (targets: EntryTarget[]) => {
 /** Determines whether provided file requires an esbuild pre-transform. */
 const requiresEsbuildTransform = (path: string) => isJsxFile(path);
 /** Determines whether provided path is a JSX/TSX file. */
-export const isJsxFile = (path: string) => path.endsWith('.jsx') || path.endsWith('.tsx');
+const isJsxFile = (path: string) => path.endsWith('.jsx') || path.endsWith('.tsx');
 
 export const getCodeFromPath = async (path: string) => {
   const code = readFileSync(resolve(path), 'utf-8');
@@ -77,7 +78,7 @@ const loadTinyglobby = async () => {
 export const isObjectDefinition = (target: EntryTarget): target is TargetObject =>
   typeof target === 'object' && 'path' in target;
 
-export const isGlobPatternDefinition = (target: EntryTarget): target is TargetGlobPattern =>
+const isGlobPatternDefinition = (target: EntryTarget): target is TargetGlobPattern =>
   typeof target === 'object' && 'glob' in target;
 
 export default {

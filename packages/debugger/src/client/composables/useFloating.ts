@@ -4,8 +4,8 @@ import type { UseFloatingOptions } from '@floating-ui/vue';
 import { useFloating as useFloatingUi, autoUpdate, flip, shift, offset } from '@floating-ui/vue';
 
 type CSSStyles = Record<string, any>;
+type UseFloatingHandler = 'mouseenter' | 'mouseleave' | 'focus' | 'blur' | 'click';
 export type UseFloatingHandlers = Partial<Record<UseFloatingHandler, () => void>>;
-export type UseFloatingHandler = 'mouseenter' | 'mouseleave' | 'focus' | 'blur' | 'click';
 export type UseFloatingReturn = {
   /** Is the floating element shown? */
   isOpen: Ref<boolean>;

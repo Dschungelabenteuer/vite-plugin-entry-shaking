@@ -44,14 +44,6 @@ export function createReadOnlyMonacoEditor(
   return monaco.editor.create(container, { ...readonlyEditorOptions, ...options, scrollbar });
 }
 
-export function setModelLanguageIfNeeded(
-  monaco: typeof Monaco,
-  model: Monaco.editor.ITextModel,
-  language: string
-) {
-  if (model.getLanguageId() !== language) monaco.editor.setModelLanguage(model, language);
-}
-
 export function guessMonacoLanguage(code: string) {
   if (code.trimStart().startsWith('<')) return 'html';
   if (/^import\s/.test(code)) return 'javascript';

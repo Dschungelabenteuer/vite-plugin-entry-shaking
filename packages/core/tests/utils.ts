@@ -20,14 +20,6 @@ import { transformIfNeeded } from '../src/transform';
 import { Context } from '../src/context';
 import utils from '../src/utils';
 
-/** Case structure. */
-export interface Case {
-  /** Input string. */
-  input: string;
-  /** List of targets' paths. */
-  targetsPaths: string;
-}
-
 /** Case target structure. */
 export interface CaseTarget {
   /** Path to target. */
@@ -55,11 +47,11 @@ type ExpectedOutputDefinition = Map<
 let testResolver: Awaited<ReturnType<typeof getTestResolver>> | undefined;
 
 /** Mock folder name. */
-export const MOCKS_FOLDER = '__mocks__';
+const MOCKS_FOLDER = '__mocks__';
 /** Path to unit mocks (from core package). */
 export const MOCKS_FOLDER_UNIT = '__mocks__/unit';
 /** Base filename tests rely on (it should include a supported extension). */
-export const MOCK_MAIN_FILE = 'main.ts';
+const MOCK_MAIN_FILE = 'main.ts';
 /** Mock import input. */
 export const MOCK_IMPORT_INPUT = {
   path: 'some path',
@@ -74,18 +66,6 @@ export const STUB_SOURCE = '';
 export const STUB_PATH = '';
 /** Stub for the content of an id. */
 export const STUB_ID = '';
-/** Stub for an empty analyzed entry data. */
-export const STUB_EMPTY_ENTRY_DATA: EntryData = {
-  exports: new Map(),
-  diagnostics: new Set(),
-  hits: 0,
-  time: 0,
-  self: 0,
-  importsCount: 0,
-  source: STUB_SOURCE,
-  updatedSource: STUB_SOURCE,
-  depth: 0,
-};
 
 /** Stub for Vite's configuration.. */
 export const VITE_CONFIG = {
@@ -105,7 +85,7 @@ export const DUPE_EXPORT_EXPECTATION = 'should also work when using a dupe expor
 export const ALIAS_IMPORT_EXPECTATION = 'should also work when using an alias import';
 
 /** Target remains (this should be the only remaining content in targets). */
-export const targetRemains = dedent(`
+const targetRemains = dedent(`
   /** Below content should not be removed from the transformed target. */
   import "@test-modules/sideffect-module";
   import { ConsumedExport } from '@test-modules/consumed-export';
@@ -129,7 +109,7 @@ export const getTestResolver = async () =>
   (await resolveConfig(VITE_CONFIG, 'serve')).createResolver();
 
 /** Returns the updated target content. */
-export const getCaseTarget = (res: Awaited<ReturnType<typeof runCase>>, target: string) =>
+const getCaseTarget = (res: Awaited<ReturnType<typeof runCase>>, target: string) =>
   res.entries.get(target)?.updatedSource.trim();
 
 /** Prepares some target case data. */
@@ -317,7 +297,7 @@ async function getResolver() {
  * This returns the absolute path from a path (which could use aliases).
  * @param path Path to resolve.
  */
-export async function resolvePath(path: string) {
+async function resolvePath(path: string) {
   const resolver = await getResolver();
   return await resolver(path);
 }

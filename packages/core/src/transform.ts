@@ -46,7 +46,7 @@ export async function transformIfNeeded(
  * @param code Source code of the file.
  * @returns Transformed file content or undefined if it did not include relevant import.
  */
-export async function transformImportsIfNeeded(
+async function transformImportsIfNeeded(
   ctx: Context,
   id: string,
   code: string
@@ -111,7 +111,7 @@ function registerTransform(ctx: Context, transformData: TransformData) {
  * @param imports File's list of parsed imports.
  * @param exports File's list of parsed exports.
  */
-export async function transformImports(
+async function transformImports(
   ctx: Context,
   id: string,
   code: string,
@@ -149,7 +149,7 @@ export async function transformImports(
  * @param ctx _reference_ Plugin context.
  * @param id Resolved id of the file.
  */
-export function requiresTransform(ctx: Context, id: string) {
+function requiresTransform(ctx: Context, id: string) {
   const extension = id.split('.').pop()!;
   const isIgnored = ctx.options.ignorePatterns.some((pattern) => id.match(pattern));
   return !isIgnored && ctx.options.extensions.includes(extension);
@@ -161,7 +161,7 @@ export function requiresTransform(ctx: Context, id: string) {
  * @param id Resolved id of the file.
  * @param imports List of imports.
  */
-export async function getEntryImports(
+async function getEntryImports(
   ctx: Context,
   id: string,
   imports: readonly ImportSpecifier[]
@@ -185,7 +185,7 @@ export async function getEntryImports(
  * Creates a statement to reexport named imports.
  * @param exports List of exports extracted by es-module-lexer.
  */
-export function createReexportStatement(exports: readonly ExportSpecifier[]) {
+function createReexportStatement(exports: readonly ExportSpecifier[]) {
   const namedExports = exports
     .filter((e) => e.n !== undefined && e.n !== 'default' && e.ln === undefined)
     .map(({ n }) => n);

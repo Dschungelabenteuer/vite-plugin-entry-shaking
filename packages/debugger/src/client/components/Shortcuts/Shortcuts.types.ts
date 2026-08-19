@@ -1,4 +1,4 @@
-export type ShortcutData = {
+type ShortcutData = {
   /** Shortcut's action label. */
   label: string;
   /** Shortcut's key(s) (array for key combinations) */

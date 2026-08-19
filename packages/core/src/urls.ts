@@ -1,5 +1,5 @@
 /** Query suffix name used to tell Vite to serve the original source file instead of the cleaned up one. */
-export const SOURCE_QUERY_SUFFIX = 'source';
+const SOURCE_QUERY_SUFFIX = 'source';
 
 /**
  * Adds source query suffix to the file path.

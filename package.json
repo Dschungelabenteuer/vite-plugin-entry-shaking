@@ -23,17 +23,20 @@
     "generate-example": "node scripts/generate-example",
     "check": "pnpm format && pnpm lint && pnpm test",
     "changeset:release": "pnpm build && changeset publish",
-    "changeset:version": "changeset version && pnpm install --lockfile-only"
+    "changeset:version": "changeset version && pnpm install --lockfile-only",
+    "knip": "knip"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
+    "@types/node": "catalog:",
     "@types/prompts": "catalog:",
+    "knip": "catalog:",
     "ora": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
     "oxlint-tsgolint": "catalog:",
-    "prompts": "catalog:"
+    "prompts": "catalog:",
+    "typescript": "catalog:"
   },
   "engines": {
     "node": ">=20.1.0"
