@@ -29,10 +29,6 @@ export async function useHotModule(): Promise<NormalizedHotChannel> {
       store.metrics.transform += a;
     },
     incrementJsRequests: () => {
-      console.log(
-        'on event incrementJsRequests, store.metrics.jsRequests',
-        store.metrics.jsRequests
-      );
       store.metrics.jsRequests += 1;
     },
     incrementOtherRequests: () => {
