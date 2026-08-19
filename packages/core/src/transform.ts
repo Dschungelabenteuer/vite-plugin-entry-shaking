@@ -5,6 +5,7 @@ import { init, parse } from 'es-module-lexer';
 import type { Context } from './context';
 import ImportAnalyzer from './analyze-import';
 import { getCode } from './utils';
+import type { TransformData } from './types';
 
 /**
  * Transforms a candidate file only if needed.
@@ -75,19 +76,31 @@ export async function transformImportsIfNeeded(
     `Transforming file "${id}"`,
     async () => await transform(ctx, id, code, imports, exports)
   );
-  ctx.hmr.registerEntryImporter(id, importedEntries);
 
-  ctx.eventBus?.emit('registerTransform', {
-    id,
+  ctx.hmr.registerEntryImporter(id, importedEntries);
+  const timestamp = Date.now();
+
+  registerTransform(ctx, {
+    id: `${id}?t=${timestamp}`,
     source: code,
     transformed: out ?? code,
     time,
-    timestamp: Date.now(),
+    timestamp,
     entriesMatched,
     potentialRequestsAvoided,
   });
 
   return out;
+}
+
+/**
+ * Registers a transform.
+ * @param ctx  _reference_ Plugin context.
+ * @param transformData Transform data to register.
+ */
+function registerTransform(ctx: Context, transformData: TransformData) {
+  ctx.transforms.set(transformData.id, transformData);
+  ctx.eventBus?.emit('registerTransform', transformData);
 }
 
 /**

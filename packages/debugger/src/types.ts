@@ -81,7 +81,7 @@ export interface ChannelMessages {
    * Registers a transformed file and its metrics.
    * @param transform Transformed file data.
    */
-  registerTransform: (transform: any) => void;
+  registerTransform: (transform: TransformData) => void;
 }
 
 /** Returns known keys of a given object type/interface. */

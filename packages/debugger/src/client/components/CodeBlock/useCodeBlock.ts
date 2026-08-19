@@ -12,7 +12,8 @@ export function useCodeBlock(props: CodeBlockProps) {
   const getTransformers = async (): Promise<ShikiTransformer[]> => {
     const transformers = props.transformers ?? [];
 
-    if (props.source && props.target) transformers.push(transformerNotationDiff());
+    if (props.source && props.target)
+      transformers.push(transformerNotationDiff({ matchAlgorithm: 'v3' }));
 
     if (['typescript', 'ts'].includes(props.lang!) && !props.target) {
       const { useTwoSlash } = await import('./useTwoSlash');
@@ -30,6 +31,7 @@ export function useCodeBlock(props: CodeBlockProps) {
         const diffs = useDiffs();
         await diffs.prepare();
         diffs.compare('lol', props.source, props.target).then(async (val) => {
+          console.log('@@@@@ diffs', val);
           code.value = await codeToHtml(val, {
             lang: props.lang!,
             theme: props.theme!,
