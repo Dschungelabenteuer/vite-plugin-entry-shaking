@@ -1,5 +1,42 @@
 # vite-plugin-entry-shaking
 
+## 0.6.0
+
+### Minor Changes
+
+- 816136f: Fixed HMR for registered entry files by watching analyzed entries, re-analyzing changed entries, and invalidating transformed importers that depended on stale entry analysis.
+
+  Fixed dev-server import rewrites when another Vite plugin remaps imports in `resolveId`, including package-entry and concrete-file remaps. Entry analysis and import matching now use final resolved ids from Vite's plugin container, and default alias re-exports remain available through wildcard entry chains.
+
+- 8030a20: <!--
+
+  ## Governance
+  - Switched from eslint to sxlint
+  - Switched from biome to oxfmt
+  - Started using pnpm catalogs for dep management
+  - Upgraded to Vite 8 and from unbuild to obuild (rolldown support)
+  - Upgraded other dependencies and devDependencies
+  - Upgraded github actions and added a typecheck action
+  - Created a `vue-component-library` example that includes a generator to create a large component library with a barrel export file so that we can later benchmark this plugin's performances against Vite 8.2.2's stable bundledDev option.
+
+  ## Tests
+  - Fixed some test that became flaky due to Vite 8 changes.
+    -->
+
+  ## Core
+  - Dropped CJS support, it is now ESM only.
+  - This plugin is now tested against Vite 8+ codebases, older Vite versions are not guaranteed to be supported.
+  - This plugin now uses `tinyglobby` instead of `fast-glob` to keep in line with Vite's [own switch](https://github.com/vitejs/vite/issues/18243).
+
+  ## Debugger
+  - Switched from shiki to codemirror to show code snipppets and diffs.
+  - Fixed some issues with diffs calculation.
+  - Fixed context's transforms propagation from ViteDevServer to debugger client.
+
+### Patch Changes
+
+- 69dd544: Preserve the local alias of named imports that cannot be resolved to a concrete file (e.g. symbols reached through an `export *` re-export chain). Previously the alias was dropped when such an import fell back to being left on the target entry, so `import { X as Y }` was rewritten to `import { X }` while the module body still referenced `Y` — producing an undefined reference, or a duplicate-identifier crash when another `X` binding existed in the same module.
+
 ## 0.5.2
 
 ### Patch Changes
