@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 import { useClassNames } from '@composables/useClassNames';
-import type { TransformDetailsProps } from '../Transform.types';
 import CodeBlockDiffs from '@components/CodeBlockDiffs/CodeBlockDiffs.vue';
+import type { TransformDetailsProps } from '../Transform.types';
 
 const $class = useClassNames('transform-diffs');
 const transformDetails = inject<TransformDetailsProps>('transform-details')!;
