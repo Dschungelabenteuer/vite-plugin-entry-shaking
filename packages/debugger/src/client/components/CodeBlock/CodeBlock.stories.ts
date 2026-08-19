@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3';
 
 import CodeBlock from './CodeBlock.vue';
 
-import { SimpleSource, SourceDiffFrom, SourceDiffTo } from './CodeBlock.mocks';
+import { SimpleSource } from './CodeBlock.mocks';
 import { paddingDecorator } from '$storybook/decorators';
 
 const meta = {
@@ -14,10 +14,9 @@ const meta = {
 
 type Story = StoryObj<typeof meta>;
 
-export const Simple: Story = { args: { source: SimpleSource, lang: 'rust' } };
-
-export const WithDiffs: Story = {
-  args: { source: SourceDiffFrom, target: SourceDiffTo, lang: 'ts' },
+export const Rust: Story = { args: { content: SimpleSource, language: 'rust', lineWrap: false } };
+export const Typescript: Story = {
+  args: { content: SimpleSource, language: 'javascript', lineWrap: true },
 };
 
 export default meta;
