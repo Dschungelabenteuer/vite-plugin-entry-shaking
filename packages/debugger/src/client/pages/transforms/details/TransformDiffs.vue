@@ -12,13 +12,18 @@ const transformDetails = inject<TransformDetailsProps>('transform-details')!;
   <Codeblock
     :id="transformDetails.absolutePath ?? ''"
     :class="$class()"
-    :source="transformDetails.transform?.source ?? ''"
-    :target="transformDetails.transform?.transformed ?? ''"
+    :from="transformDetails.transform?.source ?? ''"
+    :to="transformDetails.transform?.transformed ?? ''"
+    :diff="true"
+    :one-column="true"
+    :line-wrap="false"
+    :diff-panel-size="100"
   />
 </template>
 
-<style>
+<style scoped>
 .transform-diffs {
-  margin: var(--spacing-lg);
+  padding: var(--spacing-md);
+  padding-inline-start: calc(var(--spacing-md) + 1px);
 }
 </style>

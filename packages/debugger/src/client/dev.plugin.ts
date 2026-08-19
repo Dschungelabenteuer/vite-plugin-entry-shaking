@@ -21,7 +21,9 @@ const consumer: ConsumerPackageInfo = { name: 'vpes-debugger-with-mocks', versio
 function devPlugin() {
   return {
     name: 'vpes-client-dev-plugin',
-    configureServer({ ws }: ViteDevServer) {
+
+    configureServer({ ws, config }: ViteDevServer) {
+      console.log(config);
       ws.on(READY, () => {
         ws.send(
           READY,

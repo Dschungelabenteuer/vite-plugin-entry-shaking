@@ -1,14 +1,12 @@
-import type { ShikiTransformer, ThemeRegistrationAny } from 'shiki';
-
 export type CodeBlockProps = {
   /** Source code. */
-  source: string;
+  from: string;
   /** Target code when using diffs. */
-  target?: string;
-  /** Code language. */
-  lang?: string;
-  /** Shiki theme. */
-  theme?: ThemeRegistrationAny | string;
-  /** Shiki transformers. */
-  transformers?: ShikiTransformer[];
+  to: string;
+  /** Display diffs in a single column? */
+  oneColumn: boolean;
+  /** Enable diff feature? */
+  diff: boolean;
+  /** Wrap long lines?. */
+  lineWrap: boolean;
 };

@@ -5,25 +5,31 @@ import dev from './dev.plugin.ts';
 
 const outDir = '../../dist/client';
 
+const _ = (relPath: string) => fileURLToPath(new URL(relPath, import.meta.url));
+
 export default defineConfig({
   base: './',
   build: { outDir, emptyOutDir: true },
   plugins: [vue(), dev()],
+  devtools: { enabled: false },
   resolve: {
+    // still not resolving client-side as root !== client
+    tsconfigPaths: true,
     alias: {
-      $storybook: fileURLToPath(new URL('../../.storybook', import.meta.url)),
-      '#store': fileURLToPath(new URL('./store.ts', import.meta.url)),
-      '#utils': fileURLToPath(new URL('./utils.ts', import.meta.url)),
-      '#types': fileURLToPath(new URL('../../types.ts', import.meta.url)),
-      '#uitypes': fileURLToPath(new URL('./types.ts', import.meta.url)),
-      '@assets': fileURLToPath(new URL('./assets', import.meta.url)),
-      '@components': fileURLToPath(new URL('./components', import.meta.url)),
-      '@composables': fileURLToPath(new URL('./composables', import.meta.url)),
-      '@helpers': fileURLToPath(new URL('./helpers', import.meta.url)),
-      '@layout': fileURLToPath(new URL('./layout', import.meta.url)),
-      '@views': fileURLToPath(new URL('./views', import.meta.url)),
-      '@pages': fileURLToPath(new URL('./pages', import.meta.url)),
-      '@styles': fileURLToPath(new URL('./styles', import.meta.url)),
+      $storybook: _('../../.storybook'),
+      '#store': _('./store.ts'),
+      '#utils': _('./utils.ts'),
+      '#types': _('../../types.ts'),
+      '#uitypes': _('./types.ts'),
+      '@assets': _('./assets'),
+      '@components': _('./components'),
+      '@composables': _('./composables'),
+      '@helpers': _('./helpers'),
+      '@layout': _('./layout'),
+      '@views': _('./views'),
+      '@pages': _('./pages'),
+      '@styles': _('./styles'),
+      '@workers': _('./workers'),
     },
   },
   css: {
