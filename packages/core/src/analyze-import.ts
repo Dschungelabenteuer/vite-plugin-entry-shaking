@@ -23,7 +23,7 @@ const VITE_IGNORE_REGEX = /\/\*\s*@vite-ignore\s*\*\//;
  * @param startPosition Start position of the import statement.
  * @param endPosition End position of the import statement.
  */
-export async function analyzeImportStatement(
+async function analyzeImportStatement(
   ctx: Context,
   src: MagicString,
   code: string,
@@ -124,7 +124,7 @@ async function resolveImport(
  * @param name Name of the import.
  * @param alias Alias of the import.
  */
-export async function findNamedImport(
+async function findNamedImport(
   ctx: Context,
   entry: EntryData,
   entryPath: EntryPath,
@@ -156,7 +156,7 @@ export async function findNamedImport(
  * @param map _reference_ - Map of imports.
  * @param name Name of the import.
  */
-export async function findNamedWildcard(
+async function findNamedWildcard(
   ctx: Context,
   entry: EntryData,
   entryPath: EntryPath,
@@ -188,7 +188,7 @@ export async function findNamedWildcard(
  * @param name Name of the import.
  * @param alias Alias of the import.
  */
-export async function findDirectWildcardExports(
+async function findDirectWildcardExports(
   ctx: Context,
   entry: EntryData,
   entryPath: EntryPath,

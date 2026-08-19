@@ -9,7 +9,7 @@ export const extensions = ['js', 'mjs', 'ts', 'mts', 'jsx', 'tsx'];
 const ignorePatterns = [/node_modules/];
 
 /** Default plugin options. */
-export const defaultOptions: FinalPluginOptions = {
+const defaultOptions: FinalPluginOptions = {
   targets: [],
   extensions,
   ignorePatterns,

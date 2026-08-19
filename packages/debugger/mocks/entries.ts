@@ -59,7 +59,7 @@ function mockExports(): EntryExports {
   );
 }
 
-export let diagnosticsCount = 0;
+let diagnosticsCount = 0;
 
 export const entries: Context['entries'] = new Map(
   new Array(mockedEntryCount).fill(0).map((): [string, EntryData] => {

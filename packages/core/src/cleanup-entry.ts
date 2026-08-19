@@ -12,11 +12,7 @@ import type { EntryExports } from './types';
  * @param entryMap _reference_ - Map of entry's analyzed exports.
  * @param exps List of exports.
  */
-export function cleanupEntry(
-  rawEntry: string,
-  entryMap: EntryExports,
-  exps: readonly ExportSpecifier[]
-) {
+function cleanupEntry(rawEntry: string, entryMap: EntryExports, exps: readonly ExportSpecifier[]) {
   return methods.reformatRemainingExports(
     methods.removeEmptyExports(methods.removeResolvedExports(rawEntry, entryMap, exps))
   );
@@ -26,7 +22,7 @@ export function cleanupEntry(
  * Reformats remaining changed exports from updated entry file.
  * @param content Updated entry file content.
  */
-export function reformatRemainingExports(content: string) {
+function reformatRemainingExports(content: string) {
   return content.replace(/export {([^}]*)}/gm, (_, exps: string) => {
     const reformattedExport = exps
       .split(',')
@@ -50,7 +46,7 @@ const removeEmptyExports = (content: string) => content.replace(/(export {[^\w}]
  * @param entryMap _reference_ - Map of entry's analyzed exports.
  * @param exps List of exports.
  */
-export function removeResolvedExports(
+function removeResolvedExports(
   rawEntry: string,
   entryMap: EntryExports,
   exps: readonly ExportSpecifier[]
@@ -72,11 +68,12 @@ export function removeResolvedExports(
   return output.toString().replace(/(\w*\s+as\s+)([,}])/gm, '$2');
 }
 
-export const methods = {
+const methods = {
   cleanupEntry,
   reformatRemainingExports,
   removeEmptyExports,
   removeResolvedExports,
 };
 
+/** @alias */
 export default methods;

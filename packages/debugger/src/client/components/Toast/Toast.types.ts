@@ -1,7 +1,7 @@
 import type { useToaster } from './useToaster';
 
 /** Available Toast types. */
-export type ToastType = 'success' | 'warning' | 'error' | 'info' | 'loading';
+type ToastType = 'success' | 'warning' | 'error' | 'info' | 'loading';
 
 export type ToastProps = {
   /** Toast type. */

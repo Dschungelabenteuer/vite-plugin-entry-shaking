@@ -3,7 +3,7 @@ import type {
   PluginEntries,
   Diagnostic,
   PluginMetrics,
-  TransformData,
+  PluginTransforms,
   PluginOptions,
 } from 'vite-plugin-entry-shaking';
 
@@ -22,7 +22,7 @@ export interface ConsumerPackageInfo {
 }
 
 /** Channel status. */
-export type ChannelStatus =
+type ChannelStatus =
   /** When using the debugger on data whose source Vite server was disconnected. */
   | 'disconnected'
   /** When using the debugger on data whose source Vite is connected. */
@@ -50,7 +50,7 @@ export interface ChannelStore {
   /** Plugin diagnostics. */
   diagnostics: { list: Diagnostic[]; listPerPath: Map<string, number[]> };
   /** List of transforms. */
-  transforms: Map<string, TransformData>;
+  transforms: PluginTransforms;
   /** List of targets. */
   entries: PluginEntries;
   /** List of logs. */
@@ -60,34 +60,11 @@ export interface ChannelStore {
     diagnostics: Required<Exclude<PluginOptions['diagnostics'], boolean>>;
   };
   /** Channel status. */
-  status: 'disconnected' | 'connected' | 'connecting';
+  status: ChannelStatus;
 }
 
 /** Sort direction */
 export type SortDirection = 'asc' | 'desc';
-
-/**
- * Plugin channel messages.
- * This defines the types of all accepted messages between client and Vite server
- * through a common context instance.
- * */
-export interface ChannelMessages {
-  /**
-   * Increases plugin's process time by `time`ms.
-   * @param time Time (in ms) to add to the process time.
-   */
-  increaseProcessTime: (time: number) => void;
-  /**
-   * Registers a transformed file and its metrics.
-   * @param transform Transformed file data.
-   */
-  registerTransform: (transform: TransformData) => void;
-}
-
-/** Returns known keys of a given object type/interface. */
-export type KnownKeys<T> = {
-  -readonly [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K];
-};
 
 /** Paths to a file. */
 export type Paths = {
